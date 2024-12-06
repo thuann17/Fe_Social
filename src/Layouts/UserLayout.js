@@ -1,21 +1,25 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
-import ClientHeader from "../Components/user/header";
-function UserLayout() {
+import Header from "../Components/user/header";
+import RightSidebar from "../Components/user/rightsidebar";
+import PostList from "../Pages/user/Post/PostList";
+const UserLayout = () => {
   return (
-    <div>
+    <div className="bg-gray-100 min-h-screen">
       {/* Header */}
-      <ClientHeader />
+      <Header />
 
-      {/* Nội dung chính của mỗi trang, ví dụ Dashboard */}
-      <main>
-        <Outlet />
-      </main>
+      {/* Main Content */}
+      <div className="flex justify-center px-4 py-4">
+        {/* Post List (Center) */}
+        <div className="w-full max-w-3xl"> {/* Giới hạn chiều rộng của khu vực bài viết */}
+          <PostList />
+        </div>
 
-      {/* Footer */}
-      {/* <ClientFooter /> */}
+        {/* Right Sidebar */}
+        <RightSidebar />
+      </div>
     </div>
   );
-}
+};
 
 export default UserLayout;
