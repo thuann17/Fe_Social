@@ -8,20 +8,31 @@ import {
 } from "react-router-dom";
 
 import UserLayout from "./Layouts/UserLayout";
-import AdminLayout from "./Layouts/AdminLayout";
+import AdminLayout from "./Layouts/AdminLayout"; 
+import MyProfileLayout from "./Layouts/MyProfileLayout"; 
+import LoginForm from "./login";
+import RegisterForm from "./register";
+
 
 function App() {
-  const route = createBrowserRouter(
+  const router = createBrowserRouter(
     createRoutesFromElements(
       <>
-        {/* Định tuyến User */}
-        <Route path="/user">
-          <Route path="index" element={<UserLayout />} />
+        {/* User Routes */}
+        <Route path="/user" >
+          <Route path="index" element={<UserLayout />} /> {/* Redirect to UserLayout by default */}
+          <Route path="profile" element={<MyProfileLayout />} />
         </Route>
 
-        {/* Định tuyến Admin */}
+        {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
+          {/* Uncomment and define your Admin routes here */}
           {/* <Route path="dashboard" element={<AdminDashboard />} /> */}
+        </Route>
+
+        <Route>
+          <Route path="login" element={<LoginForm />} /> {/* Redirect to UserLayout by default */}
+          <Route path="register" element={<RegisterForm />} />
         </Route>
       </>
     )
@@ -29,7 +40,7 @@ function App() {
 
   return (
     <React.StrictMode>
-      <RouterProvider router={route} />
+      <RouterProvider router={router} />
     </React.StrictMode>
   );
 }

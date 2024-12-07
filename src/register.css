@@ -1,0 +1,89 @@
+/* Register.css */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif; /* Ensure to import this font in index.html or use Google Fonts */
+}
+
+.register-container {
+    display: flex;
+    max-width: 800px; /* Reduced max-width for a more compact layout */
+    height: 90vh; /* Adjusted height */
+    margin: auto;
+    background-color: #f0f0f0; /* Light background color */
+    border-radius: 10px; /* Slightly smaller rounded corners */
+    overflow: hidden; /* Prevent overflow */
+}
+
+.register-left {
+    flex: 1;
+    background-color: white; /* White background for the form */
+    padding: 20px; /* Reduced padding */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.register-left h1 {
+    margin-bottom: 15px; /* Reduced margin */
+    color: #311433; /* Dark text color */
+    font-size: 1.8em; /* Adjusted font size */
+}
+
+.register-left input {
+    margin-bottom: 10px; /* Reduced margin */
+    padding: 12px; /* Increased padding for better touch */
+    border: 2px solid #ddd; /* Thicker border for better visibility */
+    border-radius: 5px;
+    font-size: 0.9em; /* Slightly smaller font size */
+    width: calc(100% - 20px); /* Make input fields longer */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for focus effects */
+}
+
+.register-left input:focus {
+    border-color: #6c63ff; /* Change border color on focus */
+    box-shadow: 0 0 5px rgba(108, 99, 255, 0.5); /* Add shadow effect on focus */
+    outline: none; /* Remove default outline */
+}
+
+.register-left button {
+    padding: 10px; /* Reduced button padding */
+    background-color: #6c63ff; /* Button color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em; /* Slightly smaller font size */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.register-left button:hover {
+    background-color: #5a54d3; /* Darker button color on hover */
+}
+
+.register-left p {
+    margin-top: 15px; /* Reduced margin */
+    text-align: center;
+    font-size: 0.9em; /* Adjusted font size */
+}
+
+.register-right {
+    flex: 1;
+    background-image: url('https://static.vecteezy.com/system/resources/thumbnails/000/203/020/small_2x/T_17-01.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: white; /* Text color for the right side */
+    padding: 20px; /* Reduced padding */
+    text-align: center;
+}
+
+.register-right h1 {
+    font-size: 2em; /* Adjusted font size */
+    margin-bottom: 10px; /* Reduced margin */
+}
+
+.register-right p {
+    font-size: 1em; /* Adjusted font size */
+}
