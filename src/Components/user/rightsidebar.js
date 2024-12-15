@@ -20,7 +20,7 @@ const RightSidebar = () => {
     const suggestions = ["User1", "User2", "User3", "User4", "User5", "User6"];
 
     return (
-        <aside className="fixed top-16 right-0 w-72 h-[calc(100vh-4rem)] bg-white shadow-lg border-l border-gray-200 p-4">
+        <aside className="w-64 h-screen bg-white shadow-lg p-4">
             {/* Suggestions Section */}
             <div className="mb-7">
                 <h3 className="font-semibold text-lg mb-2">Yêu cầu kết bạn</h3>

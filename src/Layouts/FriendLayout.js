@@ -2,10 +2,11 @@ import React from "react";
 import Header from "../Components/user/header";
 import RightSidebar from "../Components/user/rightsidebar";
 import LeftSidebar from "../Components/user/leftsidebar";
-import PostList from "../Pages/user/Post/PostList";
-import Posting from "../Pages/user/Post/Posting";
+import FriendRequestList from "../Pages/user/Friend/FriendRequestList";
+import FriendTipList from "../Pages/user/Friend/FriendTipList";
+import "./FriendLayout.css";
 
-const UserLayout = () => {
+const FriendLayout = () => {
   return (
     <div className="bg-gray-100 min-h-screen">
       {/* Header */}
@@ -19,25 +20,20 @@ const UserLayout = () => {
         </div>
 
         {/* Main Content (Center - Post and PostList) */}
-        <div className="flex-grow max-w-3xl mx-4 mb-4">
+        <div className="flex-grow mx-4 mb-4">
           <div className="mt-4 mb-6">
-            {/* Posting Section */}
-            <Posting />
+            {/* FriendList */}
+            <FriendRequestList />
           </div>
 
-          <div>
-            {/* Post List Section */}
-            <PostList />
+          <div className="mt-4 mb-6">
+            {/* FriendTipList */}
+            <FriendTipList />
           </div>
-        </div>
-
-        {/* Right Sidebar (mobile - hidden, desktop - shown) */}
-        <div className="w-full md:w-64 mb-4 md:mb-0 hidden md:block">
-          <RightSidebar />
         </div>
       </div>
     </div>
   );
 };
 
-export default UserLayout;
+export default FriendLayout;

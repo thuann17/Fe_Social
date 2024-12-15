@@ -10,8 +10,10 @@ import {
 import UserLayout from "./Layouts/UserLayout";
 import AdminLayout from "./Layouts/AdminLayout"; 
 import MyProfileLayout from "./Layouts/MyProfileLayout"; 
+import FriendLayout from "./Layouts/FriendLayout"; 
 import LoginForm from "./login";
 import RegisterForm from "./register";
+
 
 
 function App() {
@@ -22,6 +24,7 @@ function App() {
         <Route path="/user" >
           <Route path="index" element={<UserLayout />} /> {/* Redirect to UserLayout by default */}
           <Route path="profile" element={<MyProfileLayout />} />
+          <Route path="friends" element={<FriendLayout />} />
         </Route>
 
         {/* Admin Routes */}

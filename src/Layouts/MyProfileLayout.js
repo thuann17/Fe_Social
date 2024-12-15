@@ -13,16 +13,15 @@ const MyProfileLayout = () => {
           <Header />
     
           {/* Main Content */}
-          <div className="flex justify-between px-4 py-4">
-            {/* Left Sidebar */}
-            <div className="w-64"> {/* Fixed width for Left Sidebar */}
+          <div className="flex flex-col md:flex-row px-4 py-4">
+            {/* Left Sidebar (mobile - hidden, desktop - shown) */}
+            <div className="w-full md:w-64 mb-4 md:mb-0 hidden md:block"> 
               <LeftSidebar />
             </div>
     
             {/* Post List (Center) */}
-            <div className="flex-grow max-w-3xl mx-4"> {/* Center area for posts */}
+            <div className="flex-grow max-w-3xl mx-4 mb-4">
                 <div className="mt-12 mb-2"> {/* Add margin to push MyProfile down and margin-bottom for spacing */}
-                   
                     <MyProfile />
                 </div>
                 <div>
@@ -32,8 +31,9 @@ const MyProfileLayout = () => {
                     <PostList />
                 </div>
             </div>
-            {/* Right Sidebar */}
-            <div className="w-64"> {/* Fixed width for Right Sidebar */}
+    
+            {/* Right Sidebar (mobile - hidden, desktop - shown) */}
+            <div className="w-full md:w-64 mb-4 md:mb-0 hidden md:block"> 
               <RightSidebar />
             </div>
           </div>

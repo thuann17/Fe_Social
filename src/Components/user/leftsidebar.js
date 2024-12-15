@@ -1,5 +1,5 @@
 import React from "react";
-import { FaUserFriends, FaUsers, FaStore, FaVideo, FaClock, FaGamepad, FaImages, FaEnvelope } from "react-icons/fa";
+import { FaUserFriends, FaUsers, FaVideo, FaClock, FaEnvelope } from "react-icons/fa";
 
 const Sidebar = () => {
     const mainSections = [
@@ -14,11 +14,14 @@ const Sidebar = () => {
     ];
 
     return (
-        <aside className="w-64 h-screen bg-white shadow-lg p-4">
+        <aside className="w-64 h-auto bg-white shadow-lg p-4">
             {/* Main Sections */}
             <div className="mb-6">
                 {mainSections.map((section, index) => (
-                    <div key={index} className="flex items-center p-2 hover:bg-gray-100 transition duration-200">
+                    <div
+                        key={index}
+                        className="flex items-center p-2 hover:bg-gray-100 transition duration-200 rounded-lg"
+                    >
                         <span className="text-xl mr-2">{section.icon}</span>
                         <span className="font-medium">{section.name}</span>
                     </div>
@@ -29,7 +32,10 @@ const Sidebar = () => {
             <div>
                 <h3 className="font-semibold mb-2">Khoảnh khắc</h3>
                 {yourMomentsSections.map((section, index) => (
-                    <div key={index} className="flex items-center p-2 hover:bg-gray-100 transition duration-200">
+                    <div
+                        key={index}
+                        className="flex items-center p-2 hover:bg-gray-100 transition duration-200 rounded-lg"
+                    >
                         <span className="text-xl mr-2">{section.icon}</span>
                         <span className="font-medium">{section.name}</span>
                     </div>

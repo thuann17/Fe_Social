@@ -1,13 +1,13 @@
 
-body {
+.login-wrapper{
     display: flex;
     justify-content: center; 
     align-items: center;
     height: 100vh; 
     margin: 0; 
     background-color: #d7bfef; 
-   font-family: Playfair Display, serif;
-}
+    font-family: Playfair Display, serif;
+}  
 
 .login-container {
     max-width: 800px;
@@ -20,12 +20,12 @@ body {
 }
 
 .login-title h2 {
-    color: #311433; /* Set the desired color */
-    font-size: 2.5em; /* Emphasized font size */
-    margin-bottom: 20px; /* Maintain bottom margin */
-    font-weight: 700; /* Bold text */
-    letter-spacing: 1px; /* Add some space between letters */
-    text-transform: uppercase; /* Make text uppercase for emphasis */
+    color: #311433;  
+    font-size: 2.5em; 
+    margin-bottom: 20px; 
+    font-weight: 700;  
+    letter-spacing: 1px;  
+    text-transform: uppercase; 
 }
 
 .login-left {
@@ -124,14 +124,98 @@ body {
 }
 
 /* Responsive adjustments */
+/* Responsive adjustments for mobile */
 @media (max-width: 768px) {
     .login-container {
         flex-direction: column; 
-        width: 100%; 
-        border-radius: 0; 
+        width: 90%; /* Thu hẹp container để phù hợp màn hình nhỏ */
+        margin: 0 auto; /* Căn giữa */
+        border-radius: 10px; /* Bo tròn nhẹ cho thẩm mỹ */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Nhẹ nhàng hơn trên mobile */
     }
-    .login-left,
+
+    .login-left {
+        padding: 20px; /* Giảm padding */
+        text-align: center; 
+        height: auto; /* Tự động điều chỉnh chiều cao */
+    }
+
+    .login-left h1 {
+        font-size: 2em; /* Giảm kích thước tiêu đề */
+        margin-bottom: 15px;
+    }
+
+    .login-description {
+        font-size: 1em; /* Văn bản nhỏ hơn */
+        margin-bottom: 20px;
+    }
+
+    .register-button {
+        font-size: 1em; /* Thu nhỏ nút */
+        padding: 10px 20px;
+    }
+
     .login-right {
-        flex: 0 0 100%;
+        padding: 20px; /* Giảm padding */
+        border-left: none; /* Xóa border ngăn cách bên trái */
+        border-top: 1px solid #ddd; /* Thêm border ngăn cách phía trên */
+    }
+
+    .login-right h2 {
+        font-size: 1.8em; /* Giảm kích thước tiêu đề */
+        margin-bottom: 15px;
+    }
+
+    .login-right input {
+        font-size: 0.9em; /* Giảm kích thước input */
+        padding: 12px; /* Giảm padding */
+    }
+
+    .login-right button {
+        font-size: 1em; /* Thu nhỏ nút */
+        padding: 12px 25px;
+    }
+
+    .error-message {
+        font-size: 0.9em; /* Văn bản nhỏ hơn */
+        text-align: center; /* Canh giữa cho dễ nhìn */
+    }
+}
+
+/* Cải tiến thêm cho thiết bị rất nhỏ (màn hình dưới 480px) */
+@media (max-width: 480px) {
+    .login-container {
+        width: 95%; /* Tăng chiều rộng container để vừa khung */
+    }
+
+    .login-left {
+        height: 200px; /* Giới hạn chiều cao hình ảnh */
+        background-size: cover; /* Điều chỉnh hình ảnh */
+    }
+
+    .login-left h1 {
+        font-size: 1.8em; /* Thu nhỏ tiêu đề */
+    }
+
+    .login-description {
+        font-size: 0.9em;
+    }
+
+    .login-right {
+        padding: 15px; /* Giảm padding */
+    }
+
+    .login-right h2 {
+        font-size: 1.5em; /* Thu nhỏ tiêu đề */
+    }
+
+    .login-right input {
+        padding: 10px;
+        font-size: 0.85em;
+    }
+
+    .login-right button {
+        font-size: 0.9em;
+        padding: 10px 20px;
     }
 }
