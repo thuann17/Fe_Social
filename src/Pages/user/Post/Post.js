@@ -45,10 +45,10 @@ const Post = ({ post }) => {
       {/* Like, Share */}
       <div className="post-actions mt-4 flex justify-between items-center">
         <button onClick={handleLike} className={`hover:text-blue-500 ${isLiked ? "font-bold" : ""}`}>
-          {isLiked ? "💖 Like" : "👍 Like"} {likes}
+          {isLiked ? "💖 Thích" : "👍 Thích"} {likes}
         </button>
         <button onClick={handleShare} className="hover:text-green-600">
-          🔗 Share
+          🔗 Chia sẻ
         </button>
       </div>
 
@@ -62,13 +62,13 @@ const Post = ({ post }) => {
         <div className="add-comment mt-2 flex items-center">
           <input
             type="text"
-            placeholder="Write a comment..."
+            placeholder="Bình luận..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             className="border rounded p-2 w-full"
           />
           <button onClick={handleComment} className="ml-2 bg-blue-500 text-white px-4 rounded-lg">
-            Post
+            Đăng
           </button>
         </div>
       </div>

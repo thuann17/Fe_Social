@@ -11,22 +11,28 @@ import {
 
 // Các Layouts và Pages
 import UserLayout from "./Layouts/UserLayout";
-import AdminLayout from "./Layouts/AdminLayout";
 import TripPlanner from "./Pages/user/Trip/TripPlanner";
 import TripStart from "./Pages/user/Trip/TripStart";
 import Login from "./Pages/login/login";
 import ForgotPassword from "./Pages/login/ForgotPassword";
-import Chat from './Pages/user/Chat/Chat'
+import Chat from './Pages/user/Chat/Chat';
+import AdminLayout from "./Layouts/AdminLayout";
+import MyProfileLayout from "./Layouts/MyProfileLayout";
+import FriendLayout from "./Layouts/FriendLayout";
+import RegisterForm from "./register"; // Removed duplicate LoginForm import
+
 function App() {
-  const route = createBrowserRouter(
+  // Define the router object
+  const router = createBrowserRouter(
     createRoutesFromElements(
       <>
-
         {/* Định tuyến User */}
-        <Route path="/user" element={<UserLayout />} >
+        <Route path="/user" element={<UserLayout />}>
           <Route path="index" />
           <Route path="cal" element={<TripPlanner />} />
           <Route path="start" element={<TripStart />} />
+          <Route path="profile" element={<MyProfileLayout />} />
+          <Route path="friends" element={<FriendLayout />} />
         </Route>
 
         {/* Định tuyến Admin */}
@@ -34,10 +40,15 @@ function App() {
           <Route path="dashboard" element={<AdminLayout />} />
         </Route>
 
-        {/* Định tuyến cho Login và ForgotPassword */}
+        {/* Định tuyến cho Login và Forgot Password */}
         <Route path="/login" element={<Login />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/chat" element={<Chat />} />
+
+        {/* Định tuyến cho Register */}
+        <Route path="/register" element={<RegisterForm />} />
+
+        {/* Chỉnh lại cấu trúc sao cho các Route không trùng lặp */}
       </>
     )
   );
@@ -45,7 +56,7 @@ function App() {
   return (
     <React.StrictMode>
       <DndProvider backend={HTML5Backend}>
-        <RouterProvider router={route} />
+        <RouterProvider router={router} />
       </DndProvider>
     </React.StrictMode>
   );

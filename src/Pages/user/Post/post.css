@@ -1,39 +1,76 @@
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
+
+/* PostList Styling */
+.post-list {
+  @apply w-full max-w-[710px] mx-auto p-1; /* Centered post list, max width 700px */
 }
 
+/* Post Styling */
 .post {
-  transition: transform 0.3s ease, box-shadow 0.5s;
-  background: #fff;
+  @apply bg-white shadow-md rounded-lg p-6 mb-8; /* Subtle shadow */
 }
 
-/* .post:hover {
-  transform-origin: top;
-  transform: scale(1.05);
-  box-shadow: 0px 0px 20px rgba(0, 0, 255, 0.4);
-} */
-
-.post-header img {
-  object-fit: cover;
+.post-header {
+  @apply flex items-center mb-4;
 }
 
-.post-content p {
-  font-size: 16px;
-  line-height: 1.5;
+.post-avatar {
+  @apply rounded-full w-12 h-12 mr-4; /* Increased spacing */
 }
 
-.post-actions button {
-  padding: 8px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-weight: bold;
+.post-username {
+  @apply font-medium text-lg; /* Slightly larger font size */
 }
 
-.comments div {
-  background: #e8f7fa;
-  padding: 8px;
-  margin-top: 4px;
-  border-radius: 12px;
+.post-timestamp {
+  @apply text-gray-500 text-sm;
+}
+
+.post-content {
+  @apply mt-4 text-gray-700; /* Darker text color */
+}
+
+.post-image,
+.post-video {
+  @apply rounded-lg mt-2 w-full;
+}
+
+.post-actions {
+  @apply mt-6 flex justify-between items-center; /* Increased spacing */
+}
+
+.post-action {
+  @apply hover:text-blue-600; /* Darker blue on hover */
+  @apply text-blue-500; /* Default blue */
+}
+
+.comments {
+  @apply mt-4;
+}
+
+.add-comment {
+  @apply mt-2 flex items-center;
+}
+
+.add-comment input {
+  @apply border rounded p-2 w-full mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500; /* Focus styling */
+}
+
+.add-comment button {
+  @apply bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700; /* Darker blue on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .post-header {
+      @apply flex-col items-start; /* Stack avatar and username vertically */
+  }
+  .post-avatar {
+      @apply mb-2;
+  }
+  .post-actions {
+      @apply flex-col items-start; /* Stack actions vertically */
+  }
+  .post-action {
+      @apply mb-2;
+  }
 }

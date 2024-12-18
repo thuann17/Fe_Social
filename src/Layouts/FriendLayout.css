@@ -1,0 +1,17 @@
+.friend-layout {
+    background-color: #242526;
+    min-height: 100vh;
+    padding: 20px;
+    color: white;
+  }
+  
+  .friend-layout .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .friend-layout h1 {
+    font-size: 28px;
+    margin: 0;
+    color: #e4e6eb;
+  }
