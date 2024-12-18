@@ -17,9 +17,10 @@ import Login from "./Pages/login/login";
 import ForgotPassword from "./Pages/login/ForgotPassword";
 import Chat from './Pages/user/Chat/Chat';
 import AdminLayout from "./Layouts/AdminLayout";
-import MyProfileLayout from "./Layouts/MyProfileLayout";
-import FriendLayout from "./Layouts/FriendLayout";
-import RegisterForm from "./register"; // Removed duplicate LoginForm import
+import MyProfileLayout from "./Pages/user/Profile/MyProfileLayout";
+import FriendLayout from "./Pages/user/Friend/FriendLayout";
+import RegisterForm from "./Pages/login/register";
+import PostList from "./Pages/user/Post/PostList";
 
 function App() {
   // Define the router object
@@ -28,7 +29,7 @@ function App() {
       <>
         {/* Định tuyến User */}
         <Route path="/user" element={<UserLayout />}>
-          <Route path="index" />
+          <Route path="index" element={<PostList></PostList>} />
           <Route path="cal" element={<TripPlanner />} />
           <Route path="start" element={<TripStart />} />
           <Route path="profile" element={<MyProfileLayout />} />

@@ -1,10 +1,10 @@
 import React from "react"; 
-import Header from "../Components/user/header"; 
-import MyProfile from "../Pages/user/Profile/MyProfile"; 
-import PostList from "../Pages/user/Post/PostList"; 
-import LeftSidebar from "../Components/user/leftsidebar"; 
-import RightSidebar from "../Components/user/rightsidebar"; 
-import Posting from "../Pages/user/Post/Posting"; 
+import Header from "../../../Components/user/header"; 
+import MyProfile from "./MyProfile"; 
+import PostList from "../Post/PostList"; 
+import LeftSidebar from "../../../Components/user/leftsidebar"; 
+import RightSidebar from "../../../Components/user/rightsidebar"; 
+import Posting from "../Post/Posting"; 
 
 const MyProfileLayout = () => { 
     return (
