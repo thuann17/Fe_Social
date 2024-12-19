@@ -19,7 +19,7 @@ import Chat from './Pages/user/Chat/Chat';
 import AdminLayout from "./Layouts/AdminLayout";
 import MyProfileLayout from "./Layouts/MyProfileLayout";
 import FriendLayout from "./Layouts/FriendLayout";
-import RegisterForm from "./register"; // Removed duplicate LoginForm import
+import RegisterForm from "./Pages/register/register";
 
 function App() {
   // Define the router object
@@ -27,8 +27,8 @@ function App() {
     createRoutesFromElements(
       <>
         {/* Định tuyến User */}
-        <Route path="/user" element={<UserLayout />}>
-          <Route path="index" />
+        <Route path="/user">
+          <Route path="index" element={<UserLayout />}/>
           <Route path="cal" element={<TripPlanner />} />
           <Route path="start" element={<TripStart />} />
           <Route path="profile" element={<MyProfileLayout />} />

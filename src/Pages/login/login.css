@@ -1,0 +1,149 @@
+/* Gradient Animation Keyframes */
+@keyframes gradientAnimation {
+    0% {
+      background: linear-gradient(to right, #e0c3fc, #8ec5fc);
+    }
+    25% {
+      background-color: #8ec5fc;
+    }
+    50% {
+      background: linear-gradient(to right, #8ec5fc, #e0c3fc);
+    }
+    75% {
+      background-color: #fc8ec5;
+    }
+    100% {
+      background: linear-gradient(to right, #e0c3fc, #8ec5fc);
+    }
+  }
+  
+ 
+  .login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    animation: gradientAnimation 5s infinite;
+    background-size: 200% 200%;
+  }
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1); /* Lớp phủ trắng mờ */
+}
+
+.login-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 10px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.login-left {
+    background: url('https://static.vecteezy.com/system/resources/thumbnails/000/203/020/small_2x/T_17-01.jpg') no-repeat center center / cover;
+    color: white;
+    padding: 20px;
+    border-radius: 10px 10px 0 0;
+    text-align: center;
+}
+
+.login-title h2 {
+    margin: 0;
+    font-size: 35px;
+}
+
+.login-description {
+    font-size: 15px;
+    margin: 10px 0;
+}
+
+.register-button {
+    background-color: #2a2043;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.register-button:hover {
+    background-color: #0056b3;
+}
+
+.login-right {
+    padding: 30px;
+}
+
+.login-right h2 {
+    font-size: 28px;
+}
+
+.image-container {
+    margin-left: 20px;
+}
+
+form input {
+    width: 100%;
+    padding: 13px;
+    margin: 13px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+}
+
+form input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+form button:hover {
+    background-color: #218838;
+}
+
+@media (min-width: 768px) {
+    .login-container {
+        flex-direction: row;
+    }
+
+    .login-left,
+    .login-right {
+        width: 50%;
+        padding: 30px;
+    }
+}
+
+@media (max-width: 767px) {
+    .login-left {
+        display: none;
+    }
+}

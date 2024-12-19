@@ -20,12 +20,12 @@ const PostInput = () => {
         className="w-full mt-4 p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
         rows={3}
       />
-      <div className="flex justify-between items-center mt-4">
-        <div className="flex space-x-4">
+      <div className="flex flex-col md:flex-row justify-between items-center mt-4">
+        <div className="flex space-x-4 mb-4 md:mb-0">
           <button className="flex items-center bg-gray-200 p-2 rounded-lg hover:bg-gray-300 transition duration-200">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-blue-500"  // Color for the icon
+              className="h-5 w-5 text-blue-500"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -42,7 +42,7 @@ const PostInput = () => {
           <button className="flex items-center bg-gray-200 p-2 rounded-lg hover:bg-gray-300 transition duration-200">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-green-500"  // Color for the icon
+              className="h-5 w-5 text-green-500"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -59,7 +59,7 @@ const PostInput = () => {
           <button className="flex items-center bg-gray-200 p-2 rounded-lg hover:bg-gray-300 transition duration-200">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-purple-500"  // Color for the icon
+              className="h-5 w-5 text-purple-500"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -71,11 +71,11 @@ const PostInput = () => {
                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
               />
             </svg>
-            <span className="ml-2 font-medium">Gắn thẻ bạn bè</span>
+            <span className="ml-2 font-medium">Gắn thẻ</span>
           </button>
         </div>
-        <button className="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200">
-          Share
+        <button className="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 w-full md:w-auto">
+          Đăng
         </button>
       </div>
     </div>

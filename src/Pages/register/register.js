@@ -1,16 +1,17 @@
 import React from "react";
-import "./register.css"; // Ensure this CSS file exists.
+import "./register.css";
 
 const RegisterForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission logic here
   };
 
   return (
-    <div class="register-wrapper">
+    <div className="register-wrapper">
       <div className="register-container">
         <div className="register-left">
+          {/* Mobile Header */}
+          <div className="mobile-header">Đăng ký</div>
           <form onSubmit={handleSubmit}>
             <label>
               Tên tài khoản
@@ -24,14 +25,16 @@ const RegisterForm = () => {
               Mật khẩu
               <input type="password" placeholder="Mật khẩu" required />
             </label>
-            <label>
-              Họ
-              <input type="text" placeholder="Họ" required />
-            </label>
-            <label>
-              Tên
-              <input type="text" placeholder="Tên" required />
-            </label>
+            <div className="name-fields">
+              <label>
+                Họ
+                <input type="text" placeholder="Họ" required />
+              </label>
+              <label>
+                Tên
+                <input type="text" placeholder="Tên" required />
+              </label>
+            </div>
             <button type="submit">Đăng ký</button>
           </form>
           <p>
@@ -42,11 +45,15 @@ const RegisterForm = () => {
           </p>
         </div>
         <div className="register-right">
-            <h1 style={{ color: "white" }}> ĐĂNG KÝ </h1>
-          <h1 style={{ color: "#311433" }}>FShark Social Media</h1>
+          <div className="image-container">
+            <img className="logo" src="logoreback.png" alt="Buckety" />
+          </div>
+          <h1 style={{ color: "#311433" }}>
+            <b>ĐĂNG KÝ</b>
+          </h1>
           <p>
             FShark là nền tảng mạng xã hội du lịch đầu tiên tại Việt Nam. Nơi
-            lưu giữ và chia sẽ những chuyến đi và hành trình tuyệt vời của bạn.
+            lưu giữ và chia sẻ những chuyến đi và hành trình tuyệt vời của bạn.
           </p>
         </div>
       </div>

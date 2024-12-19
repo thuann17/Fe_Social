@@ -15,6 +15,15 @@ const Sidebar = () => {
 
     return (
         <aside className="w-64 h-auto bg-white shadow-lg p-4">
+            {/* Logo */}
+            <div className="flex justify-center mb-4">
+                <img 
+                    src="/logoreback.png" // Change to your logo path
+                    alt="Logo"
+                    className="h-16 w-auto" // Adjust size as needed
+                />
+            </div>
+
             {/* Main Sections */}
             <div className="mb-6">
                 {mainSections.map((section, index) => (
