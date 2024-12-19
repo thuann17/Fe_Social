@@ -2,10 +2,10 @@ import { Disclosure, Menu } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 const navigation = [
-  { name: "Trang chủ", href: "#", current: true },
-  { name: "Lịch trình", href: "#", current: false },
-  { name: "Bạn bè", href: "#", current: false },
-  { name: "Trang cá nhân", href: "#", current: false },
+  { name: "Trang chủ", href: "index", current: true },
+  { name: "Lịch trình", href: "cal", current: false },
+  { name: "Bạn bè", href: "friends", current: false },
+  { name: "Trang cá nhân", href: "profile", current: false },
 ];
 
 function classNames(...classes) {
