@@ -1,7 +1,14 @@
-const API_URL = "http://localhost:8080/api"; 
+const API_URL = "http://localhost:8080/api";
 
 // Function để đăng nhập
 export const login = async (username, password, remember) => {
+  const token = localStorage.getItem('token');
+  fetch('api/endpoint', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+
   try {
     const response = await fetch(`${API_URL}/login`, {
       method: "POST",

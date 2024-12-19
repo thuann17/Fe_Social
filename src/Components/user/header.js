@@ -1,6 +1,6 @@
 import { Disclosure, Menu } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
-
+import { useNavigate } from "react-router-dom";
 const navigation = [
   { name: "Trang chủ", href: "#", current: true },
   { name: "Lịch trình", href: "#", current: false },
@@ -12,7 +12,16 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
+
+
 export default function Example() {
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/login");
+  };
   return (
     <Disclosure as="nav" className="bg-gray-800 sticky top-0 z-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -144,15 +153,15 @@ export default function Example() {
                 </Menu.Item>
                 <Menu.Item>
                   {({ active }) => (
-                    <a
-                      href="#"
+                    <button
+                      onClick={handleSignOut}
                       className={classNames(
                         active ? "bg-gray-100" : "",
                         "block px-4 py-2 text-sm text-gray-700"
                       )}
                     >
                       Sign out
-                    </a>
+                    </button>
                   )}
                 </Menu.Item>
               </Menu.Items>
