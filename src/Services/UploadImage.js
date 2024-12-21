@@ -25,7 +25,7 @@ function UploadImage() {
         setUploading(true);
 
         // Create a reference to the Firebase Storage location
-        const storageRef = ref(storage, `ThuanImage/${image.name}`);  // Use the modular `ref` function
+        const storageRef = ref(storage, `Images/${image.name}`);  // Use the modular `ref` function
 
         // Upload the image
         uploadBytes(storageRef, image).then((snapshot) => {
@@ -55,7 +55,7 @@ function UploadImage() {
         }
 
         // Get a reference to the file to delete
-        const imageRef = ref(storage, `ThuanImage/${imageName}`);
+        const imageRef = ref(storage, `Images/${imageName}`);
 
         // Delete the file
         deleteObject(imageRef).then(() => {
