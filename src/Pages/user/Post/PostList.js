@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Post from "./Post";
+import PostInput from "./Posting";
 
 const PostList = () => {
     const [posts, setPosts] = useState([
@@ -29,12 +30,14 @@ const PostList = () => {
         }
     ]);
 
-    return (
+    return (<>
+        <PostInput></PostInput>
         <div className="post-list space-y-8">
             {posts.map((post) => (
                 <Post key={post.id} post={post} />
             ))}
         </div>
+    </>
     );
 };
 

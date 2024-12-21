@@ -28,7 +28,6 @@ const Post = ({ post }) => {
 
   return (
     <div className="mt-6 post bg-white shadow-lg rounded-lg p-6 mb-6 transform transition-transform">
-      {/* Header */}
       <div className="post-header flex items-center mb-4">
         <img src={post.userAvatar} alt="Avatar" className="rounded-full w-12 h-12 mr-3" />
         <div>

@@ -1,9 +1,9 @@
 import React from "react";
-import Header from "../Components/user/header";
-import RightSidebar from "../Components/user/rightsidebar";
-import LeftSidebar from "../Components/user/leftsidebar";
-import FriendRequestList from "../Pages/user/Friend/FriendRequestList";
-import FriendTipList from "../Pages/user/Friend/FriendTipList";
+import Header from "../../../Components/user/header";
+import RightSidebar from "../../../Components/user/rightsidebar";
+import LeftSidebar from "../../../Components/user/leftsidebar";
+import FriendRequestList from "./FriendRequestList";
+import FriendTipList from "./FriendTipList";
 import "./FriendLayout.css";
 
 const FriendLayout = () => {

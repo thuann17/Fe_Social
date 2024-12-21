@@ -1,0 +1,176 @@
+/* General styles */
+.register-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #d7bfef;
+    font-family: 'Poppins', sans-serif;
+}
+
+.register-container {
+    display: flex;
+    max-width: 800px;
+    height: 90vh;
+    margin: auto;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.register-left {
+    flex: 1;
+    background-color: white;
+    padding: 30px; /* Slightly larger padding for better spacing */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.register-left h1 {
+    margin-bottom: 20px;
+    color: #311433;
+    font-size: 1.8em;
+    text-align: center;
+}
+
+.register-left input {
+    margin-bottom: 15px;
+    padding: 14px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9em;
+    width: 100%;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.register-left input:focus {
+    border-color: #6c63ff;
+    box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
+    outline: none;
+}
+
+.register-left button {
+    padding: 12px;
+    background-color: #6c63ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    width: 100%;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.register-left button:hover {
+    background-color: #5a54d3;
+    transform: scale(1.02); /* Slight zoom effect */
+}
+
+.register-left p {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.register-right {
+    flex: 1;
+    background-image: url('https://static.vecteezy.com/system/resources/thumbnails/000/203/020/small_2x/T_17-01.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.register-right h1 {
+    font-size: 2em;
+    margin-bottom: 15px;
+}
+
+.register-right p {
+    font-size: 1.1em;
+    line-height: 1.5em;
+}
+
+/* Responsive styles */
+
+/* For tablets and smaller screens */
+@media (max-width: 768px) {
+    .register-wrapper {
+        height: 100%;
+    }
+
+    .register-container {
+        flex-direction: column;
+        height: 100vh;
+        max-width: 90%; /* Shrink width for smaller screens */
+        margin: 20px;
+    }
+
+    .register-left,
+    .register-right {
+        flex: 0 0 auto;
+        width: 100%;
+        padding: 20px;
+    }
+
+    .register-right {
+        background-size: cover; /* Adjust image to fit better */
+        padding: 20px;
+    }
+
+    .register-left button {
+        width: 100%;
+    }
+
+    .register-left input {
+        width: 100%;
+    }
+
+    .register-left h1,
+    .register-right h1 {
+        font-size: 1.6em;
+    }
+}
+
+/* For mobile phones */
+@media (max-width: 480px) {
+    .register-left h1,
+    .register-right h1 {
+        font-size: 1.4em;
+    }
+
+    .register-left input {
+        padding: 10px;
+        font-size: 0.85em;
+    }
+
+    .register-left button {
+        padding: 10px;
+        font-size: 0.85em;
+        border-radius: 6px; /* Slightly reduced border-radius */
+    }
+
+    .register-right p {
+        font-size: 1em;
+        line-height: 1.4em;
+    }
+
+    .register-left p {
+        font-size: 0.8em;
+        color: #666; /* Subtle text color for better readability */
+    }
+
+    .register-container {
+        border-radius: 8px;
+    }
+}

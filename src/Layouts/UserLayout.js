@@ -2,8 +2,7 @@ import React from "react";
 import Header from "../Components/user/header";
 import RightSidebar from "../Components/user/rightsidebar";
 import LeftSidebar from "../Components/user/leftsidebar";
-import PostList from "../Pages/user/Post/PostList";
-import Posting from "../Pages/user/Post/Posting";
+import { Outlet } from "react-router-dom";
 
 const UserLayout = () => {
   const animatedBackgroundStyle = {
@@ -30,32 +29,18 @@ const UserLayout = () => {
   document.head.appendChild(styleTag);
 
   return (
-    <div style={animatedBackgroundStyle}>
-      {/* Header */}
+    <div className="bg-gray-100 min-h-screen">
       <Header />
-      
-      {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar (visible only on desktop) */}
-        <div className="hidden md:block w-64 bg-white shadow-md fixed h-full">
+      <div className="flex px-4 py-4 relative">
+        <div className="w-64 hidden md:block fixed left-0 top-0 pt-16 h-screen overflow-auto bg-white shadow-md">
           <LeftSidebar />
         </div>
-
-        {/* Center Content */}
-        <div className="flex-grow mx-4 md:mx-0 md:ml-64 md:mr-64 overflow-auto">
-          <div className="mt-4 mb-6">
-            {/* Posting Section */}
-            <Posting />
-          </div>
-
-          <div>
-            {/* Post List Section */}
-            <PostList />
+        <div className="flex-grow max-w-3xl mx-auto mt-16">
+          <div className="mb-6">
+            <Outlet></Outlet>
           </div>
         </div>
-
-        {/* Right Sidebar (visible only on desktop) */}
-        <div className="hidden md:block w-64 bg-white shadow-md fixed h-full right-0">
+        <div className="w-64 hidden md:block fixed right-0 top-0 pt-16 h-screen overflow-auto bg-white shadow-md">
           <RightSidebar />
         </div>
       </div>
