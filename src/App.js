@@ -12,7 +12,7 @@ import {
 // Các Layouts và Pages
 import UserLayout from "./Layouts/UserLayout";
 import TripPlanner from "./Pages/user/Trip/TripPlanner";
-import TripStart from "./Pages/user/Trip/TripStart";
+// import TripStart from "./Pages/user/Trip/TripStart";
 import Login from "./Pages/login/login";
 import ForgotPassword from "./Pages/login/ForgotPassword";
 import Chat from './Pages/user/Chat/Chat';
@@ -21,6 +21,7 @@ import MyProfileLayout from "./Pages/user/Profile/MyProfileLayout";
 import FriendLayout from "./Pages/user/Friend/FriendLayout";
 import RegisterForm from "./Pages/login/register";
 import PostList from "./Pages/user/Post/PostList";
+import UploadImage from "./Services/UploadImage";
 
 function App() {
   // Define the router object
@@ -31,7 +32,7 @@ function App() {
         <Route path="/user" element={<UserLayout />}>
           <Route path="index" element={<PostList></PostList>} />
           <Route path="cal" element={<TripPlanner />} />
-          <Route path="start" element={<TripStart />} />
+          {/* <Route path="start" element={<TripStart />} /> */}
           <Route path="profile" element={<MyProfileLayout />} />
           <Route path="friends" element={<FriendLayout />} />
         </Route>
@@ -45,7 +46,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/chat" element={<Chat />} />
-
+        <Route path="" element={<UploadImage />}></Route>
         {/* Định tuyến cho Register */}
         <Route path="/register" element={<RegisterForm />} />
 
