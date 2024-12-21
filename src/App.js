@@ -15,7 +15,7 @@ import TripPlanner from "./Pages/user/Trip/TripPlanner";
 // import TripStart from "./Pages/user/Trip/TripStart";
 import Login from "./Pages/login/login";
 import ForgotPassword from "./Pages/login/ForgotPassword";
-import Chat from './Pages/user/Chat/Chat';
+import Chat from "./Pages/user/Chat/Chat";
 import AdminLayout from "./Layouts/AdminLayout";
 import MyProfileLayout from "./Layouts/MyProfileLayout";
 
@@ -30,8 +30,8 @@ function App() {
     createRoutesFromElements(
       <>
         {/* Định tuyến User */}
-        <Route path="/user">
-          <Route path="index" element={<UserLayout />}/>
+        <Route path="/user" element={<UserLayout />}>
+          <Route path="index" element={<PostList />} />
           <Route path="cal" element={<TripPlanner />} />
           {/* <Route path="start" element={<TripStart />} /> */}
           <Route path="profile" element={<MyProfileLayout />} />

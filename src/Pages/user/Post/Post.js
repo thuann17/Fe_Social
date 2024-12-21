@@ -50,7 +50,7 @@ const Post = ({ post }) => {
       {/* Like, Share, and Comment */}
       <div className="post-actions mt-4 flex justify-between items-center">
         <button onClick={handleLike} className={`hover:text-blue-500 ${isLiked ? "font-bold" : ""}`}>
-          {isLiked ? "💖 Thích" : "🖤 Thích"} {likes}
+          {isLiked ? "💖" : "🖤"} {likes}
         </button>
         <button onClick={toggleComments} className="hover:text-blue-500">
         📝 Bình luận {comments.length}
