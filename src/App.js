@@ -23,7 +23,8 @@ import RegisterForm from "./Pages/register/register";
 import FriendLayout from "./Pages/user/Friend/FriendLayout";
 import PostList from "./Pages/user/Post/PostList";
 import UploadImage from "./Services/UploadImage";
-
+import MapTest from "./Pages/user/Trip/MapTest";
+import Chatbox from "./Pages/user/Chat/Chatbox";
 function App() {
   // Define the router object
   const router = createBrowserRouter(
@@ -36,6 +37,7 @@ function App() {
           {/* <Route path="start" element={<TripStart />} /> */}
           <Route path="profile" element={<MyProfileLayout />} />
           <Route path="friends" element={<FriendLayout />} />
+          
           <Route path="" element={<UploadImage />} />
         </Route>
 
@@ -48,9 +50,11 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/chat" element={<Chat />} />
+        
         <Route path="" element={<UploadImage />}></Route>
+        <Route path="/map" element={<MapTest />}></Route >
         {/* Định tuyến cho Register */}
-        <Route path="/register" element={<RegisterForm />} />
+        < Route path="/register" element={< RegisterForm />} />
 
         {/* Chỉnh lại cấu trúc sao cho các Route không trùng lặp */}
       </>
