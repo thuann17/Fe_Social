@@ -17,11 +17,14 @@ import Login from "./Pages/login/login";
 import ForgotPassword from "./Pages/login/ForgotPassword";
 import Chat from "./Pages/user/Chat/Chat";
 import AdminLayout from "./Layouts/AdminLayout";
+import TripLayout from "./Layouts/TripLayout";
 import MyProfileLayout from "./Layouts/MyProfileLayout";
 
 import RegisterForm from "./Pages/register/register";
 import FriendLayout from "./Pages/user/Friend/FriendLayout";
 import PostList from "./Pages/user/Post/PostList";
+import DetailsPlan from "./Pages/user/Trip/DetailsPlanner";
+import DetailsPlace from "./Pages/user/Trip/DetailsPlace";
 import UploadImage from "./Services/UploadImage";
 
 function App() {
@@ -36,6 +39,10 @@ function App() {
           {/* <Route path="start" element={<TripStart />} /> */}
           <Route path="profile" element={<MyProfileLayout />} />
           <Route path="friends" element={<FriendLayout />} />
+          <Route path="place" element={<TripLayout />} />
+          <Route path="detailsplan" element={<DetailsPlan />} />
+          <Route path="detailsplace" element={<DetailsPlace />} />
+         
           <Route path="" element={<UploadImage />} />
         </Route>
 

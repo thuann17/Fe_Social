@@ -1,12 +1,11 @@
-
 /* PostList Styling */
 .post-list {
-  @apply w-full max-w-[710px] mx-auto p-1; /* Centered post list, max width 700px */
+  @apply w-full max-w-[710px] mx-auto p-1;
 }
 
 /* Post Styling */
 .post {
-  @apply bg-white shadow-md rounded-lg p-6 mb-8; /* Subtle shadow */
+  @apply bg-white shadow-md rounded-lg p-6 mb-8 relative;
 }
 
 .post-header {
@@ -14,11 +13,11 @@
 }
 
 .post-avatar {
-  @apply rounded-full w-12 h-12 mr-4; /* Increased spacing */
+  @apply rounded-full w-12 h-12 mr-4;
 }
 
 .post-username {
-  @apply font-medium text-lg; /* Slightly larger font size */
+  @apply font-medium text-lg;
 }
 
 .post-timestamp {
@@ -26,7 +25,7 @@
 }
 
 .post-content {
-  @apply mt-4 text-gray-700; /* Darker text color */
+  @apply mt-4 text-gray-700;
 }
 
 .post-image,
@@ -35,12 +34,11 @@
 }
 
 .post-actions {
-  @apply mt-6 flex justify-between items-center; /* Increased spacing */
+  @apply mt-6 flex justify-between items-center;
 }
 
 .post-action {
-  @apply hover:text-blue-600; /* Darker blue on hover */
-  @apply text-blue-500; /* Default blue */
+  @apply inline-flex items-center text-blue-500 hover:text-blue-600;
 }
 
 .comments {
@@ -52,23 +50,32 @@
 }
 
 .add-comment input {
-  @apply border rounded p-2 w-full mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500; /* Focus styling */
+  @apply border rounded p-2 w-full mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
 }
 
 .add-comment button {
-  @apply bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700; /* Darker blue on hover */
+  @apply bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700;
+}
+
+/* Menu Dropdown */
+.menu-dropdown {
+  @apply absolute right-0 bg-white shadow-lg rounded-lg mt-2 z-10;
+}
+
+.menu-item {
+  @apply block px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left;
 }
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
   .post-header {
-      @apply flex-col items-start; /* Stack avatar and username vertically */
+      @apply flex-col items-start;
   }
   .post-avatar {
       @apply mb-2;
   }
   .post-actions {
-      @apply flex-col items-start; /* Stack actions vertically */
+      @apply flex-col items-start;
   }
   .post-action {
       @apply mb-2;
