@@ -36,17 +36,16 @@ const UserLayout = () => {
         {/* Right Sidebar - Hidden on mobile devices */}
         <div className="w-64 hidden lg:block fixed right-0 top-0 pt-16 h-screen overflow-auto bg-white shadow-md">
           <RightSidebar />
-          {/* Toggle Chatbox */}
-          <div className="fixed bottom-0 right-4 z-50">
+
+          <div className="fixed bottom-0 right-4 z-60">
             <Chatbox chat={activeChat} />
           </div>
         </div>
-        <div className="w-64 hidden md:block fixed right-0 top-0 pt-16 h-screen overflow-auto bg-white shadow-md">
-          <RightSidebar />
-        </div>
-      </div>
 
-      );
+
+      </div>
+    </div>
+  );
 };
 
-      export default UserLayout;
+export default UserLayout;
