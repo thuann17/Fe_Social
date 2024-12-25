@@ -27,7 +27,6 @@ import DetailsPlan from "./Pages/user/Trip/DetailsPlanner";
 import DetailsPlace from "./Pages/user/Trip/DetailsPlace";
 import UploadImage from "./Services/UploadImage";
 import MapTest from "./Pages/user/Trip/MapTest";
-import Chatbox from "./Pages/user/Chat/Chatbox";
 function App() {
   // Define the router object
   const router = createBrowserRouter(
@@ -43,8 +42,6 @@ function App() {
           <Route path="place" element={<TripLayout />} />
           <Route path="detailsplan" element={<DetailsPlan />} />
           <Route path="detailsplace" element={<DetailsPlace />} />
-         
-          <Route path="" element={<UploadImage />} />
         </Route>
 
         {/* Định tuyến Admin */}
@@ -53,11 +50,11 @@ function App() {
         </Route>
 
         {/* Định tuyến cho Login và Forgot Password */}
+
+        <Route path="" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/chat" element={<Chat />} />
-        
-        <Route path="" element={<UploadImage />}></Route>
         <Route path="/map" element={<MapTest />}></Route >
         {/* Định tuyến cho Register */}
         < Route path="/register" element={< RegisterForm />} />

@@ -12,7 +12,7 @@ function Chatbox({ chat, onClose }) {
     };
 
     return (
-        <div className="flex flex-col bg-white rounded-lg shadow-lg w-[50vh] max-w-[50vh] fixed bottom-0 right-20 border border-gray-300 h-[65vh] max-h-[65vh]">
+        <div className="flex flex-col bg-white rounded-lg shadow-lg w-[50vh] max-w-[50vh] fixed bottom-0 right-7 border border-gray-300 h-[65vh] max-h-[65vh]">
             <div className="flex items-center bg-blue-500 rounded-t-lg p-2">
                 <img
                     src={chat.avatar || "https://via.placeholder.com/40"}

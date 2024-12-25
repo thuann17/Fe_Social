@@ -113,9 +113,6 @@ const TripPlanner = () => {
             locale="vi"
             events={tripDetails.trips}
             select={handleDateSelect}
-            eventClick={(info) => {
-              console.log("Sự kiện được chạm:", info.event.title);
-            }}
           />
         </div>
       </div>
@@ -157,9 +154,9 @@ const TripPlanner = () => {
                   ) : (
                     <p
                       className="mt-2 text-gray-500 cursor-pointer"
-                      onClick={() => handleImageClick()} 
+                      onClick={() => handleImageClick()}
                     >
-                      <FaPlus className="inline mr-1"  />
+                      <FaPlus className="inline mr-1" />
                       Không có chuyến đi được lên. Thêm lịch trình mới
                     </p>
                   )}
@@ -180,7 +177,7 @@ const TripPlanner = () => {
       </Dialog>
 
       {/* Modal for Adding New Trip */}
-   
+
     </>
   );
 };
