@@ -26,7 +26,8 @@ import PostList from "./Pages/user/Post/PostList";
 import DetailsPlan from "./Pages/user/Trip/DetailsPlanner";
 import DetailsPlace from "./Pages/user/Trip/DetailsPlace";
 import UploadImage from "./Services/UploadImage";
-
+import MapTest from "./Pages/user/Trip/MapTest";
+import Chatbox from "./Pages/user/Chat/Chatbox";
 function App() {
   // Define the router object
   const router = createBrowserRouter(
@@ -55,9 +56,11 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/chat" element={<Chat />} />
+        
         <Route path="" element={<UploadImage />}></Route>
+        <Route path="/map" element={<MapTest />}></Route >
         {/* Định tuyến cho Register */}
-        <Route path="/register" element={<RegisterForm />} />
+        < Route path="/register" element={< RegisterForm />} />
 
         {/* Chỉnh lại cấu trúc sao cho các Route không trùng lặp */}
       </>

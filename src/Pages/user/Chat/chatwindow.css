@@ -1,0 +1,26 @@
+/* Custom Scrollbar for Chat */
+.chat-scrollbar::-webkit-scrollbar {
+    width: 8px; /* Width of vertical scrollbar */
+    height: 8px; /* Height of horizontal scrollbar */
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #4B5563;  /* Thumb color */
+    border-radius: 8px;  /* Rounded corners */
+    border: 2px solid #1F2937; /* Border around the thumb */
+}
+
+.chat-scrollbar::-webkit-scrollbar-track {
+    background: #2D3748;  /* Track background color */
+    border-radius: 8px;  /* Rounded corners for track */
+}
+
+.chat-scrollbar::-webkit-scrollbar-horizontal {
+    height: 8px; /* Height of horizontal scrollbar */
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb-horizontal {
+    background-color: #4B5563; /* Thumb color for horizontal */
+    border-radius: 8px;
+    border: 2px solid #1F2937; /* Border around horizontal thumb */
+}

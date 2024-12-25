@@ -21,9 +21,7 @@ function UploadImage() {
             alert("Please select an image to upload");
             return;
         }
-
         setUploading(true);
-
         // Create a reference to the Firebase Storage location
         const storageRef = ref(storage, `Images/${image.name}`);  // Use the modular `ref` function
 
