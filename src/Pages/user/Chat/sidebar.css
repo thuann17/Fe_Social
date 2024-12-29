@@ -1,26 +1,17 @@
-/* Custom Scrollbar for Sidebar */
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 transparent;
+}
+
 .sidebar-scrollbar::-webkit-scrollbar {
-  width: 8px; /* Width of vertical scrollbar */
-  height: 8px; /* Height of horizontal scrollbar */
+  width: 6px;
 }
 
 .sidebar-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #4b5563; /* Thumb color */
-  border-radius: 8px; /* Rounded corners */
-  border: 2px solid #1f2937; /* Border around the thumb */
+  background-color: #4b5563;
+  border-radius: 4px;
 }
 
 .sidebar-scrollbar::-webkit-scrollbar-track {
-  background: #2d3748; /* Track background color */
-  border-radius: 8px; /* Rounded corners for track */
-}
-
-.sidebar-scrollbar::-webkit-scrollbar-horizontal {
-  height: 8px; /* Height of horizontal scrollbar */
-}
-
-.sidebar-scrollbar::-webkit-scrollbar-thumb-horizontal {
-  background-color:rgb(38, 120, 235); /* Thumb color for horizontal */
-  border-radius: 8px;
-  border: 2px solidrgb(84, 140, 218); /* Border around horizontal thumb */
+  background: transparent;
 }

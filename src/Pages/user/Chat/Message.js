@@ -22,16 +22,16 @@ function Message() {
             sender: "You",
             content: message.trim(),
             time: new Date(),
-            status: "sent",
+            status: "sent", // Initially, the message is sent
         };
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setMessage("");
     };
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full bg-[#b8aef3]">
             {/* Tin nhắn */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-gray-50 sm:p-6 md:p-8">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-[#e0e7ff] sm:p-6 md:p-8">
                 {messages.map((msg, index) => (
                     <div key={index} className="group">
                         {/* Hiển thị thời gian giữa nếu cách nhau hơn 1 giờ */}
@@ -41,26 +41,37 @@ function Message() {
                             </div>
                         )}
                         <div className={`flex ${msg.sender === "You" ? "justify-end" : "justify-start"}`}>
+                            {/* Time display, hidden by default and shown on hover */}
+                            <span className="text-xs text-gray-500 mr-2 self-end opacity-0 group-hover:opacity-100 transition duration-200">
+                                {formatTime(msg.time)}
+                            </span>
                             <div
-                                className={`max-w-xs sm:max-w-md p-3 rounded-lg ${msg.sender === "You" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
-                                    }`}
+                                className={`max-w-xs sm:max-w-md p-3 rounded-lg ${
+                                    msg.sender === "You" ? "bg-[#ad83d9] text-white" : "bg-white text-gray-800"
+                                }`}
                             >
                                 <p>{msg.content}</p>
-                                <span className="text-xs text-gray-500 block mt-1 opacity-0 group-hover:opacity-100">
-                                    {formatTime(msg.time)}
-                                </span>
-                                {/* Trạng thái tin nhắn */}
-                                {index === messages.length - 1 && msg.sender !== "You" && msg.status === "received" && (
-                                    <div className="text-xs text-gray-400 mt-1">✔️✔️ Đã xem</div>
-                                )}
                             </div>
                         </div>
+                        {/* Trạng thái tin nhắn */}
+                        {index === messages.length - 1 && msg.sender === "You" && msg.status === "sent" && (
+                            <div className="text-xs text-gray-400 mt-1 text-right">✔️ Đã gửi</div>
+                        )}
+                        {index === messages.length - 1 && msg.sender !== "You" && msg.status === "received" && (
+                            <div className="text-xs text-gray-400 mt-1 text-right">✔️✔️ Đã xem</div>
+                        )}
                     </div>
                 ))}
             </div>
 
             {/* Input tin nhắn */}
-            <div className="flex items-center p-2 bg-gray-100 rounded-b-lg sm:p-3 md:p-4">
+            <div className="flex items-center p-2 bg-white rounded-b-lg sm:p-3 md:p-4 shadow-lg">
+                {/* Avatar with white background */}
+                <img
+                    src="path/to/avatar.png" // Replace with your avatar image path
+                    alt="Avatar"
+                    className="w-8 h-8 rounded-full bg-white border border-gray-300 mr-2" // White background and border
+                />
                 <button className="text-gray-600 p-1 hover:bg-gray-200 hover:shadow-sm rounded-full transition ease-in-out duration-300">
                     😊
                 </button>
@@ -76,15 +87,15 @@ function Message() {
                 />
                 <button
                     onClick={handleSendMessage}
-                    className={`p-1 rounded-full transition ease-in-out duration-300 ${!message.trim()
-                        ? "text-gray-400 cursor-not-allowed"
-                        : "bg-blue-500 hover:bg-blue-600 hover:shadow-lg text-white px-3"
-                        }`}
+                    className={`p-1 rounded-full transition ease-in-out duration-300 ${
+                        !message.trim()
+                            ? "text-gray-400 cursor-not-allowed"
+                            : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg text-white px-3"
+                    }`}
                 >
                     {message.trim() === "" ? "❤️" : "Gửi"}
                 </button>
             </div>
-
         </div>
     );
 }

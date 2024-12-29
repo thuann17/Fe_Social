@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie"; // Import thư viện js-cookie
 import { login } from "../../Services/login/LoginService.js";
 
 const LoginForm = () => {
@@ -72,13 +73,16 @@ const LoginForm = () => {
 
     try {
       const data = await login(username, password, remember);
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
+      const { token, role } = data;
+
+      // Lưu thông tin vào cookie thay vì localStorage/sessionStorage
+      Cookies.set("token", token, { expires: remember ? 365 : undefined }); // Lưu token với thời gian hết hạn nếu ghi nhớ
+      Cookies.set("role", role, { expires: remember ? 365 : undefined });  // Lưu role
 
       if (remember) {
-        localStorage.setItem("username", username);
+        Cookies.set("username", username, { expires: 365 }); // Lưu username vào cookie trong 1 năm
       } else {
-        sessionStorage.setItem("username", username);
+        Cookies.set("username", username); // Lưu username vào cookie phiên làm việc (không có expiration)
       }
 
       console.log("Login successfully!");
@@ -91,7 +95,7 @@ const LoginForm = () => {
       localStorage.removeItem("lastFailedAttempt");
 
       setTimeout(() => {
-        if (data.role === "Admin") {
+        if (role === "Admin") {
           navigate("/admin/dashboard");
         } else {
           navigate("/user/index");

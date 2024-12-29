@@ -1,5 +1,5 @@
 import "./App.css";
-import React from "react";
+import React, { useEffect } from "react";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { DndProvider } from "react-dnd";
 import {
@@ -7,12 +7,13 @@ import {
   RouterProvider,
   createBrowserRouter,
   createRoutesFromElements,
-} from "react-router-dom"; // Đảm bảo là từ react-router-dom
+  Navigate,
+} from "react-router-dom";
+import Cookies from "js-cookie"; // Thư viện để xử lý cookies
 
 // Các Layouts và Pages
 import UserLayout from "./Layouts/UserLayout";
 import TripPlanner from "./Pages/user/Trip/TripPlanner";
-// import TripStart from "./Pages/user/Trip/TripStart";
 import Login from "./Pages/login/login";
 import ForgotPassword from "./Pages/login/ForgotPassword";
 import Chat from "./Pages/user/Chat/Chat";
@@ -25,18 +26,30 @@ import FriendLayout from "./Pages/user/Friend/FriendLayout";
 import PostList from "./Pages/user/Post/PostList";
 import DetailsPlan from "./Pages/user/Trip/DetailsPlanner";
 import DetailsPlace from "./Pages/user/Trip/DetailsPlace";
-import UploadImage from "./Services/UploadImage";
 import MapTest from "./Pages/user/Trip/MapTest";
+const ProtectedRoute = ({ children, requiredRole }) => {
+  const token = Cookies.get("token");
+  const userRole = Cookies.get("role");
+
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+
+  if (requiredRole && userRole !== requiredRole) {
+    return <Navigate to="/" />;
+  }
+  return children;
+};
+
 function App() {
-  // Define the router object
+  // Định nghĩa router với các routes
   const router = createBrowserRouter(
     createRoutesFromElements(
       <>
         {/* Định tuyến User */}
-        <Route path="/user" element={<UserLayout />}>
+        <Route path="/user" element={<ProtectedRoute requiredRole="User"><UserLayout /></ProtectedRoute>}>
           <Route path="index" element={<PostList />} />
           <Route path="cal" element={<TripPlanner />} />
-          {/* <Route path="start" element={<TripStart />} /> */}
           <Route path="profile" element={<MyProfileLayout />} />
           <Route path="friends" element={<FriendLayout />} />
           <Route path="place" element={<TripLayout />} />
@@ -45,21 +58,21 @@ function App() {
         </Route>
 
         {/* Định tuyến Admin */}
-        <Route path="/admin">
-          <Route path="dashboard" element={<AdminLayout />} />
+        <Route path="/admin" element={<ProtectedRoute requiredRole="Admin"><AdminLayout /></ProtectedRoute>}>
+          <Route path="dashboard" element={<div>Admin Dashboard</div>} />
         </Route>
 
         {/* Định tuyến cho Login và Forgot Password */}
-
-        <Route path="" element={<Login />} />
+        <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot" element={<ForgotPassword />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/map" element={<MapTest />}></Route >
-        {/* Định tuyến cho Register */}
-        < Route path="/register" element={< RegisterForm />} />
+        <Route path="/user/chat" element={<Chat />} />
+        <Route path="/map" element={<MapTest />} />
 
-        {/* Chỉnh lại cấu trúc sao cho các Route không trùng lặp */}
+        {/* Định tuyến cho Register */}
+        <Route path="/register" element={<RegisterForm />} />
+
+        <Route path="*" element={<Navigate to="/login" />} />
       </>
     )
   );
