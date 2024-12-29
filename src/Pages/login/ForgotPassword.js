@@ -1,24 +1,34 @@
 import React, { useState } from 'react';
+import { forgotPassword } from '../../Services/login/ForgotService';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (email) {
-            // Giả sử bạn có API gửi email reset mật khẩu
-            // Bạn có thể gọi API ở đây để gửi yêu cầu quên mật khẩu.
-            // Ví dụ: axios.post('/api/forgot-password', { email })
-            setMessage('Một email đã được gửi đến địa chỉ của bạn để đặt lại mật khẩu!');
-        } else {
+        if (!email) {
             setMessage('Vui lòng nhập email!');
+            return;
+        }
+        setMessage('');
+        setLoading(true);
+        try {
+            setMessage("Gửi mật khẩu thành công! Vui lòng kiểm tra email của bạn.");
+        } catch (error) {
+            if (error.response && error.response.data) {
+                setMessage(error.response.data);
+            } else {
+                setMessage("Email không hợp lệ hoặc không tồn tại!");
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="bg-gray-100 flex justify-center items-center h-screen">
+        <div className="bg-gradient-to-r from-purple-300 to-blue-400 animate-gradientAnimation flex justify-center items-center h-screen">
             <div className="w-full md:w-1/3 bg-white shadow rounded-md p-8">
                 <h1 className="text-2xl font-semibold mb-4 text-center">Quên mật khẩu?</h1>
                 <form onSubmit={handleSubmit}>
@@ -33,13 +43,13 @@ const ForgotPassword = () => {
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                             autoComplete="off"
-                            required
+        
                         />
                     </div>
 
                     {/* Message */}
                     {message && (
-                        <div className="mb-4 text-center text-blue-500">
+                        <div className={`mb-4 text-center ${message.includes('Email không tồn tại') ? 'text-red-500' : 'text-blue-500'}`}>
                             <p>{message}</p>
                         </div>
                     )}
@@ -48,8 +58,9 @@ const ForgotPassword = () => {
                     <button
                         type="submit"
                         className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full"
+                        disabled={loading}
                     >
-                        Gửi
+                        {loading ? 'Đang gửi...' : 'Gửi'}
                     </button>
                 </form>
 

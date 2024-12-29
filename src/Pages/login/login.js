@@ -6,24 +6,60 @@ const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState(""); // state for success message
+  const [isLocked, setIsLocked] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+
   const navigate = useNavigate();
 
+  // Kiểm tra trạng thái khóa tài khoản khi page load
   useEffect(() => {
-    // Tự động điền thông tin người dùng nếu có lưu trong localStorage và nhớ tôi
-    const storedUsername = localStorage.getItem("username");
-    const storedToken = localStorage.getItem("token");
+    const failedAttempts = parseInt(localStorage.getItem("failedAttempts")) || 0;
+    const lastFailedAttempt = parseInt(localStorage.getItem("lastFailedAttempt")) || 0;
 
-    if (storedToken) {
-      navigate("/user/index"); // Nếu có token, chuyển đến trang người dùng
-    } else if (storedUsername) {
-      setUsername(storedUsername); // Điền tên đăng nhập nếu có trong localStorage
+    // Nếu tài khoản đã thử đăng nhập sai 5 lần trong vòng 60 giây
+    if (failedAttempts >= 5) {
+      const currentTime = Date.now();
+      const lockTime = 60000; // 60 giây khóa tài khoản
+      if (currentTime - lastFailedAttempt < lockTime) {
+        setIsLocked(true);
+        setTimeRemaining(Math.ceil((lockTime - (currentTime - lastFailedAttempt)) / 1000)); // Chuyển thời gian còn lại thành giây
+      } else {
+        localStorage.removeItem("failedAttempts");
+        localStorage.removeItem("lastFailedAttempt");
+        setIsLocked(false);
+        setTimeRemaining(0);
+      }
     }
-  }, [navigate]);
+  }, []);
 
+  // Đếm ngược thời gian khóa tài khoản
+  useEffect(() => {
+    let timer;
+    if (isLocked && timeRemaining > 0) {
+      timer = setInterval(() => {
+        setTimeRemaining((prevTime) => {
+          if (prevTime <= 1) {
+            setIsLocked(false); // Khi hết thời gian, mở khóa
+            clearInterval(timer); // Dừng timer
+          }
+          return prevTime - 1; // Giảm thời gian còn lại mỗi giây
+        });
+      }, 1000); // Cập nhật mỗi giây
+    }
+    return () => clearInterval(timer); // Dọn dẹp khi component bị hủy
+  }, [isLocked, timeRemaining]);
+
+  // Xử lý form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isLocked) {
+      setErrorMessage(`Tài khoản của bạn đã bị khoá. Vui lòng thử lại sau ${timeRemaining} giây.`);
+      return;
+    }
 
     if (!username || !password) {
       setErrorMessage("Vui lòng điền đủ tên đăng nhập và mật khẩu.");
@@ -32,28 +68,48 @@ const LoginForm = () => {
 
     setLoading(true);
     setErrorMessage("");
+    setSuccessMessage(""); // Reset success message
 
     try {
       const data = await login(username, password, remember);
-
-      // Lưu trữ thông tin đăng nhập
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
 
       if (remember) {
-        localStorage.setItem("username", username); // Lưu tên đăng nhập nếu chọn "remember me"
+        localStorage.setItem("username", username);
       } else {
-        sessionStorage.setItem("username", username); // Chỉ lưu tên đăng nhập trong phiên hiện tại
+        sessionStorage.setItem("username", username);
       }
 
-      // Điều hướng đến trang Admin hoặc User dựa trên vai trò
-      if (data.role === "Admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/user/index");
-      }
+      console.log("Login successfully!");
+
+      // Hiển thị thông báo thành công
+      setSuccessMessage("Đăng nhập thành công!");
+
+      // Reset failed attempts on successful login
+      localStorage.removeItem("failedAttempts");
+      localStorage.removeItem("lastFailedAttempt");
+
+      setTimeout(() => {
+        if (data.role === "Admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/user/index");
+        }
+      }, 2000); // Delay 2 giây
     } catch (error) {
-      setErrorMessage(error.message || "Có lỗi xảy ra. Vui lòng thử lại sau.");
+      console.log("Login failed!");
+
+      // Xử lý các lần đăng nhập thất bại
+      const failedAttempts = parseInt(localStorage.getItem("failedAttempts")) || 0;
+      localStorage.setItem("failedAttempts", failedAttempts + 1);
+      localStorage.setItem("lastFailedAttempt", Date.now().toString());
+
+      if (failedAttempts + 1 >= 5) {
+        setErrorMessage("Tài khoản của bạn đã bị khoá. Vui lòng thử lại sau 60 giây.");
+      } else {
+        setErrorMessage("Thông tin đăng nhập không đúng. Vui lòng thử lại.");
+      }
     } finally {
       setLoading(false);
     }
@@ -88,7 +144,11 @@ const LoginForm = () => {
         {/* Right Section */}
         <div className="login-right flex-1 p-8">
           <h2 className="text-3xl font-bold mb-4">ĐĂNG NHẬP</h2>
+
+          {/* Thông báo lỗi và thành công */}
           {errorMessage && <p className="error-message text-red-500 mb-4">{errorMessage}</p>}
+          {successMessage && <p className="success-message text-green-500 mb-4">{successMessage}</p>}
+
           <form onSubmit={handleSubmit}>
             <label htmlFor="username" className="block text-gray-700 mb-2">
               Tài khoản:
@@ -100,7 +160,7 @@ const LoginForm = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+
             />
 
             <label htmlFor="password" className="block text-gray-700 mb-2">
@@ -113,7 +173,7 @@ const LoginForm = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+
             />
 
             <div className="flex items-center mb-4">
@@ -137,6 +197,7 @@ const LoginForm = () => {
               {loading ? "Đang đăng nhập..." : "Đăng nhập"}
             </button>
           </form>
+          <p className="text-red-500 flex justify-end me-1 cursor-pointer"><a href="/forgot">Quên mật khẩu?</a></p>
         </div>
       </div>
     </div>

@@ -1,6 +1,4 @@
 const API_URL = "http://localhost:8080/api";
-
-// Function để đăng nhập
 export const login = async (username, password, remember) => {
   const token = localStorage.getItem('token');
   fetch('api/endpoint', {
@@ -23,7 +21,6 @@ export const login = async (username, password, remember) => {
     });
 
     const data = await response.json();
-
     if (!response.ok) {
       throw new Error(data.message || "Đăng nhập không thành công");
     }
