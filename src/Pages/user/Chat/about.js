@@ -1,6 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 
 const AboutChat = () => {
+    const images = [
+        "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/08/anh-phat-dep-lam-hinh-nen-62.jpg",
+        "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/08/anh-phat-dep-lam-hinh-nen-62.jpg",
+        "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/08/anh-phat-dep-lam-hinh-nen-62.jpg"
+    ];
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
     return (
         <div className="h-screen sm:w-72 w-full p-4 flex flex-col" style={{ backgroundColor: '#b8aef3' }}>
             {/* Profile Section */}
@@ -22,46 +37,50 @@ const AboutChat = () => {
                     </svg>
                     <span className="ml-2">Trang cá nhân</span>
                 </button>
-
-                <button className="flex items-center px-4 py-2 text-black hover:bg-gray-700 rounded">
-                    <svg className="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v1a3 3 0 0 0 6 0v-1" />
-                    </svg>
-                    <span className="ml-2">Tắt thông báo</span>
-                </button>
-
-                <button className="flex items-center px-4 py-2 text-black hover:bg-gray-700 rounded">
-                    <svg className="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v1a3 3 0 0 0 6 0v-1" />
-                    </svg>
-                    <span className="ml-2">Tìm kiếm</span>
-                </button>
             </div>
 
-            {/* Additional Sections */}
-            <div className="mt-6">
-                <h4 className="font-semibold text-black">Thông tin về đoạn chat</h4>
-                <button className="flex justify-between items-center text-black hover:bg-gray-700 rounded px-4 py-2 w-full">
-                    <span>Tùy chỉnh đoạn chat</span>
-                    <svg className="h-4 w-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
-                <button className="flex justify-between items-center text-black hover:bg-gray-700 rounded px-4 py-2 w-full">
-                    <span>File phương tiện & file</span>
-                    <svg className="h-4 w-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
-                <button className="flex justify-between items-center text-black hover:bg-gray-700 rounded px-4 py-2 w-full">
-                    <span>Quyền riêng tư và hỗ trợ</span>
-                    <svg className="h-4 w-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
+            {/* Scrollable Content Section */}
+            <div className="mt-6 overflow-y-auto max-h-[75vh]">
+                <h4 className="font-semibold text-black">File phương tiện</h4>
+                {/* Multiple images display */}
+                <div className="mt-4 grid grid-cols-2 gap-4">
+                    {images.map((image, index) => (
+                        <img
+                            key={index}
+                            src={image}
+                            alt={`File Media ${index + 1}`}
+                            className="rounded-lg w-full h-auto cursor-pointer"
+                            onClick={openModal}
+                        />
+                    ))}
+                </div>
             </div>
+
+            {/* Modal for showing all images */}
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white p-4 rounded-lg max-w-3xl max-h-[90vh] overflow-y-auto relative">
+                        <button
+                            className="absolute top-2 right-2 text-red-600 text-2xl"
+                            onClick={closeModal}
+                        >
+                            ❎  
+                        </button>
+
+                        <div className="space-y-4">
+                            {/* Display all images vertically */}
+                            {images.map((image, index) => (
+                                <img
+                                    key={index}
+                                    src={image}
+                                    alt={`Selected Media ${index + 1}`}
+                                    className="rounded-lg w-full h-auto"
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

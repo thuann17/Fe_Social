@@ -35,9 +35,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return <Navigate to="/login" />;
   }
 
-  if (requiredRole && userRole !== requiredRole) {
-    return <Navigate to="/" />;
-  }
+  // x
   return children;
 };
 
@@ -63,7 +61,6 @@ function App() {
         </Route>
 
         {/* Định tuyến cho Login và Forgot Password */}
-        <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/user/chat" element={<Chat />} />
