@@ -63,7 +63,6 @@ function App() {
         </Route>
 
         {/* Định tuyến cho Login và Forgot Password */}
-        <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/user/chat" element={<Chat />} />

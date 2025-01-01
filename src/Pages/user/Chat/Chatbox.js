@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Message from "./Message";
 
 function Chatbox({ chat, onClose }) {
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
 
     if (!chat || !isOpen) return null;
 
