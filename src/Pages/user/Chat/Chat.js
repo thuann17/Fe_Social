@@ -33,7 +33,6 @@ function Chat() {
             <div className="flex flex-col sm:flex-row h-screen bg-white text-blue-900">
                 {/* Sidebar (Hidden on small screens) */}
                 <Sidebar />
-
                 {/* Main chat window */}
                 <div className="flex flex-col flex-1 bg-white overflow-hidden border-l border-blue-200 h-full">
                     <HeaderChatWindow toggleAboutChat={toggleAboutChat} />
@@ -41,7 +40,6 @@ function Chat() {
                         <Message />
                     </div>
                 </div>
-            
                 {showAbout && <AboutChat />}
             </div>
         </>
