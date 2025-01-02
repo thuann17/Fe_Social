@@ -26,12 +26,21 @@ const Post = ({ post, onDelete }) => {
   };
 
 
-  const handleComment = () => {
+  const handleComment = async () => {
     if (newComment.trim()) {
-      setComments([...comments, { id: Date.now(), username: "User", content: newComment }]);
-      setNewComment("");
+      try {
+        const response = await PostService.commentPost(post.id, newComment);
+        setComments((prev) => [
+          ...prev,
+          { id: Date.now(), username: "User", content: newComment },
+        ]);
+        setNewComment("");
+      } catch (error) {
+        console.error("Error while commenting on the post:", error);
+      }
     }
   };
+
 
   const handleShare = () => alert("Post shared successfully!");
 
