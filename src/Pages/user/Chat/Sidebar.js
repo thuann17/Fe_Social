@@ -90,7 +90,7 @@ function Sidebar() {
       </div>
 
       {/* Friends or Groups List */}
-      <div className="space-y-4 overflow-y-auto h-[calc(100vh-8rem)]">
+      <div className="space-y-4 overflow-y-auto h-[calc(90vh-8rem)]">
         {loading ? (
           <p>Loading...</p>
         ) : error ? (
