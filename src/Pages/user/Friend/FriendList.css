@@ -1,69 +1,87 @@
-.card {
-    width: 200px;
-    background-color: #242526;
-    color: white;
-    border-radius: 10px;
-    padding: 10px;
-    text-align: center;
-    margin: 17px;
-  }
-  
-  .card img {
-    width: 100%;
-    height: 190px;
-    border-radius: 8px;
-    object-fit: cover;
-  }
-  
-  .card .name {
-    font-size: 16px;
-    margin: 10px 0;
-  }
-  
-  .card .mutual {
-    font-size: 16px;
-    color: #b0b3b8;
-  }
-  
-  .card .buttons {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .card .accept-btn {
-    background-color: #2d88ff;
-    color: white;
-    width: 60%;
-    border: none;
-    padding: 6px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .card .delete-btn {
-    background-color: #3a3b3c;
-    color: white;
-    border: none;
-    padding: 6px;
-    width: 35%;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+/* Custom modal styling */
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center the modal */
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%; /* Make modal responsive */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Softer shadow */
+  z-index: 1000; /* Ensure it's above other content */
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Smooth fade-in/out */
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.9); /* Start with a scaled-down version */
+}
 
-  .friend-request-container {
-    background-color: #65666b;
-    padding: 20px;
-    color: white;
-  }
-  
-  .friend-request-title {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  
-  .friend-request-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  
+.modal.open {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1); /* Full size when open */
+}
+
+/* Overlay styling */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 999; /* Overlay should be behind the modal */
+  transition: opacity 0.3s ease-in-out; /* Smooth fade for the overlay */
+}
+
+/* Modal header styling */
+.modal h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+/* Modal content styling */
+.modal p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* Modal action buttons */
+.modal .flex {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal button {
+  padding: 12px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal button:hover {
+  opacity: 0.8;
+}
+
+.modal .bg-red-600 {
+  background-color: #e74c3c;
+  border: none;
+  color: #fff;
+}
+
+.modal .bg-gray-600 {
+  background-color: #bdc3c7;
+  border: none;
+  color: #fff;
+}
+
+.modal .bg-red-600:hover {
+  background-color: #c0392b;
+}
+
+.modal .bg-gray-600:hover {
+  background-color: #95a5a6;
+}

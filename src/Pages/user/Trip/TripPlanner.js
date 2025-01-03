@@ -2,15 +2,9 @@ import React, { useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
-import {
-  FaPlus,
-  FaTimes,
-  FaCalendarAlt,
-  FaMapMarkerAlt,
-  FaStar,
-} from "react-icons/fa";
+import { FaPlus, FaTimes, FaCalendarAlt, FaMapMarkerAlt, FaStar } from "react-icons/fa";
 
 const initialTrips = [
   // Initial trips data...
@@ -98,7 +92,7 @@ const TripPlanner = () => {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col md:flex-row gap-6 bg-[#ebc8fe] p-6">
         {/* Calendar Component */}
         <div className="w-full bg-white shadow-lg rounded-md p-4">
           <label className="block text-gray-800 font-semibold mb-4 text-lg">
@@ -175,9 +169,6 @@ const TripPlanner = () => {
           </DialogPanel>
         </div>
       </Dialog>
-
-      {/* Modal for Adding New Trip */}
-
     </>
   );
 };

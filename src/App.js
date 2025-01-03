@@ -27,6 +27,7 @@ import PostList from "./Pages/user/Post/PostList";
 import DetailsPlan from "./Pages/user/Trip/DetailsPlanner";
 import DetailsPlace from "./Pages/user/Trip/DetailsPlace";
 import MapTest from "./Pages/user/Trip/MapTest";
+import UploadImage from "./Services/UploadImage";
 const ProtectedRoute = ({ children, requiredRole }) => {
   const token = Cookies.get("token");
   const userRole = Cookies.get("role");
@@ -65,10 +66,9 @@ function App() {
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/user/chat" element={<Chat />} />
         <Route path="/map" element={<MapTest />} />
-
+        <Route path="/load" element={<UploadImage />} />
         {/* Định tuyến cho Register */}
         <Route path="/register" element={<RegisterForm />} />
-
         <Route path="*" element={<Navigate to="/login" />} />
       </>
     )
