@@ -1,34 +1,36 @@
 import React, { useState, useEffect } from "react";
-import "./sidebar.css"; // Ensure you add necessary custom styles in this file
+import "./sidebar.css";
 import ChatService from "../../../Services/user/ChatService";
 import Cookies from "js-cookie";
 
-function Sidebar() {
-  const [friends, setFriends] = useState([]);
-  const [groups, setGroups] = useState([]);
+function Sidebar({ onSelectFriend, onSelectGroup }) {
+  const [friends, setFriends] = useState([]); // Dữ liệu bạn bè
+  const [groups, setGroups] = useState([]); // Dữ liệu nhóm
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState("friends"); // "friends" or "groups"
+  const [activeTab, setActiveTab] = useState("friends"); // Tab hiện tại
   const username = Cookies.get("username");
 
   useEffect(() => {
     if (!username) {
-      setError("Username not found in cookies");
+      setError("Không tìm thấy tên người dùng trong cookies");
       setLoading(false);
       return;
     }
 
     const fetchFriendsAndGroups = async () => {
       try {
-        if (activeTab === "friends") {
-          setLoading(true);
+        setLoading(true);
+
+        // Kiểm tra tab hiện tại và load dữ liệu nếu chưa có
+        if (activeTab === "friends" && friends.length === 0) {
           const response = await ChatService.getListFriend(username);
           setFriends(response.data);
-        } else if (activeTab === "groups") {
-          setLoading(true);
-          const response = await ChatService.getListGroups(username); // Assuming this endpoint exists
+        } else if (activeTab === "groups" && groups.length === 0) {
+          const response = await ChatService.getListGroups(username);
           setGroups(response.data);
         }
+
       } catch (error) {
         setError("Không thể tải dữ liệu.");
       } finally {
@@ -37,14 +39,13 @@ function Sidebar() {
     };
 
     fetchFriendsAndGroups();
-  }, [username, activeTab]);
+  }, [username, activeTab, friends.length, groups.length]); // Thêm `friends.length` và `groups.length` vào dependency để kiểm tra khi dữ liệu chưa có
 
   return (
     <div
       className="w-1/5"
       style={{ backgroundColor: "#b8aef3", color: "black", height: "100vh" }}
     >
-      {/* Header */}
       <div
         className="flex items-center justify-between mb-4 p-4"
         style={{ backgroundColor: "#b8aef3" }}
@@ -59,8 +60,6 @@ function Sidebar() {
           </button>
         </div>
       </div>
-
-      {/* Search Bar */}
       <div className="mb-4 px-4">
         <input
           type="text"
@@ -68,31 +67,25 @@ function Sidebar() {
           className="w-full p-2 rounded bg-white text-gray-800 placeholder-gray-500 focus:outline-none"
         />
       </div>
-
-      {/* Tabs */}
       <div className="flex mb-4">
         <button
           onClick={() => setActiveTab("friends")}
-          className={`flex-1 p-2 ${
-            activeTab === "friends" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"
-          } rounded-l hover:bg-gray-300`}
+          className={`flex-1 p-2 ${activeTab === "friends" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"
+            } rounded-l hover:bg-gray-300`}
         >
           Hộp thư
         </button>
         <button
           onClick={() => setActiveTab("groups")}
-          className={`flex-1 p-2 ${
-            activeTab === "groups" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"
-          } rounded-r hover:bg-gray-300`}
+          className={`flex-1 p-2 ${activeTab === "groups" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"
+            } rounded-r hover:bg-gray-300`}
         >
           Nhóm
         </button>
       </div>
-
-      {/* Friends or Groups List */}
       <div className="space-y-4 overflow-y-auto h-[calc(90vh-8rem)]">
         {loading ? (
-          <p>Loading...</p>
+          <p>Đang tải...</p>
         ) : error ? (
           <p>{error}</p>
         ) : activeTab === "friends" ? (
@@ -102,20 +95,23 @@ function Sidebar() {
             friends.map((friend, index) => (
               <div
                 key={index}
-                className="flex items-center space-x-3 p-2 bg-white rounded hover:bg-gray-200"
+                className="flex items-center space-x-3 p-2 bg-white rounded hover:bg-gray-200 cursor-pointer"
+                onClick={() => onSelectFriend(friend)}
               >
                 <img
-                  src={friend.friendAvatar || "https://via.placeholder.com/40"}
+                  src={friend.friendAvatar}
                   alt="avatar"
                   className="w-10 h-10 rounded-full"
                 />
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-800">{friend.friendName}</h3>
-                  <p className="text-xs text-gray-600">{friend.message || "No recent message"}</p>
+                  <h3 className="text-lm font-semibold text-gray-800">{friend.friendName}</h3>
+                  <p className="text-xs text-gray-600">
+                    {Array.isArray(friend.message) ? friend.message.length - 1 : 0 || ""}
+                    <span className="ml-auto text-xs text-gray-600 ms-5">
+                      {friend.time || ""}
+                    </span>
+                  </p>
                 </div>
-                <span className="ml-auto text-xs text-gray-600">
-                  {friend.time || "Just now"}
-                </span>
               </div>
             ))
           )
@@ -125,7 +121,8 @@ function Sidebar() {
           groups.map((group, index) => (
             <div
               key={index}
-              className="flex items-center space-x-3 p-2 bg-white rounded hover:bg-gray-200"
+              className="flex items-center space-x-3 p-2 bg-white rounded hover:bg-gray-200 cursor-pointer"
+              onClick={() => onSelectGroup(group)}
             >
               <img
                 src={group.groupAvatar || "https://via.placeholder.com/40"}
@@ -134,7 +131,7 @@ function Sidebar() {
               />
               <div>
                 <h3 className="text-sm font-semibold text-gray-800">{group.groupName}</h3>
-                <p className="text-xs text-gray-600">{group.description || "No description"}</p>
+                <p className="text-xs text-gray-600">{group.description || "Không có mô tả"}</p>
               </div>
             </div>
           ))

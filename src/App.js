@@ -35,7 +35,6 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return <Navigate to="/login" />;
   }
 
-  // x
   return children;
 };
 

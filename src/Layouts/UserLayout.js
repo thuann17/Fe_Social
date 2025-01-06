@@ -37,7 +37,7 @@ const UserLayout = () => {
           <RightSidebar />
 
           <div className="fixed bottom-0 right-4 z-60">
-            <Chatbox chat={activeChat} />
+            {/* <Chatbox chat={activeChat} /> */}
           </div>
         </div>
       </div>
