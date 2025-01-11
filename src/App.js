@@ -20,8 +20,9 @@ import Chat from "./Pages/user/Chat/Chat";
 import AdminLayout from "./Layouts/AdminLayout";
 import TripLayout from "./Layouts/TripLayout";
 import MyProfileLayout from "./Layouts/MyProfileLayout";
+import FriendLayout from "./Layouts/FriendLayout";
 import RegisterForm from "./Pages/register/register";
-import FriendLayout from "./Pages/user/Friend/FriendLayout";
+import FriendList from "./Pages/user/Friend/FriendList";
 import PostList from "./Pages/user/Post/PostList";
 import DetailsPlan from "./Pages/user/Trip/DetailsPlanner";
 import DetailsPlace from "./Pages/user/Trip/DetailsPlace";
@@ -30,6 +31,7 @@ import AccountAdmin from "./Pages/admin/Account/account";
 import RegisterAdminForm from "./Pages/register/RegisterAdmin";
 import PostAdmin from "./Pages/admin/Post/PostAdmin";
 // Thành phần bảo vệ tuyến đường
+import UploadImage from "./Services/UploadImage";
 const ProtectedRoute = ({ children, requiredRole }) => {
   const token = Cookies.get("token");
   const userRole = Cookies.get("role");
@@ -51,21 +53,16 @@ function App() {
     createRoutesFromElements(
       <>
         {/* Định tuyến User */}
-        <Route
-          path="/user"
-          element={
-            <ProtectedRoute requiredRole="User">
-              <UserLayout />
-            </ProtectedRoute>
-          }
-        >
+        <Route path="/user" element={<ProtectedRoute requiredRole="User"><UserLayout /></ProtectedRoute>}>
+        
           <Route path="index" element={<PostList />} />
           <Route path="cal" element={<TripPlanner />} />
           <Route path="profile" element={<MyProfileLayout />} />
-          <Route path="friends" element={<FriendLayout />} />
+          <Route path="friendprofile" element={<FriendLayout />} />
+          <Route path="friends" element={<FriendList />} />
           <Route path="place" element={<TripLayout />} />
           <Route path="detailsplan" element={<DetailsPlan />} />
-          <Route path="detailsplace" element={<DetailsPlace />} />
+          <Route path="detailsplace/:addressFilter" element={<DetailsPlace />} />
         </Route>
 
         {/* Định tuyến Admin */}
@@ -94,7 +91,7 @@ function App() {
         {/* Định tuyến Chat và Map */}
         <Route path="/user/chat" element={<Chat />} />
         <Route path="/map" element={<MapTest />} />
-
+        <Route path="/load" element={<UploadImage />} />
         {/* Định tuyến cho Register */}
         <Route path="/register" element={<RegisterForm />} />
 

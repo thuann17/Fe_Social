@@ -1,93 +1,106 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import Cookies from "js-cookie";
+import FriendService from "../../Services/user/FriendService";
 
 const RightSidebar = () => {
-  const friends = [
-    { name: "John Doe", status: "Online" },
-    { name: "Jane Smith", status: "Offline" },
-    { name: "Alice Johnson", status: "Online" },
-    { name: "Michael Brown", status: "Offline" },
-    { name: "Emily Davis", status: "Online" },
-    { name: "Chris Wilson", status: "Online" },
-    { name: "Sarah Lee", status: "Offline" },
-    { name: "David Clark", status: "Online" },
-    { name: "Rachel Green", status: "Online" },
-    { name: "Ross Geller", status: "Online" },
-    { name: "Monica Geller", status: "Offline" },
-    { name: "Chandler Bing", status: "Online" },
-    { name: "Phoebe Buffay", status: "Offline" },
-  ];
+  const [friends, setFriends] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const suggestions = ["User1", "User2", "User3", "User4", "User5", "User6"];
+  // Fetch dữ liệu bạn bè từ service
+  const fetchData = () => {
+    setLoading(true);
 
-  const suggestionSectionStyle = {
-    maxHeight: '8rem', // Reduced height for friend requests
-    overflowY: 'auto',
-    overflowX: 'hidden',
-    paddingRight: '10px', // Add padding for scrollbar
+    // Gọi API lấy dữ liệu bạn bè
+    FriendService.getFriend()
+      .then((response) => {
+        const data = response.data || [];
+
+        // In ra dữ liệu trả về
+        console.log("data: ", data);
+
+        // Cập nhật danh sách bạn bè
+        setFriends(data); // Giả sử dữ liệu trả về là danh sách bạn bè
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError("Failed to fetch data: " + err.message);
+        console.error(err);
+        setLoading(false);
+      });
   };
 
-  const onlineSectionStyle = {
-    maxHeight: '15rem', // Maintain height for online friends
-    overflowY: 'auto',
-    overflowX: 'hidden',
-    paddingRight: '10px',
-  };
+  useEffect(() => {
+    fetchData(); // Gọi API khi component mount
+  }, []);
+
+  const sectionStyle = (maxHeight) => ({
+    maxHeight: maxHeight,
+    overflowY: "auto",
+    overflowX: "hidden", // Đảm bảo không có thanh cuộn ngang
+    paddingRight: "10px",
+  });
 
   return (
-    <aside className="w-64 h-screen bg-white shadow-lg p-4">
-      {/* Suggestions Section */}
-      <div className="mb-7">
-        <h3 className="font-semibold text-lg mb-2">Yêu cầu kết bạn</h3>
-        <div style={suggestionSectionStyle}>
-          <ul>
-            {suggestions.map((user, index) => (
-              <li key={index} className="flex justify-between items-center p-2 hover:bg-gray-100 transition duration-200">
-                <span>{user}</span>
-                <button className="bg-blue-500 text-white px-2 py-1 rounded">Follow</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+    <aside className="w-64 h-screen bg-white shadow-lg p-4 rounded-lg">
+      {loading && <p className="text-center">Đang tải dữ liệu...</p>}
+      {error && <p className="text-center text-red-500">{error}</p>}
 
-      {/* Online Friends Section */}
+      {/* Danh sách bạn bè */}
       <div>
-        <h3 className="font-semibold text-lg mb-2">Đang truy cập</h3>
-        <div style={onlineSectionStyle}>
-          <ul className="divide-y divide-gray-200">
-            {friends.filter(friend => friend.status === "Online").map((friend, index) => (
-              <li key={index} className="flex items-center justify-between p-2 hover:bg-gray-100 transition duration-200">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-bold">
-                    {friend.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-800">{friend.name}</p>
-                    <p className="text-sm text-green-500">{friend.status}</p>
-                  </div>
-                </div>
-                <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
-              </li>
-            ))}
-          </ul>
+        <h3 className="font-semibold text-lg mb-4 text-center">
+          Bạn bè của bạn
+        </h3>
+        <div style={sectionStyle("15rem")}>
+          {friends.length === 0 ? (
+            <p className="text-center">Không có bạn bè nào.</p>
+          ) : (
+            <ul className="space-y-3">
+              {friends.map((user, index) => (
+                <li
+                  key={index}
+                  className="flex justify-start items-center p-3 hover:bg-gray-100 rounded-lg transition duration-200"
+                >
+                  <img
+                    src={user.friendAvatar}
+                    alt={user.friendName}
+                    className="rounded-full w-12 h-12 mr-4 shadow-md"
+                  />
+                  <span
+                    className="text-lg font-small"
+                    style={{ fontSize: "16px" }}
+                  >
+                    {user.userTarget.firstname}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
 
-      {/* Style for Scrollbar */}
+      {/* Style cho Scrollbar */}
       <style>
         {`
           div::-webkit-scrollbar {
-            width: 8px; /* Width of the scrollbar */
+            width: 8px;
           }
           div::-webkit-scrollbar-track {
-            background: #f7fafc; /* Track color */
+            background: #f7fafc;
           }
           div::-webkit-scrollbar-thumb {
-            background-color: #cbd5e0; /* Thumb color */
-            border-radius: 10px; /* Rounded corners for thumb */
+            background-color: #cbd5e0;
+            border-radius: 10px;
           }
           div::-webkit-scrollbar-thumb:hover {
-            background: #a0aec0; /* Darker thumb color on hover */
+            background: #a0aec0;
+          }
+
+          /* Ensure no horizontal scrollbar */
+          .w-64 {
+            width: 100%;
+            max-width: 16rem;
+            overflow-x: hidden;
           }
         `}
       </style>

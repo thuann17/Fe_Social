@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import Message from "./Message";
 
 function Chatbox({ chat, onClose }) {
-    const [isOpen, setIsOpen] = useState(true);  // Chatbox state
+    const [isOpen, setIsOpen] = useState(false);  // Chatbox state
     const [dialogVisible, setDialogVisible] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);  // State for icon visibility
     const dialogButtonRef = useRef(null);

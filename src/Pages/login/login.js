@@ -120,7 +120,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="login-wrapper relative flex items-center justify-center h-screen bg-gradient-to-r from-purple-300 to-blue-400 animate-gradientAnimation">
+    <div className="login-wrapper relative flex items-center justify-center h-screen bg-gradient-to-r from-purple-300 to-blue-400 ">
       <div className="overlay top-0 left-0 right-0 bottom-0 bg-white opacity-10"></div>
       <div className="login-container flex flex-col lg:flex-row w-full max-w-4xl rounded-lg shadow-xl bg-white overflow-hidden">
         {/* Left Section */}
