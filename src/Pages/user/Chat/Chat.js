@@ -1,4 +1,3 @@
-// Chat.js
 import React, { useState, useEffect } from "react";
 import Message from "./Message";
 import Sidebar from "./Sidebar";
@@ -21,7 +20,7 @@ function Chat() {
   useEffect(() => {
     if (userFromCookie) {
       setUsername(userFromCookie);
-      WebSocketService.connect("http://localhost:8080/ws"); // Connect to WebSocket server
+      WebSocketService.connect("http://localhost:8080/ws");
     }
     return () => {
       WebSocketService.disconnect(); // Disconnect when component unmounts
@@ -70,7 +69,7 @@ function Chat() {
   };
 
   const toggleAboutChat = () => {
-    setShowAbout(!showAbout);
+    setShowAbout(!showAbout); // Toggle About modal visibility
   };
 
   return (
@@ -82,6 +81,7 @@ function Chat() {
           avt={selectedFriend?.friendAvatar}
           toggleAboutChat={toggleAboutChat}
         />
+
         <div className="flex-1 overflow-y-auto space-y-4 bg-blue-50 p-4">
           {loading ? (
             <div className="flex justify-center items-center h-full">
@@ -107,7 +107,7 @@ function Chat() {
           )}
         </div>
       </div>
-      {showAbout && <AboutChat />}
+      {showAbout && <AboutChat toggleAboutChat={toggleAboutChat} />}
     </div>
   );
 }

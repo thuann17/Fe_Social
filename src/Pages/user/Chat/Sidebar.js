@@ -22,7 +22,6 @@ function Sidebar({ onSelectFriend, onSelectGroup }) {
       try {
         setLoading(true);
 
-        // Kiểm tra tab hiện tại và load dữ liệu nếu chưa có
         if (activeTab === "friends" && friends.length === 0) {
           const response = await ChatService.getListFriend(username);
           setFriends(response.data);
@@ -39,7 +38,7 @@ function Sidebar({ onSelectFriend, onSelectGroup }) {
     };
 
     fetchFriendsAndGroups();
-  }, [username, activeTab, friends.length, groups.length]); // Thêm `friends.length` và `groups.length` vào dependency để kiểm tra khi dữ liệu chưa có
+  }, [username, activeTab, friends.length, groups.length]);
 
   return (
     <div

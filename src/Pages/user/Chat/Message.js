@@ -47,7 +47,7 @@ function Message({ avt, messages, setMessages, handleSendMessage }) {
             sender: userFromCookie,
             content: url,
             time: new Date(),
-            status: false,
+            read: false,
             type: "image",
           };
           handleSendMessage(newMessage.content);
@@ -57,26 +57,26 @@ function Message({ avt, messages, setMessages, handleSendMessage }) {
         }
       );
     } else
-     if (message.trim()) {
-      const newMessage = {
-        sender: userFromCookie,
-        content: message.trim(),
-        time: new Date(),
-        status: false,
-        type: "text",
-      };
-      handleSendMessage(newMessage.content);
-      setMessage("");
-    } else {
-      const newMessage = {
-        sender: userFromCookie,
-        content: "❤️",
-        time: new Date(),
-        status: false,
-        type: "emoji",
-      };
-      handleSendMessage(newMessage.content);
-    }
+      if (message.trim()) {
+        const newMessage = {
+          sender: userFromCookie,
+          content: message.trim(),
+          time: new Date(),
+          read: false,
+          type: "text",
+        };
+        handleSendMessage(newMessage.content);
+        setMessage("");
+      } else {
+        const newMessage = {
+          sender: userFromCookie,
+          content: "❤️",
+          time: new Date(),
+          read: false,
+          type: "emoji",
+        };
+        handleSendMessage(newMessage.content);
+      }
   };
 
   const handleEmojiSelect = (emoji) => {
@@ -123,16 +123,16 @@ function Message({ avt, messages, setMessages, handleSendMessage }) {
                 {formatTime(msg.time)}
               </span>
               <div
-                className={`max-w-xs sm:max-w-md p-3 rounded-lg ${msg.sender === userFromCookie
-                    ? "bg-[#3b82f6] text-white"
-                    : "bg-gray-200 text-gray-800"
+                className={`max-w-xs sm:max-w-md p-2 rounded-lg ${msg.sender === userFromCookie
+                  ? "bg-[#3b82f6] text-white"
+                  : "bg-gray-200 text-gray-800"
                   } ${msg.content === "❤️" ? "bg-transparent border-0 text-4xl" : ""}`}
               >
                 {msg.type === "image" ? (
                   <img src={msg.content} alt="Sent Image" className="w-full h-auto rounded-lg" />
                 ) : (
                   <p>{msg.content}</p>
-                )}
+                )}   {msg.read && <span className="text-xs text-green-500">Đã xem</span>}
               </div>
             </div>
           </div>
@@ -184,8 +184,8 @@ function Message({ avt, messages, setMessages, handleSendMessage }) {
         <button
           onClick={handleSendMessageClick}
           className={`p-1 rounded-full transition ease-in-out duration-300 ${!message.trim() && !image
-              ? "text-gray-400 text-2xl"
-              : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg text-white px-3 text-1xl"
+            ? "text-gray-400 text-2xl"
+            : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg text-white px-3 text-1xl"
             }`}
         >
           {message.trim() === "" && !image ? "❤️" : "Gửi"}

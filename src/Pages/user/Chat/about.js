@@ -1,12 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const AboutChat = () => {
+const AboutChat = ({ toggleAboutChat }) => {
     const images = [
         "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/08/anh-phat-dep-lam-hinh-nen-62.jpg",
         "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/08/anh-phat-dep-lam-hinh-nen-62.jpg",
         "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/08/anh-phat-dep-lam-hinh-nen-62.jpg"
     ];
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false); // Track if the screen is mobile size
+
+    // Handle screen resize to toggle mobile state
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 640); // Tailwind's sm breakpoint (640px)
+        };
+
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     const openModal = () => {
         setIsModalOpen(true);
@@ -16,8 +28,22 @@ const AboutChat = () => {
         setIsModalOpen(false);
     };
 
+    const goBack = () => {
+        toggleAboutChat(); // Close About Chat modal when back button is clicked
+    };
+
     return (
         <div className="h-screen sm:w-72 w-full p-4 flex flex-col" style={{ backgroundColor: '#b8aef3' }}>
+            {/* Back Button on mobile */}
+            {isMobile && (
+                <button
+                    onClick={goBack}
+                    className="absolute top-4 left-4 text-2xl text-blue-600 bg-white p-2 rounded-full shadow-lg"
+                >
+                    ←
+                </button>
+            )}
+
             {/* Profile Section */}
             <div className="flex flex-col items-center mb-6">
                 <img
@@ -64,7 +90,7 @@ const AboutChat = () => {
                             className="absolute top-2 right-2 text-red-600 text-2xl"
                             onClick={closeModal}
                         >
-                            ❎  
+                            ❎
                         </button>
 
                         <div className="space-y-4">
