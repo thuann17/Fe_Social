@@ -4,6 +4,7 @@ import RightSidebar from "../Components/user/rightsidebar";
 import LeftSidebar from "../Components/user/leftsidebar";
 import { Outlet } from "react-router-dom";
 import Chatbox from "../Pages/user/Chat/Chatbox";
+import { toast, ToastContainer } from "react-toastify";
 
 const UserLayout = () => {
   const [activeChat, setActiveChat] = useState({
@@ -20,6 +21,7 @@ const UserLayout = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
+      <ToastContainer/>
       <Header />
       <div className="flex px-4 py-4 relative">
         <div className="w-64 hidden lg:block fixed left-0 top-0 pt-16 h-screen overflow-auto bg-white shadow-md">

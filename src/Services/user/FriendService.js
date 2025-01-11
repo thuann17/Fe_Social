@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 
 const API_BASE_URL = 'http://localhost:8080';
 
-class PostService {
+class FriendService {
     
     // lấy danh sách gợi ý kết bạn
     fetchSuggestedFriends() {
@@ -37,11 +37,7 @@ class PostService {
     getFriend(){
         const username = Cookies.get('username');
         return axios.get(`${API_BASE_URL}/api/friend-requests/${username}`);
-
-
     }
-
-
 }
 
-export default new PostService();
+export default new FriendService();

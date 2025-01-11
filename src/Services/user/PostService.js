@@ -23,5 +23,29 @@ class PostService {
     getComments(postId) {
         return axios.get(`${API_BASE_URL}/api/user/post/comments/${postId}`);
     }
-}
+    getMyPost() {
+        const username = Cookies.get('username');
+        return axios.get(`${API_BASE_URL}/api/user/post/${username}`);
+    }
+    async createPost(postData) {
+        const username = Cookies.get('username'); // Get username from cookies
+    
+        if (!username) {
+          throw new Error('User not found.');
+        }
+    
+        try {
+          const response = await axios.post(
+            `${API_BASE_URL}/api/user/post/${username}`, // URL with PathVariable
+            postData // Post data to be sent in the body
+          );
+          return response.data; // Return the post data from the response
+        } catch (err) {
+          throw new Error(err.response ? err.response.data.message : err.message); // Handle errors
+        }
+      }
+    }
+    
+
+
 export default new PostService();

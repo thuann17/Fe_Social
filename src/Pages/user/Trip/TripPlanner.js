@@ -29,6 +29,10 @@ const TripPlanner = () => {
   const handleDateSelect = (selectInfo) => {
     setSelectedDate(selectInfo.startStr);
     setIsModalOpen(true);
+    navigate(`/user/place`, {
+      state: { selectedDate: selectInfo.startStr },
+    }
+      );
   };
 
   const navigate = useNavigate();

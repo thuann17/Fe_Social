@@ -1,39 +1,24 @@
-/* Custom modal styling */
 .modal {
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Center the modal */
-  padding: 30px;
-  background-color: #fff;
-  border-radius: 12px;
-  max-width: 500px;
-  width: 90%; /* Make modal responsive */
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Softer shadow */
-  z-index: 1000; /* Ensure it's above other content */
-  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Smooth fade-in/out */
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.9); /* Start with a scaled-down version */
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  z-index: 1000; /* Bảo đảm modal ở trên các phần tử khác */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.Toastify__toast-container {
+  z-index: 9999;
+}
 .modal.open {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1); /* Full size when open */
 }
 
-/* Overlay styling */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  z-index: 999; /* Overlay should be behind the modal */
-  transition: opacity 0.3s ease-in-out; /* Smooth fade for the overlay */
-}
 
-/* Modal header styling */
 .modal h2 {
   font-size: 1.5rem;
   font-weight: 600;

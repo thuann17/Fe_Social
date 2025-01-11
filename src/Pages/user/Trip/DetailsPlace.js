@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import { FaMapMarkerAlt, FaStar } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import axios from "axios";
+import { useParams, useNavigate, useLocation } from "react-router-dom"; // Fixed duplicate import
 
 const truncateText = (text, maxLength) => {
   if (text.length > maxLength) {
@@ -8,7 +10,7 @@ const truncateText = (text, maxLength) => {
   return text;
 };
 
-const Card = ({ imageUrl, title, rating, reviews, description, onClick }) => {
+const Card = ({ imageUrl, title, description, onClick }) => {
   const shortDescription = truncateText(description, 60);
   return (
     <div
@@ -19,69 +21,40 @@ const Card = ({ imageUrl, title, rating, reviews, description, onClick }) => {
       <div className="p-4">
         <h3 className="text-lg font-semibold">{title}</h3>
         <p className="text-sm text-gray-700 mt-2">{shortDescription}</p>
-        <div className="flex items-center mt-2">
-          <span className="text-yellow-500">
-            {"⭐".repeat(Math.round(rating))}
-          </span>
-          <span className="ml-2 text-gray-600">({reviews} đánh giá)</span>
-        </div>
       </div>
     </div>
   );
 };
 
 const DetailsPlace = () => {
+  const { addressFilter } = useParams();
+  const [places, setPlaces] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [tripName, setTripName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [tripDescription, setTripDescription] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const selectedDate = location.state?.selectedDate;
 
-  const cardsData = [
-    {
-      imageUrl: "https://cellphones.com.vn/sforum/wp-content/uploads/2024/01/dia-diem-du-lich-o-ha-noi-1.jpg",
-      title: "Hồ Hoàn Kiếm",
-      rating: 3.9,
-      reviews: 5,
-      description: "Hồ Hoàn Kiếm, biểu tượng của Hà Nội, là nơi gắn liền với truyền thuyết Rùa thần.",
-    },
-    {
-      imageUrl: "https://dulichvietdu.com/wp-content/uploads/2023/07/quang-truong-ba-dinh.jpg",
-      title: "Lăng Hồ Chủ Tịch",
-      rating: 4.2,
-      reviews: 10,
-      description: "Lăng Hồ Chủ Tịch là nơi lưu giữ thi hài của Chủ tịch Hồ Chí Minh vĩ đại.",
-    },
-    {
-      imageUrl: "https://statics.vinpearl.com/dia-diem-du-lich-ha-noi-3_1688468966.jpg",
-      title: "Chùa Một Cột",
-      rating: 4.5,
-      reviews: 8,
-      description: "Chùa Một Cột, công trình kiến trúc độc đáo, biểu tượng văn hóa lâu đời.",
-    },
-    {
-      imageUrl: "https://intertour.vn/wp-content/uploads/2022/03/b159cc9c-3010-4e99-be7f-a55419601266-1.jpg",
-      title: "Chùa Trấn Quốc",
-      rating: 4.0,
-      reviews: 12,
-      description: "Chùa Trấn Quốc là một trong những ngôi chùa cổ nhất Việt Nam, nằm bên Hồ Tây.",
-    },
-    {
-      imageUrl: "https://intertour.vn/wp-content/uploads/2022/03/e9b300f9-a94b-4339-ab16-e8d2f5517f55.jpg",
-      title: "Phủ Tây Hồ",
-      rating: 4.8,
-      reviews: 20,
-      description: "Phủ Tây Hồ nổi tiếng với kiến trúc tinh tế và vị trí tuyệt đẹp bên Hồ Tây.",
-    },
-    {
-      imageUrl: "https://intertour.vn/wp-content/uploads/2022/03/91c4073f-7e28-4087-bdd8-32a2d55f7f07.jpg",
-      title: "Đền Quán Thánh",
-      rating: 3.5,
-      reviews: 6,
-      description: "Đền Quán Thánh là ngôi đền linh thiêng, gắn liền với văn hóa tâm linh của người dân Hà Nội.",
-    },
-  ];
+  useEffect(() => {
+    getDetailPlace();
+  }, [addressFilter]);
+
+  const getDetailPlace = () => {
+    axios
+      .get("http://localhost:8080/api/place", {
+        params: { addressFilter },
+      })
+      .then((response) => {
+        setPlaces(response.data);
+      })
+      .catch((error) => {
+        console.error("There was an error fetching place details:", error);
+      });
+  };
 
   const openModal = (card) => {
     setSelectedCard(card);
@@ -103,7 +76,6 @@ const DetailsPlace = () => {
       description: selectedCard.description,
     });
 
-    // Reset fields and close modal
     setTripName("");
     setStartDate("");
     setEndDate("");
@@ -111,14 +83,29 @@ const DetailsPlace = () => {
     closeModal();
   };
 
+  // Function to format date and extract time (HH:MM)
+  const formatTime = (dateTime) => {
+    if (!dateTime) return "";
+    const date = new Date(dateTime);
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+
   return (
     <div className="container mx-auto">
       <h2 className="text-2xl font-semibold text-center mb-6">
-        Các Địa Điểm Du Lịch Nổi Bật Tại: 🗺 HÀ NỘI
+        Các Địa Điểm Du Lịch Nổi Bật Tại: 🗺 {addressFilter}
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-        {cardsData.map((card, index) => (
-          <Card key={index} {...card} onClick={() => openModal(card)} />
+        {places.map((place, index) => (
+          <Card
+            key={index}
+            imageUrl={place.placeimages[0]?.image || ""}
+            title={place.nameplace}
+            description={place.description}
+            onClick={() => openModal(place)}
+          />
         ))}
       </div>
 
@@ -132,11 +119,11 @@ const DetailsPlace = () => {
               ❎
             </button>
             <img
-              src={selectedCard.imageUrl}
-              alt={selectedCard.title}
+              src={selectedCard.placeimages[0]?.image || ""}
+              alt={selectedCard.nameplace}
               className="w-full h-48 object-cover rounded-md mb-4"
             />
-            <h3 className="text-lg font-semibold mb-2">{selectedCard.title}</h3>
+            <h3 className="text-lg font-semibold mb-2">{selectedCard.nameplace}</h3>
             <div className="flex items-center mb-4">
               <FaMapMarkerAlt className="text-gray-600 mr-2" />
               <span className="text-gray-700">{selectedCard.description}</span>
@@ -144,24 +131,11 @@ const DetailsPlace = () => {
             <form onSubmit={handleSaveTrip}>
               <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-2">
-                  Tên Chuyến Đi:
+                  Thời Gian Bắt Đầu: {selectedDate}
                 </label>
                 <input
-                  type="text"
-                  value={tripName}
-                  onChange={(e) => setTripName(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Nhập tên chuyến đi"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 font-semibold mb-2">
-                  Thời Gian Bắt Đầu:
-                </label>
-                <input
-                  type="date"
-                  value={startDate}
+                  type="time"
+                  value={startDate || formatTime(selectedDate)} // Use formatted time or startDate value
                   onChange={(e) => setStartDate(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -169,11 +143,11 @@ const DetailsPlace = () => {
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-2">
-                  Thời Gian Kết Thúc:
+                  Thời Gian Kết Thúc: {selectedDate}
                 </label>
                 <input
-                  type="date"
-                  value={endDate}
+                  type="time"
+                  value={endDate || formatTime(selectedDate)} // Use formatted time or endDate value
                   onChange={(e) => setEndDate(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
