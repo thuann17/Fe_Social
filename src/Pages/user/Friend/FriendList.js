@@ -4,11 +4,18 @@ import Cookies from "js-cookie";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Modal from "react-modal";
-import "./FriendList.css";
+import { useNavigate } from "react-router-dom";
+// import "./FriendList.css";
 
 Modal.setAppElement("#root");
 
 const CombinedFriendComponents = () => {
+  const handleImageClick = (username) => {
+    navigate(`/user/friendprofile/${username}`, {});
+  };
+
+
+  const navigate = useNavigate();
   const [friends, setFriends] = useState([]);
   const [followers, setFollowers] = useState([]);
   const [suggestedFriends, setSuggestedFriends] = useState([]);
@@ -19,8 +26,9 @@ const CombinedFriendComponents = () => {
   const [requestToDelete, setRequestToDelete] = useState(null);
   const [requestToAdd, setRequestToAdd] = useState(null);
 
-  // Function to fetch friends, followers, and suggested friends
   const fetchData = () => {
+
+
     const username = Cookies.get("username");
     if (!username) {
       setError("Username is required to fetch data.");
@@ -56,10 +64,10 @@ const CombinedFriendComponents = () => {
     setIsModalOpen(true);
   };
 
+ 
   const confirmDelete = () => {
     FriendService.deleteFriendRequest(requestToDelete)
       .then(() => {
-        // Reload the data after delete operation
         fetchData();
         setIsModalOpen(false);
         toast.success("Xóa thành công!", {
@@ -123,9 +131,9 @@ const CombinedFriendComponents = () => {
             follower.id === id ? updatedFriend : follower
           )
         );
-        
-        fetchData(); 
-        
+
+        fetchData();
+
         toast.success("Đã chấp nhận yêu cầu kết bạn");
       })
       .catch((err) => {
@@ -141,7 +149,7 @@ const CombinedFriendComponents = () => {
   return (
     <div className="bg-purple-300 p-6 text-white">
       {/* Toast Container */}
-      <ToastContainer/>
+      <ToastContainer />
 
       {/* Friend List Section */}
       <h2 className="text-3xl font-bold mb-6">Bạn bè:</h2>
@@ -156,6 +164,7 @@ const CombinedFriendComponents = () => {
                 src={friend.friendAvatar}
                 alt={friend.friendName}
                 className="w-full h-48 object-cover rounded-lg mb-4"
+                onClick={() => handleImageClick(friend.friendUserName)}
               />
               <div className="text-lg mb-2">
                 {friend.friendName || "Unnamed"}
@@ -186,6 +195,7 @@ const CombinedFriendComponents = () => {
                 src={follower.friendAvatar}
                 alt={follower.friendName}
                 className="w-full h-48 object-cover rounded-lg mb-4"
+                onClick={() => handleImageClick(follower.friendUserName)}// Add the click handler here
               />
               <div className="text-lg mb-2">
                 {follower.friendName || "Unnamed"}
@@ -225,6 +235,7 @@ const CombinedFriendComponents = () => {
                 src={friend.images[0]?.avatarrurl}
                 alt={friend.username}
                 className="w-full h-48 object-cover rounded-lg mb-4"
+                onClick={() => handleImageClick(friend.username)}
               />
               <div className="text-lg mb-2">
                 {friend.lastname} {friend.firstname}
@@ -292,9 +303,7 @@ const CombinedFriendComponents = () => {
         >
           ✖
         </button>
-        <h2 className="text-xl font-semibold mb-4 text-center">
-          Xác nhận xóa
-        </h2>
+        <h2 className="text-xl font-semibold mb-4 text-center">Xác nhận xóa</h2>
         <p className="text-gray-700 text-center">
           Bạn có chắc chắn muốn xóa người dùng này?
         </p>

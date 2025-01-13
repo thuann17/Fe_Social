@@ -70,7 +70,7 @@ const RightSidebar = () => {
                     className="text-lg font-small"
                     style={{ fontSize: "16px" }}
                   >
-                    {user.userTarget.firstname}
+                    {user.userSrc.firstname}
                   </span>
                 </li>
               ))}

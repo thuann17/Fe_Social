@@ -1,23 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Cookies from "js-cookie";
 import UserService from "../../../Services/user/UserService";
 import PostService from "../../../Services/user/PostService";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../../../Services/firebase"; // Ensure you have the firebase setup
 
 const PostInput = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [textInput, setTextInput] = useState("");
-  const [posting, setPosting] = useState(false); // Trạng thái đăng bài
-  const [postMessage, setPostMessage] = useState(""); // Thông báo sau khi đăng
+  const [posting, setPosting] = useState(false); // Posting status
+  const [postMessage, setPostMessage] = useState(""); // Post message
+  const [images, setImages] = useState([]); // Selected images
 
+  const imageInputRef = useRef(null); // Reference for the file input
+
+  // Fetch user information on component mount
   useEffect(() => {
     const username = Cookies.get("username");
     if (username) {
       setLoading(true);
-
       UserService.getInfo(username)
         .then((data) => {
           setUserInfo(data);
@@ -33,9 +38,22 @@ const PostInput = () => {
     }
   }, []);
 
-  // Hàm để gửi bài đăng
+  // Image upload to Firebase
+  const uploadImageToFirebase = async (file, postId) => {
+    try {
+      const storageRef = ref(storage, `posts/${postId}/${Date.now()}_${file.name}`);
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      return downloadURL;
+    } catch (error) {
+      console.error("Error uploading image to Firebase:", error);
+      throw error;
+    }
+  };
+
+  // Handle post submission
   const handlePost = async () => {
-    const username = Cookies.get("username"); // Retrieve username from cookies
+    const username = Cookies.get("username");
 
     if (!textInput.trim()) {
       setPostMessage("Nội dung bài viết không được để trống!");
@@ -50,19 +68,36 @@ const PostInput = () => {
     setPosting(true);
     setPostMessage("");
 
-    const postData = {
-      username: username,
-      createdAt: new Date().toISOString(),
-      content: textInput,
-      status: 1, // You can adjust the status as needed
-    };
+    let imageUrls = [];
 
     try {
-      // Call createPost from PostService to send the data to the backend
-      await PostService.createPost(postData); // Call the async method
+      // Step 1: If images exist, upload them concurrently
+      if (images.length > 0) {
+        const uploadPromises = images.map((image) =>
+          uploadImageToFirebase(image) // Upload each image and return its URL
+        );
 
-      // Clear the input and show success message
+        // Wait for all uploads to complete and get image URLs
+        imageUrls = await Promise.all(uploadPromises);
+      }
+
+      // Step 2: Create the post with image URLs (if any)
+      const newPost = {
+        username: username,
+        createdAt: new Date().toISOString(),
+        content: textInput,
+        status: 1, // Adjust the status as needed
+        imagePosts: imageUrls, // Save multiple image URLs
+      };
+
+      // Create the post in the database and get the response (postId)
+      const response = await PostService.createPost(newPost);
+
+      console.log("Post created successfully, postId:", response.postId);
+
+      // Clear inputs and reset form state
       setTextInput("");
+      setImages([]); // Reset image inputs after successful post
       toast.success("Đã đăng bài viết", {
         position: "top-right",
         autoClose: 3000,
@@ -74,14 +109,28 @@ const PostInput = () => {
         theme: "light",
       });
     } catch (err) {
-      // Handle error if post creation fails
       setPostMessage("Đã xảy ra lỗi khi đăng bài viết.");
       toast.error("Đã xảy ra lỗi khi đăng bài viết.");
+      console.error("Error during post submission:", err);
     } finally {
       setPosting(false);
     }
   };
 
+  // Handle image selection
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files); // Convert FileList to an array
+    setImages(files); // Store the selected files in the state
+  };
+
+  // Trigger the file input click event
+  const handleImageButtonClick = () => {
+    if (imageInputRef.current) {
+      imageInputRef.current.click();
+    }
+  };
+
+  // Display loading or error states if necessary
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -100,7 +149,7 @@ const PostInput = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-5 w-full max-w-[700px] mx-auto">
-        <ToastContainer />
+      <ToastContainer />
       <div className="flex items-center space-x-3">
         <img
           src={userInfo.avatarUrl || "https://via.placeholder.com/32"}
@@ -119,7 +168,10 @@ const PostInput = () => {
       />
       <div className="flex flex-col md:flex-row justify-between items-center mt-4">
         <div className="flex space-x-4 mb-4 md:mb-0">
-          <button className="flex items-center bg-gray-200 p-2 rounded-lg hover:bg-gray-300 transition duration-200">
+          <button
+            onClick={handleImageButtonClick} // Trigger file input when clicked
+            className="flex items-center bg-gray-200 p-2 rounded-lg hover:bg-gray-300 transition duration-200"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 text-blue-500"
@@ -136,6 +188,15 @@ const PostInput = () => {
             </svg>
             <span className="ml-2 font-medium">Ảnh</span>
           </button>
+          {/* Hidden file input to allow multiple files */}
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            multiple
+            className="hidden"
+          />
         </div>
         <button
           onClick={handlePost}

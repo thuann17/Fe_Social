@@ -51,7 +51,7 @@ function App() {
           <Route path="index" element={<PostList />} />
           <Route path="cal" element={<TripPlanner />} />
           <Route path="profile" element={<MyProfileLayout />} />
-          <Route path="friendprofile" element={<FriendLayout />} />
+          <Route path="friendprofile/:username" element={<FriendLayout />} />
           <Route path="friends" element={<FriendList />} />
           <Route path="place" element={<TripLayout />} />
           <Route path="detailsplan" element={<DetailsPlan />} />
@@ -68,10 +68,16 @@ function App() {
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/user/chat" element={<Chat />} />
         <Route path="/map" element={<MapTest />} />
-        <Route path="/load" element={<UploadImage />} />
+         {/* <Route path="/load" element={<UploadImage />} />  */}
         {/* Định tuyến cho Register */}
         <Route path="/register" element={<RegisterForm />} />
+<<<<<<< Updated upstream
         <Route path="*" element={<Navigate to="/login" />} />
+=======
+
+        {/* Định tuyến mặc định */}
+        {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
+>>>>>>> Stashed changes
       </>
     )
   );
