@@ -15,11 +15,11 @@ const formatTime = (dateString) => {
 const shouldShowMiddleTime = (current, previous) =>
   Math.abs(new Date(current) - new Date(previous)) / (1000 * 60 * 60) >= 1;
 
-function Message({ avt, messages, setMessages, handleSendMessage }) {
+function Message({ avt, messages = [], setMessages, handleSendMessage }) {
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [image, setImage] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null); // Xem trước ảnh
+  const [previewImage, setPreviewImage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const messagesEndRef = useRef(null);
 
@@ -31,9 +31,7 @@ function Message({ avt, messages, setMessages, handleSendMessage }) {
     if (image) {
       const storageRef = ref(storage, `Images/${image.name}`);
       const uploadTask = uploadBytesResumable(storageRef, image);
-
       setUploading(true);
-
       uploadTask.on(
         "state_changed",
         null,
@@ -52,31 +50,30 @@ function Message({ avt, messages, setMessages, handleSendMessage }) {
           };
           handleSendMessage(newMessage.content);
           setImage(null);
-          setPreviewImage(null); // Xóa ảnh xem trước
+          setPreviewImage(null);
           setUploading(false);
         }
       );
-    } else
-      if (message.trim()) {
-        const newMessage = {
-          sender: userFromCookie,
-          content: message.trim(),
-          time: new Date(),
-          read: false,
-          type: "text",
-        };
-        handleSendMessage(newMessage.content);
-        setMessage("");
-      } else {
-        const newMessage = {
-          sender: userFromCookie,
-          content: "❤️",
-          time: new Date(),
-          read: false,
-          type: "emoji",
-        };
-        handleSendMessage(newMessage.content);
-      }
+    } else if (message.trim()) {
+      const newMessage = {
+        sender: userFromCookie,
+        content: message.trim(),
+        time: new Date(),
+        read: false,
+        type: "text",
+      };
+      handleSendMessage(newMessage.content);
+      setMessage("");
+    } else {
+      const newMessage = {
+        sender: userFromCookie,
+        content: "❤️",
+        time: new Date(),
+        read: false,
+        type: "emoji",
+      };
+      handleSendMessage(newMessage.content);
+    }
   };
 
   const handleEmojiSelect = (emoji) => {
@@ -88,7 +85,7 @@ function Message({ avt, messages, setMessages, handleSendMessage }) {
     const file = e.target.files[0];
     if (file) {
       setImage(file);
-      setPreviewImage(URL.createObjectURL(file)); // Tạo URL xem trước
+      setPreviewImage(URL.createObjectURL(file));
     }
   };
 
@@ -103,7 +100,7 @@ function Message({ avt, messages, setMessages, handleSendMessage }) {
 
   return (
     <div className="flex flex-col h-full bg-[#f3f4f6]">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#ffffff] sm:p-6 md:p-8">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white sm:p-6 md:p-8">
         {messages.map((msg, index) => (
           <div key={index} className="group">
             {index > 0 && shouldShowMiddleTime(msg.time, messages[index - 1].time) && (
@@ -124,7 +121,7 @@ function Message({ avt, messages, setMessages, handleSendMessage }) {
               </span>
               <div
                 className={`max-w-xs sm:max-w-md p-2 rounded-lg ${msg.sender === userFromCookie
-                  ? "bg-[#3b82f6] text-white"
+                  ? "bg-blue-600 text-white"
                   : "bg-gray-200 text-gray-800"
                   } ${msg.content === "❤️" ? "bg-transparent border-0 text-4xl" : ""}`}
               >
@@ -132,7 +129,8 @@ function Message({ avt, messages, setMessages, handleSendMessage }) {
                   <img src={msg.content} alt="Sent Image" className="w-full h-auto rounded-lg" />
                 ) : (
                   <p>{msg.content}</p>
-                )}   {msg.read && <span className="text-xs text-green-500">Đã xem</span>}
+                )}
+                {msg.read && <span className="text-xs text-green-500">Đã xem</span>}
               </div>
             </div>
           </div>

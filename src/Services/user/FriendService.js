@@ -32,8 +32,6 @@ class FriendService {
     acceptFriendRequest(id){
         return axios.put(`${API_BASE_URL}/api/friend-requests/${id}/update-status`);
     }
-
-    //lấy danh sách bạn bè
     getFriend(){
         const username = Cookies.get('username');
         return axios.get(`${API_BASE_URL}/api/friend-requests/${username}`);
