@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import PostService from "../../../Services/admin/PostService";
-import { toast, ToastContainer } from 'react-toastify'; 
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Post from "./Post";
 
 const POST_STATUSES = [
     { label: "Tất cả", value: "all" },
@@ -9,7 +10,7 @@ const POST_STATUSES = [
     { label: "Chưa khoá", value: "false" },
 ];
 
-const TABLE_HEAD = ["Tác giả", "Tiêu đề", "Ngày tạo", "Trạng thái", "Lượt yêu thích", "Lượt bình luận", ""];
+const TABLE_HEAD = ["STT", "Tác giả", "Tiêu đề", "Ngày tạo", "Trạng thái", "Lượt yêu thích", "Lượt bình luận", ""];
 
 function PostAdmin() {
     const [status, setStatus] = useState("all");
@@ -19,6 +20,8 @@ function PostAdmin() {
     const [pageSize, setPageSize] = useState(7);
     const [totalPages, setTotalPages] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedPostId, setSelectedPostId] = useState(null);
 
     useEffect(() => {
         fetchPosts();
@@ -27,18 +30,20 @@ function PostAdmin() {
     const togglePostStatus = async (postId, currentStatus) => {
         try {
             const updatedStatus = !currentStatus;
+            console.log(updatedStatus);
             await PostService.updatePostStatus(postId, updatedStatus);
             setPosts((prevPosts) =>
                 prevPosts.map((post) =>
                     post.id === postId ? { ...post, status: updatedStatus } : post
                 )
             );
-            toast.success("Trạng thái bài viết đã được cập nhật thành công!"); // Success message
+            toast.success("Trạng thái bài viết đã được cập nhật thành công!");
         } catch (error) {
             console.error("Error updating post status:", error);
-            toast.error("Cập nhật trạng thái bài viết thất bại!"); // Error message
+            toast.error("Cập nhật trạng thái bài viết thất bại!");
         }
     };
+
 
     const fetchPosts = async () => {
         setLoading(true);
@@ -46,20 +51,16 @@ function PostAdmin() {
             const params = {
                 page: currentPage,
                 size: pageSize,
-                search,
-                status: status === "all" ? null : status === "true" ? true : false,
+                status: status === "all" ? undefined : status,
             };
             const response = await PostService.getPosts(params);
-            console.log(response.data);
-
             const sortedPosts = response.data.content.sort(
                 (a, b) => new Date(b.createdate) - new Date(a.createdate)
             );
             setPosts(sortedPosts);
             setTotalPages(response.data.totalPages);
         } catch (error) {
-            console.error("Error fetching posts:", error);
-            toast.error("Lỗi khi tải bài viết!"); // Error message
+            toast.error("Lỗi khi tải bài viết!");
         } finally {
             setLoading(false);
         }
@@ -79,6 +80,15 @@ function PostAdmin() {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
         return date.toLocaleDateString("vi-VN");
+    };
+
+    const handleShowModal = (postId) => {
+        setSelectedPostId(postId); // Lưu ID bài viết được chọn
+        setShowModal(true); // Hiển thị modal
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false); // Đóng modal
     };
 
     const renderPagination = () => {
@@ -130,33 +140,6 @@ function PostAdmin() {
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-700">Quản lý bài viết</h2>
             </div>
-
-            {/* Status Toggle */}
-            <div className="flex justify-between items-center mb-4">
-                <div className="flex space-x-4">
-                    {POST_STATUSES.map((type) => (
-                        <button
-                            key={type.value}
-                            onClick={() => setStatus(type.value)}
-                            className={`px-4 py-2 text-sm font-medium rounded-md border transition-all ${status === type.value
-                                ? "bg-blue-500 text-white border-blue-500"
-                                : "border-gray-300 text-gray-600 hover:bg-gray-100"
-                                }`}
-                        >
-                            {type.label}
-                        </button>
-                    ))}
-                </div>
-                <input
-                    type="text"
-                    placeholder="Tìm kiếm"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="border border-gray-300 rounded-md px-4 py-2 text-sm w-64 focus:ring-2 focus:ring-blue-500"
-                />
-            </div>
-
-            {/* Loading Indicator */}
             {loading ? (
                 <div className="text-center py-4">
                     <span>Đang tải dữ liệu...</span>
@@ -179,6 +162,7 @@ function PostAdmin() {
                         <tbody>
                             {posts.map((post, index) => (
                                 <tr key={index} className="hover:bg-gray-50">
+                                    <td className="px-4 items-center">{index + 1}</td>
                                     <td className="px-4 py-3 flex items-center space-x-3">
                                         <img
                                             src={post.username.images || "https://firebasestorage.googleapis.com/v0/b/socialmedia-8bff2.appspot.com/o/ThuanImage%2Favt.jpg?alt=media"}
@@ -210,13 +194,14 @@ function PostAdmin() {
                                                 onChange={() => togglePostStatus(post.id, post.status)}
                                             />
                                             <div className="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 
-                                            peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 
-                                            peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
-                                            peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 
-                                            after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full 
-                                            after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600"></div>
+                                                peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 
+                                                peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
+                                                peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 
+                                                after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full 
+                                                after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600"></div>
                                         </label>
                                     </td>
+
                                     <td className="px-4 py-3 text-sm text-gray-700">
                                         {post.countLike}
                                     </td>
@@ -224,7 +209,10 @@ function PostAdmin() {
                                         {post.countComment}
                                     </td>
                                     <td className="px-1 py-3 text-right">
-                                        <button className="text-blue-500 hover:text-blue-700">
+                                        <button
+                                            className="text-blue-500 hover:text-blue-700"
+                                            onClick={() => handleShowModal(post.id)}
+                                        >
                                             Xem thông tin
                                         </button>
                                     </td>
@@ -240,6 +228,23 @@ function PostAdmin() {
                 </p>
                 {renderPagination()}
             </div>
+
+            {/* Modal hiển thị thông tin bài viết */}
+            {showModal && (
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white w-3/4 p-6 rounded-lg shadow-lg relative">
+                        <button
+                            onClick={handleCloseModal}
+                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                        <Post postId={selectedPostId} />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

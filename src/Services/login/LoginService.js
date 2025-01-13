@@ -1,12 +1,8 @@
-const API_URL = "http://localhost:8080/api";
-export const login = async (username, password, remember) => {
-  const token = localStorage.getItem('token');
-  fetch('api/endpoint', {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
+import { toast } from 'react-toastify';
 
+const API_URL = "http://localhost:8080/api";
+
+export const login = async (username, password, remember) => {
   try {
     const response = await fetch(`${API_URL}/login`, {
       method: "POST",
@@ -21,12 +17,18 @@ export const login = async (username, password, remember) => {
     });
 
     const data = await response.json();
+
     if (!response.ok) {
-      throw new Error(data.message || "Đăng nhập không thành công");
+      if (data.message) {
+        toast.error(data.message || "Đăng nhập không thành công");
+      }
+      return;
     }
+    localStorage.setItem("token", data.token);
+    toast.success("Đăng nhập thành công!");
 
     return data;
   } catch (error) {
-    throw new Error(error.message || "Có lỗi xảy ra. Vui lòng thử lại sau.");
+    toast.error(error.message || "Có lỗi xảy ra. Vui lòng thử lại sau.");
   }
 };

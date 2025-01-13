@@ -2,14 +2,20 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8080';
 
-class AccountService {
+class PostService {
 
     getPosts(params) {
         return axios.get(`${API_BASE_URL}/api/admin/post`, { params });
     }
-    updatePostStatus(postId, status) {
-        return axios.put(`${API_BASE_URL}/api/admin/post/${postId}`, { status: status });
+    updatePostStatus(postId, updatedStatus) {
+        const postModel = {
+            status: updatedStatus,
+        };
+        return axios.put(`${API_BASE_URL}/api/admin/post/${postId}`, postModel);
+    }
+    getPostById(postId) {
+        return axios.get(`${API_BASE_URL}/api/admin/post/${postId}`)
     }
 }
 
-export default new AccountService();
+export default new PostService();

@@ -6,7 +6,18 @@ import { ToastContainer } from "react-toastify";
 function AdminLayout() {
     return (
         <div className="flex">
-            <ToastContainer />
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
+
             {/* Sidebar */}
             <SidebarAdmin />
             {/* Main Content Area */}

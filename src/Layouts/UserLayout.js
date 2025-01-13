@@ -21,7 +21,17 @@ const UserLayout = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <ToastContainer/>
+         <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
       <Header />
       <div className="flex px-4 py-4 relative">
         <div className="w-64 hidden lg:block fixed left-0 top-0 pt-16 h-screen overflow-auto bg-white shadow-md">

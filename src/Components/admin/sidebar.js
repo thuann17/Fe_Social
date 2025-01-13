@@ -10,7 +10,7 @@ import {
 const SidebarAdmin = () => {
     const navigation = [
         { name: "Dashboard", icon: HomeIcon, href: "/admin/dashboard" },
-        { name: "Quản lý địa điểm", icon: UserGroupIcon, href: "/admin/plance" },
+        { name: "Quản lý địa điểm", icon: UserGroupIcon, href: "/admin/place" },
         { name: "Quản lý tài khoản", icon: UserGroupIcon, href: "/admin/account" },
         { name: "Quản lý bài đăng", icon: ChartBarIcon, href: "/admin/post" },
         { name: "Đăng ký tài khoản", icon: CogIcon, href: "/admin/register-admin" },
@@ -22,7 +22,7 @@ const SidebarAdmin = () => {
                 className="text-xl font-semibold border-b border-gray-700"
                 style={{ padding: "1.1rem" }}
             >
-                Hệ thống quản lý
+                FSHARK
             </div>
             <nav className="mt-4">
                 {navigation.map((item) => (

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { forgotPassword } from '../../Services/login/ForgotService';
 
+import { ToastContainer, toast } from 'react-toastify';
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
@@ -29,6 +30,17 @@ const ForgotPassword = () => {
 
     return (
         <div className="bg-gradient-to-r from-purple-300 to-blue-400 animate-gradientAnimation flex justify-center items-center h-screen">
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
             <div className="w-full md:w-1/3 bg-white shadow rounded-md p-8">
                 <h1 className="text-2xl font-semibold mb-4 text-center">Quên mật khẩu?</h1>
                 <form onSubmit={handleSubmit}>
@@ -43,7 +55,7 @@ const ForgotPassword = () => {
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                             autoComplete="off"
-        
+
                         />
                     </div>
 

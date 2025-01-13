@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import { useNavigate } from "react-router-dom";
 const ACCOUNT_TYPES = [
     { label: "Người dùng", value: "User" },
     { label: "Quản trị viên", value: "Admin" },
@@ -15,7 +16,7 @@ const TABS = [
     { label: "Tạm ngưng hoạt động", value: "unmonitored" },
 ];
 
-const TABLE_HEAD = ["Người dùng", "Vai trò", "Ngày sinh", "Trạng thái", ""];
+const TABLE_HEAD = ["STT", "Người dùng", "Vai trò", "Ngày sinh", "Trạng thái", ""];
 
 function AccountAdmin() {
     const [accountType, setAccountType] = useState("User");
@@ -30,6 +31,7 @@ function AccountAdmin() {
     const [password, setPassword] = useState("");
     const [selectedAccount, setSelectedAccount] = useState(null);
     const userRole = Cookies.get("role");
+    const navigate = useNavigate();
     useEffect(() => {
         fetchAccounts();
     }, [currentPage, search, accountType, activeTab]);
@@ -104,6 +106,11 @@ function AccountAdmin() {
             toast.error("Sai mật khẩu. Vui lòng thử lại.");
         }
     };
+    const handleViewDetails = (account) => {
+        console.log(account.username);
+        navigate("/admin/account-detail", { state: { accountId: account.username } });
+    };
+
     const renderPagination = () => {
         const pages = [];
         for (let i = 0; i < totalPages; i++) {
@@ -217,7 +224,8 @@ function AccountAdmin() {
                         <tbody>
                             {accounts.map((account, index) => (
                                 <tr key={index} className="hover:bg-gray-50">
-                                    <td className="px-4 py-3 flex items-center space-x-3">
+                                    <td className="px-4 items-center">{index + 1}</td>
+                                    <td className=" py-3 flex items-center space-x-3">
                                         <img
                                             src={account.images || "https://firebasestorage.googleapis.com/v0/b/socialmedia-8bff2.appspot.com/o/ThuanImage%2Favt.jpg?alt=media"}
                                             alt={account.username}
@@ -225,10 +233,10 @@ function AccountAdmin() {
                                         />
                                         <div>
                                             <p className="text-sm font-medium text-gray-700">
-                                                {account.firstname} {account.lastname}
+                                                {account.lastname}      {account.firstname}
                                             </p>
                                             <p className="text-sm text-gray-500">
-                                                {account.email}
+                                                {account.email}{account.username}
                                             </p>
                                         </div>
                                     </td>
@@ -253,11 +261,14 @@ function AccountAdmin() {
                                         </label>
                                     </td>
                                     <td className="px-1 py-3 text-right">
-                                        <button
-                                            className="text-blue-500 hover:text-blue-700"
-                                        >
-                                            Xem thông tin
-                                        </button>
+                                        {account.roles.role !== "Admin" && (
+                                            <button
+                                                className="text-blue-500 hover:text-blue-700"
+                                                onClick={() => handleViewDetails(account)}
+                                            >
+                                                Xem thông tin
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
