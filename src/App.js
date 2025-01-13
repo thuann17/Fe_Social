@@ -31,10 +31,8 @@ import AccountAdmin from "./Pages/admin/Account/account";
 import RegisterAdminForm from "./Pages/register/RegisterAdmin";
 import PostAdmin from "./Pages/admin/Post/PostAdmin";
 // Thành phần bảo vệ tuyến đường
-import UploadImage from "./Services/UploadImage";
-import Place from "./Pages/admin/Place/Place";
 import PlacesManager from "./Pages/admin/Place/PlacesManager";
-import AccountDetail from "./Pages/admin/Account/AccountDetail";
+import AccountDetail from "./Pages/admin/Account/accountdetail";
 import ProfileAdmin from "./Pages/admin/Profile/ProfileAdmin";
 import Dashboard from "./Pages/admin/Home/dashboard";
 const ProtectedRoute = ({ children, requiredRole }) => {
@@ -87,7 +85,6 @@ function App() {
           <Route path="account" element={<AccountAdmin />} />
           <Route path="account-detail" element={<AccountDetail />} />
           <Route path="post" element={<PostAdmin />} />
-          {/* <Route path="register-admin" element={<div>Quản lý bài đăng</div>} /> */}
           <Route path="register-admin" element={<RegisterAdminForm />} />
           <Route path="profile" element={<ProfileAdmin />} />
 
@@ -97,8 +94,6 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/user/chat" element={<Chat />} />
-        <Route path="/map" element={<MapTest />} />
-        <Route path="/load" element={<UploadImage />} />
         {/* Định tuyến cho Register */}
         <Route path="/register" element={<RegisterForm />} />
         <Route path="*" element={<Navigate to="/login" />} />
