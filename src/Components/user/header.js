@@ -1,27 +1,29 @@
-import { Disclosure, Menu } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
-import { useNavigate } from "react-router-dom";
+import { Disclosure } from "@headlessui/react";
+import { Bars3Icon } from "@heroicons/react/24/outline";
+import { useNavigate, useLocation } from "react-router-dom";
+
 const navigation = [
-  { name: "Trang chủ", href: "index", current: true },
-  { name: "Lịch trình", href: "cal", current: false },
-  { name: "Bạn bè", href: "friends", current: false },
-  { name: "Trang cá nhân", href: "profile", current: false },
+  { name: "Trang chủ", href: "/user/index" },
+  { name: "Lịch trình", href: "/user/cal" },
+  { name: "Bạn bè", href: "/user/friends" },
+  { name: "Trang cá nhân", href: "/user/profile" },
 ];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-
-
 export default function Example() {
   const navigate = useNavigate();
+  const location = useLocation();  // Hook to get current URL path
 
+  // Handle sign-out logic
   const handleSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     navigate("/login");
   };
+
   return (
     <Disclosure as="nav" className="bg-[#c67dff] sticky top-0 z-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -49,12 +51,12 @@ export default function Example() {
                     key={item.name}
                     href={item.href}
                     className={classNames(
-                      item.current
+                      location.pathname === item.href
                         ? "bg-white text-gray-900"
                         : "text-gray-900 hover:bg-gray-100 hover:text-gray-900",
                       "rounded-md px-3 py-2 text-sm font-medium"
                     )}
-                    aria-current={item.current ? "page" : undefined}
+                    aria-current={location.pathname === item.href ? "page" : undefined}
                   >
                     {item.name}
                   </a>
@@ -100,12 +102,12 @@ export default function Example() {
               as="a"
               href={item.href}
               className={classNames(
-                item.current
+                location.pathname === item.href
                   ? "bg-white text-gray-900"
                   : "text-gray-900 hover:bg-gray-100 hover:text-gray-900",
                 "block rounded-md px-3 py-2 text-base font-medium"
               )}
-              aria-current={item.current ? "page" : undefined}
+              aria-current={location.pathname === item.href ? "page" : undefined}
             >
               {item.name}
             </Disclosure.Button>

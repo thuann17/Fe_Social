@@ -5,8 +5,7 @@ const API_BASE_URL = 'http://localhost:8080';
 
 class UserService {
     // Thêm username vào params khi gọi API
-    getInfo() {
-        const username = Cookies.get('username');
+    getInfo(username) {
         if (!username) {
             throw new Error('Username is required');
         }

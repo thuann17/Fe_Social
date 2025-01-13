@@ -66,7 +66,7 @@ function App() {
           <Route path="index" element={<PostList />} />
           <Route path="cal" element={<TripPlanner />} />
           <Route path="profile" element={<MyProfileLayout />} />
-          <Route path="friendprofile" element={<FriendLayout />} />
+          <Route path="friendprofile/:username" element={<FriendLayout />} />
           <Route path="friends" element={<FriendList />} />
           <Route path="place" element={<TripLayout />} />
           <Route path="detailsplan" element={<DetailsPlan />} />
@@ -99,8 +99,9 @@ function App() {
         <Route path="/user/chat" element={<Chat />} />
         <Route path="/map" element={<MapTest />} />
         <Route path="/load" element={<UploadImage />} />
+        {/* Định tuyến cho Register */}
         <Route path="/register" element={<RegisterForm />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" />} />
       </>
     )
   );

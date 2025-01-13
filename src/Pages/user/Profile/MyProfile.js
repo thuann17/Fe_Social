@@ -23,7 +23,7 @@ const UserInfo = ({ username }) => {
           setUserInfo(null); // Xóa thông tin người dùng nếu có lỗi
         })
         .finally(() => {
-          setLoading(false); // Đặt loading thành false khi hoàn thành hoặc gặp lỗi
+          setLoading(false); 
         });
     }
   }, [username]); // Thêm 'username' vào mảng phụ thuộc
