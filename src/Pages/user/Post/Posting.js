@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../../Services/firebase"; // Ensure you have the firebase setup
 
-const PostInput = () => {
+const PostInput = ({onNewPost}) => {
   const [userInfo, setUserInfo] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -97,6 +97,7 @@ const PostInput = () => {
 
       // Clear inputs and reset form state
       setTextInput("");
+      onNewPost(); 
       setImages([]); // Reset image inputs after successful post
       toast.success("Đã đăng bài viết", {
         position: "top-right",

@@ -4,7 +4,6 @@ import { FaUserFriends, FaUsers, FaVideo, FaClock, FaEnvelope } from "react-icon
 const Sidebar = () => {
     const mainSections = [
         { name: "Bạn bè", icon: <FaUserFriends className="text-blue-500" /> },
-        { name: "Nhóm", icon: <FaUsers className="text-green-500" /> },
         { name: "Bài đăng", icon: <FaVideo className="text-red-500" /> },
     ];
 
@@ -31,8 +30,8 @@ const Sidebar = () => {
                         key={index}
                         className="flex items-center p-2 hover:bg-gray-100 transition duration-200 rounded-lg"
                     >
-                        <span className="text-xl mr-2">{section.icon}</span>
-                        <span className="font-medium">{section.name}</span>
+                        <a className="text-xl mr-2 cursor-pointer">{section.icon}</a>
+                        <a className="font-medium cursor-pointer">{section.name}</a>
                     </div>
                 ))}
             </div>
@@ -45,8 +44,8 @@ const Sidebar = () => {
                         key={index}
                         className="flex items-center p-2 hover:bg-gray-100 transition duration-200 rounded-lg"
                     >
-                        <span className="text-xl mr-2">{section.icon}</span>
-                        <span className="font-medium">{section.name}</span>
+                        <a className="text-xl mr-2 cursor-pointer">{section.icon}</a>
+                        <a className="font-medium cursor-pointer">{section.name}</a>
                     </div>
                 ))}
             </div>

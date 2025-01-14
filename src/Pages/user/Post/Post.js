@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 
-const Post = ({ post, onDelete }) => {
+const Post = ({ post, onDelete, onNewPost, onNewShare }) => {
   const [likes, setLikes] = useState(post.countLike || 0);
   const [comments, setComments] = useState(post.comments || []);
   const [newComment, setNewComment] = useState("");
@@ -15,20 +15,56 @@ const Post = ({ post, onDelete }) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showCommentMenu, setShowCommentMenu] = useState(null);
   const [commentToDelete, setCommentToDelete] = useState(null);
-  const [showShareModal, setShowShareModal] = useState(false); // State to manage share modal visibility
-  const [shareContent, setShareContent] = useState(""); // State to manage the content for sharing
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareContent, setShareContent] = useState(""); // Content for sharing
 
   const menuRef = useRef(null);
 
-  const handleLike = async () => {
+  // Like Post Handler
+  const likePost = async (postId) => {
+    const username = Cookies.get("username");
+    setLikes((prevLikes) => prevLikes + 1); // Optimistic UI
+    setIsLiked(true); // Immediately mark as liked
     try {
-      setLikes((prev) => (isLiked ? prev - 1 : prev + 1));
-      setIsLiked(!isLiked);
+      await PostService.likePost(postId, username);
+      toast.success("👍 Đã thích bài viết!");
     } catch (error) {
       console.error("Error while liking the post:", error);
+      toast.error("❌ Lỗi khi thích bài viết!");
+      setLikes((prevLikes) => prevLikes - 1); // Revert UI on error
+      setIsLiked(false);
     }
   };
 
+  // Unlike Post Handler
+  const unLikePost = async (postId) => {
+    const username = Cookies.get("username");
+    try {
+      await PostService.unLikePost(postId, username);
+      setLikes((prev) => prev - 1);
+      setIsLiked(false);
+      toast.success("👎 Đã bỏ thích bài viết!");
+    } catch (error) {
+      console.error("Error while unliking the post:", error);
+      toast.error("❌ Lỗi khi bỏ thích bài viết!");
+    }
+  };
+
+  // Handle Like Button Click
+  const handleLike = async () => {
+    try {
+      if (isLiked) {
+        await unLikePost(post.id);
+      } else {
+        await likePost(post.id);
+      }
+      setIsLiked(!isLiked); // Toggle like status
+    } catch (error) {
+      console.error("Error while liking/unliking the post:", error);
+    }
+  };
+
+  // Handle Comment Submission
   const handleComment = async () => {
     if (newComment.trim()) {
       try {
@@ -37,23 +73,28 @@ const Post = ({ post, onDelete }) => {
           lastname: post.username.lastname,
           firstname: post.username.firstname,
         };
-        setComments((prev) => [
-          ...prev,
-          {
-            id: Date.now(),
-            username: user,
-            content: newComment,
-          },
-        ]);
-        setNewComment("");
+        const newCommentObject = {
+          id: Date.now(),
+          username: user,
+          content: newComment,
+        };
+
+        setComments((prev) => {
+          const updatedComments = [newCommentObject, ...prev];
+          return updatedComments.sort((a, b) => b.id - a.id); // New comment goes to the top
+        });
+
+        setNewComment(""); // Clear comment input after submission
       } catch (error) {
         console.error("Error while commenting on the post:", error);
       }
     }
   };
 
+  // Toggle Comments Visibility
   const toggleComments = () => setShowComments((prev) => !prev);
 
+  // Format Timestamp
   const formatTimestamp = (timestamp) => {
     const options = {
       weekday: "short",
@@ -71,30 +112,33 @@ const Post = ({ post, onDelete }) => {
     });
   };
 
-  const handleShare = async () => {
-    setShowShareModal(true); // Show the share modal when the share button is clicked
+  // Handle Share Button Click
+  const handleShare = () => {
+    setShowShareModal(true); // Show the share modal
   };
 
+  // Handle Share Submission
   const handleSubmitShare = async () => {
     const username = Cookies.get("username");
     try {
-      const model = {
-        content: shareContent,
-      };
+      const model = { content: shareContent };
       await PostService.addShare(username, post.id, model);
+      
+      onNewShare(); 
       toast.info("🔗 Đã chia sẻ bài viết!");
       setShowShareModal(false); // Close the modal after sharing
     } catch (error) {
-      console.error("There was an error adding the share!", error);
+      console.error("Error while sharing the post:", error);
       toast.error("❌ Chia sẻ bài viết thất bại!");
     }
   };
 
+  // Handle Post Deletion
   const handleDelete = async () => {
     try {
       await PostService.deletePost(post.id);
       onDelete(post.id);
-      setShowConfirmModal(false);
+      setShowConfirmModal(false); // Close confirmation modal
       toast.success("Đã xóa bài viết thành công!");
     } catch (error) {
       console.error("Error while deleting the post:", error);
@@ -102,6 +146,7 @@ const Post = ({ post, onDelete }) => {
     }
   };
 
+  // Handle Comment Deletion
   const handleDeleteComment = async () => {
     if (commentToDelete) {
       try {
@@ -109,7 +154,7 @@ const Post = ({ post, onDelete }) => {
         setComments((prev) =>
           prev.filter((comment) => comment.id !== commentToDelete.id)
         );
-        setShowCommentMenu(null); // Hide the comment menu
+        setShowCommentMenu(null); // Hide comment menu
         toast.success("Đã xóa bình luận thành công!");
       } catch (error) {
         console.error("Error while deleting the comment:", error);
@@ -120,6 +165,7 @@ const Post = ({ post, onDelete }) => {
 
   return (
     <div className="mt-6 post bg-white shadow-lg rounded-lg p-6 mb-6 relative">
+      {/* Post Header */}
       <div className="post-header flex items-center mb-4">
         <div>
           {post.username?.images?.length > 0 ? (
@@ -143,7 +189,7 @@ const Post = ({ post, onDelete }) => {
           <p className="post-username">
             {post.username.lastname} {post.username.firstname}
           </p>
-          <p className="post-timestamp">{formatTimestamp(post.createdate)}</p>
+          <p className="post-timestamp">{(post.createdate)}</p>
         </div>
         <div className="relative">
           <button
@@ -174,8 +220,9 @@ const Post = ({ post, onDelete }) => {
         </div>
       </div>
 
+      {/* Post Content */}
       <p>{post.content}</p>
-      {post.postimages.length === 1 ? (
+      {post.postimages && post.postimages.length === 1 ? (
         <img
           src={post.postimages[0].image}
           alt="Post"
@@ -183,17 +230,19 @@ const Post = ({ post, onDelete }) => {
         />
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
-          {post.postimages.map((img) => (
-            <img
-              key={img.id}
-              src={img.image}
-              alt="Post"
-              className="w-full h-40 object-cover rounded-lg"
-            />
-          ))}
+          {post.postimages &&
+            post.postimages.map((img) => (
+              <img
+                key={img.id}
+                src={img.image}
+                alt="Post"
+                className="w-full h-40 object-cover rounded-lg"
+              />
+            ))}
         </div>
       )}
 
+      {/* Post Actions */}
       <div className="post-actions mt-4 flex justify-between items-center">
         <button onClick={handleLike} className="post-action">
           <span
@@ -213,51 +262,59 @@ const Post = ({ post, onDelete }) => {
         </button>
       </div>
 
+      {/* Comments Section */}
       {showComments && (
-        <div className="comments mt-4">
-          {comments.map((comment) => (
-            <div
-              key={comment.id}
-              className="rounded-md bg-gray-100 p-2 mt-2 flex items-center relative"
-            >
-              <p className="flex-grow">
-                <strong>
-                  {comment.username.lastname} {comment.username.firstname}
-                </strong>
-                : {comment.content}
-              </p>
-              <button
-                onClick={() => {
-                  setShowCommentMenu(comment.id);
-                  setCommentToDelete(comment);
-                }}
-                className="text-gray-500 text-sm"
+        <div className="comments mt-6">
+          {comments.length > 0 ? (
+            comments.map((comment) => (
+              <div
+                key={comment.id}
+                className="comment-item bg-white rounded-xl shadow-md p-4 mb-4 flex items-start relative"
               >
-                ⋯
-              </button>
-              {showCommentMenu === comment.id && (
-                <div className="absolute right-0 top-0 mt-2 w-36 bg-white shadow-lg rounded-md transition-all opacity-100 z-10">
-                  <button
-                    onClick={handleDeleteComment}
-                    className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
-                  >
-                    Xóa bình luận
-                  </button>
+                <div className="ml-4 flex-grow">
+                  <p className="font-semibold text-gray-800">
+                    {comment.username.lastname} {comment.username.firstname}
+                  </p>
+                  <p className="text-gray-700">{comment.content}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formatTimestamp(comment.createdate)}
+                  </p>
                 </div>
-              )}
-            </div>
-          ))}
-           <div className="add-comment mt-2 flex items-center">
+                <button
+                  onClick={() => {
+                    setShowCommentMenu(comment.id);
+                    setCommentToDelete(comment);
+                  }}
+                  className="absolute top-0 right-0 mt-2 mr-2 text-gray-500 text-xl"
+                >
+                  ⋯
+                </button>
+                {showCommentMenu === comment.id && (
+                  <div className="absolute right-0 top-10 mt-2 w-36 bg-white shadow-lg rounded-md transition-all opacity-100 z-10">
+                    <button
+                      onClick={handleDeleteComment}
+                      className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
+                    >
+                      Xóa bình luận
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500">Chưa có bình luận</p>
+          )}
+          <div className="add-comment mt-4 flex items-center bg-white rounded-xl shadow-md p-4">
             <input
               type="text"
               placeholder="Bình luận..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              className="border rounded p-2 w-full"
+              className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
             <button
               onClick={handleComment}
-              className="ml-2 bg-blue-500 text-white px-4 rounded-lg"
+              className="ml-4 bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
             >
               Đăng
             </button>
@@ -265,50 +322,53 @@ const Post = ({ post, onDelete }) => {
         </div>
       )}
 
+      {/* Post Deletion Confirmation Modal */}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <p>Bạn có chắc muốn xóa bài viết này không?</p>
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={() => setShowConfirmModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded-lg mr-2"
-              >
-                Hủy
-              </button>
+        <div className="modal-overlay fixed inset-0 bg-gray-800 bg-opacity-50 z-50">
+          <div className="modal-container bg-white p-6 rounded-lg max-w-sm mx-auto mt-32">
+            <h3 className="text-lg">Xác nhận xóa bài viết</h3>
+            <div className="modal-buttons mt-4">
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg"
+                className="bg-red-500 text-white px-4 py-2 rounded-lg mr-2"
               >
                 Xóa
+              </button>
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg"
+              >
+                Hủy
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Share Modal */}
+      {/* Share Post Modal */}
       {showShareModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <p>Nhập nội dung chia sẻ:</p>
+        <div className="modal-overlay fixed inset-0 bg-gray-800 bg-opacity-50 z-50">
+          <div className="modal-container bg-white p-6 rounded-lg max-w-sm mx-auto mt-32">
+            <h3 className="text-lg">Chia sẻ bài viết</h3>
             <textarea
               value={shareContent}
               onChange={(e) => setShareContent(e.target.value)}
-              className="w-full h-24 mt-2 p-2 border border-gray-300 rounded-lg"
+              placeholder="Nội dung chia sẻ..."
+              rows="4"
+              className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={() => setShowShareModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded-lg mr-2"
-              >
-                Hủy
-              </button>
+            <div className="modal-buttons mt-4">
               <button
                 onClick={handleSubmitShare}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg mr-2"
               >
                 Chia sẻ
+              </button>
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg"
+              >
+                Hủy
               </button>
             </div>
           </div>
