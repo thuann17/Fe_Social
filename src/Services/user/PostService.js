@@ -98,6 +98,13 @@ class PostService {
         throw error;
       });
   }
+
+  getListFeed() {
+    const username = Cookies.get("username");
+    return axios.get(
+      `${API_BASE_URL}/api/user/post/feed/${username}`
+    );
+  }
 }
 
 export default new PostService();

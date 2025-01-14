@@ -27,7 +27,6 @@ import PostList from "./Pages/user/Post/PostList";
 import DetailsPlan from "./Pages/user/Trip/DetailsPlanner";
 import TripStart from "./Pages/user/Trip/TripStart";
 import DetailsPlace from "./Pages/user/Trip/DetailsPlace";
-import MapTest from "./Pages/user/Trip/MapTest";
 import AccountAdmin from "./Pages/admin/Account/account";
 import RegisterAdminForm from "./Pages/register/RegisterAdmin";
 import PostAdmin from "./Pages/admin/Post/PostAdmin";
