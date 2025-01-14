@@ -64,7 +64,7 @@ const PostInput = () => {
       setPostMessage("Không tìm thấy người dùng.");
       return;
     }
-
+    
     setPosting(true);
     setPostMessage("");
 

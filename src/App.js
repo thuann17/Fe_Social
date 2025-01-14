@@ -25,25 +25,21 @@ import RegisterForm from "./Pages/register/register";
 import FriendList from "./Pages/user/Friend/FriendList";
 import PostList from "./Pages/user/Post/PostList";
 import DetailsPlan from "./Pages/user/Trip/DetailsPlanner";
+import TripStart from "./Pages/user/Trip/TripStart";
 import DetailsPlace from "./Pages/user/Trip/DetailsPlace";
 import MapTest from "./Pages/user/Trip/MapTest";
 import AccountAdmin from "./Pages/admin/Account/account";
 import RegisterAdminForm from "./Pages/register/RegisterAdmin";
 import PostAdmin from "./Pages/admin/Post/PostAdmin";
-// Thành phần bảo vệ tuyến đường
 import PlacesManager from "./Pages/admin/Place/PlacesManager";
 import AccountDetail from "./Pages/admin/Account/accountdetail";
 import ProfileAdmin from "./Pages/admin/Profile/ProfileAdmin";
 import Dashboard from "./Pages/admin/Home/dashboard";
+import { useNavigate } from "react-router-dom";
 const ProtectedRoute = ({ children, requiredRole }) => {
+  const navigate = useNavigate(); 
   const token = Cookies.get("token");
   const userRole = Cookies.get("role");
-
-  // if (userRole === 'Admin') {
-  //   return <Navigate to="/admin/dashboard" replace />;
-  // } else if (userRole === 'User') {
-  //   return <Navigate to="/user/index" replace />;
-  // }
 
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -67,6 +63,7 @@ function App() {
           <Route path="friendprofile/:username" element={<FriendLayout />} />
           <Route path="friends" element={<FriendList />} />
           <Route path="place" element={<TripLayout />} />
+          <Route path="tripstart" element={<TripStart />} />
           <Route path="detailsplan" element={<DetailsPlan />} />
           <Route path="detailsplace/:addressFilter" element={<DetailsPlace />} />
         </Route>

@@ -35,7 +35,7 @@ const RightSidebar = ({ onSelectFriend }) => {
       {loading && <p className="text-center">Đang tải dữ liệu...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
       <div>
-        <h3 className="font-semibold text-lg mb-4 text-center">Bạn bè của bạn</h3>
+        <h3 className="font-semibold text-lg mb-4 text-center">Bạn bè</h3>
         <div style={sectionStyle("15rem")}>
           {friends.length === 0 ? (
             <p className="text-center">Không có bạn bè nào.</p>
@@ -45,7 +45,7 @@ const RightSidebar = ({ onSelectFriend }) => {
                 <li
                   key={index}
                   className="flex justify-start items-center p-3 hover:bg-gray-100 rounded-lg transition duration-200"
-                  onClick={() => onSelectFriend(user)} // Gọi hàm onSelectFriend khi click vào bạn bè
+                  onClick={() => onSelectFriend(user)}
                 >
                   <img
                     src={user.friendAvatar}

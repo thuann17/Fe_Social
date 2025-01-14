@@ -247,6 +247,21 @@ const Post = ({ post, onDelete }) => {
               )}
             </div>
           ))}
+           <div className="add-comment mt-2 flex items-center">
+            <input
+              type="text"
+              placeholder="Bình luận..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              className="border rounded p-2 w-full"
+            />
+            <button
+              onClick={handleComment}
+              className="ml-2 bg-blue-500 text-white px-4 rounded-lg"
+            >
+              Đăng
+            </button>
+          </div>
         </div>
       )}
 

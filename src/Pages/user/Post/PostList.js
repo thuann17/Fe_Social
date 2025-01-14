@@ -40,6 +40,7 @@ const PostList = () => {
         setLoading(false);
       });
   }, []);
+  
 
   const handleDeletePost = (postId) => {
     setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));

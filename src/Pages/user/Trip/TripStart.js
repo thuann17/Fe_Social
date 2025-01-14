@@ -1,93 +1,193 @@
-// import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { FaRegClock } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-// const StartJourneyPage = () => {
-//   const [showMap, setShowMap] = useState(false);
-//   const [origin, setOrigin] = useState(null); // Initializing origin as null
-//   const [destination, setDestination] = useState("Destination+Location"); // Can be dynamic too
+// Component for displaying a single trip
+const TripItem = ({ trip }) => {
+    const navigate = useNavigate();
+  const itemStyles = {
+    margin: "20px 0",
+    padding: "20px",
+    backgroundColor: "#fff",
+    borderRadius: "10px",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    transition: "transform 0.2s, box-shadow 0.2s",
+  };
 
-//   const activities = [
-//     { id: 1, title: "Check-in at hotel", time: "9:00 AM" },
-//     { id: 2, title: "Visit Museum", time: "11:00 AM" },
-//     { id: 3, title: "Lunch at local restaurant", time: "1:00 PM" },
-//     { id: 4, title: "Explore City Center", time: "3:00 PM" },
-//   ];
+  const imgStyles = {
+    width: "180px",
+    height: "180px",
+    objectFit: "cover",
+    borderRadius: "10px",
+    marginRight: "20px",
+  };
 
-//   // Use the Geolocation API to get the user's current location
-//   useEffect(() => {
-//     if (navigator.geolocation) {
-//       navigator.geolocation.getCurrentPosition(
-//         (position) => {
-//           const { latitude, longitude } = position.coords;
-//           setOrigin(`${latitude},${longitude}`); // Set the origin as lat, long
-//         },
-//         (error) => {
-//           console.error("Error getting geolocation", error);
-//           setOrigin("Default+Location"); // Fallback location in case of error
-//         }
-//       );
-//     } else {
-//       console.log("Geolocation is not supported by this browser.");
-//       setOrigin("Default+Location"); // Fallback location if geolocation is not supported
-//     }
-//   }, []);
+  const contentStyles = {
+    flex: 1,
+  };
 
-//   const handleStartJourney = () => {
-//     setShowMap(true);
-//   };
+  const titleStyles = {
+    fontSize: "22px",
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: "8px",
+  };
 
-//   return (
-//     <>
-//       {!showMap ? (
-//         <main className="w-11/12 max-w-3xl bg-white shadow-lg rounded-lg p-6 mt-10">
-//           <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-//             Today's Activities
-//           </h2>
-//           <ul className="divide-y divide-gray-200">
-//             {activities.map((activity) => (
-//               <li
-//                 key={activity.id}
-//                 className="flex justify-between items-center py-3"
-//               >
-//                 <span className="font-medium text-gray-800">
-//                   {activity.title}
-//                 </span>
-//                 <span className="text-gray-500 text-sm">{activity.time}</span>
-//               </li>
-//             ))}
-//           </ul>
+  const descStyles = {
+    fontSize: "16px",
+    color: "#666",
+    marginBottom: "10px",
+    lineHeight: "1.5",
+  };
 
-//           {/* Start Journey Button */}
-//           <button
-//             onClick={handleStartJourney}
-//             className="mt-6 w-full py-3 bg-green-500 text-white text-lg font-medium rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300"
-//           >
-//             Start Journey
-//           </button>
-//         </main>
-//       ) : (
-//         <div className="w-11/12 max-w-5xl bg-white shadow-lg rounded-lg p-6 mt-10">
-//           <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-//             Your Journey Map
-//           </h2>
+  const dateStyles = {
+    fontSize: "14px",
+    color: "#888",
+    marginBottom: "5px",
+  };
 
-//           {/* Dynamically set the iframe src based on origin and destination */}
-//           {origin ? (
-//             <iframe
-//               src={`https://www.google.com/maps/embed/v1/directions?key=AIzaSyCxkRu54HJamPE7DPou_vWQMaoKx1llQyI&origin=${origin}&destination=${destination}`}
-//               width="100%"
-//               height="500"
-//               allowFullScreen=""
-//               loading="lazy"
-//               title="Journey Map"
-//               className="rounded-md shadow-md"
-//             ></iframe>
-//           ) : (
-//             <p>Loading your location...</p>
-//           )}
-//         </div>
-//       )}
-//     </>
-//   );
-// };
+  const buttonStyles = {
+    backgroundColor: "green",
+    color: "#fff",
+    border: "none",
+    float: "right",
+    padding: "10px 20px",
+    borderRadius: "5px",
+    cursor: "pointer",
+    fontSize: "14px",
+    transition: "background-color 0.2s",
+  };
 
-// export default StartJourneyPage;
+  const addButtonStyles = {
+    backgroundColor: "#007bff",
+    color: "#fff",
+    border: "none",
+    float: "right",
+    padding: "12px 25px",
+    borderRadius: "5px",
+    cursor: "pointer",
+    fontSize: "16px",
+    display: "block",
+    margin: "30px auto 0",
+    transition: "background-color 0.2s",
+  };
+
+  const handleAddTrip = () => {
+    navigate("user/places");  
+  };
+  
+  const avatarUrl =
+    trip.users[0]?.images[0]?.avatarrurl;
+  const placeImageUrl =
+    trip.places[0]?.placeimages[0]?.image;
+
+  return (
+    <div>
+      <li style={itemStyles}>
+        <img src={placeImageUrl} alt={trip.tripname} style={imgStyles} />
+        <div style={contentStyles}>
+          <h3 style={titleStyles}>{trip.tripname}</h3>
+          <p style={descStyles}>{trip.description}</p>
+
+          <p style={dateStyles}>
+            <FaRegClock style={{ marginRight: "6px", color: "#555" }} />
+            <strong>Bắt đầu:</strong>{" "}
+            {new Date(trip.startdate).toLocaleDateString("vi-VN")} -{" "}
+            {new Date(trip.startdate).toLocaleTimeString("vi-VN", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+
+          <p style={dateStyles}>
+            <FaRegClock style={{ marginRight: "6px", color: "#555" }} />
+            <strong>Kết thúc:</strong>{" "}
+            {new Date(trip.enddate).toLocaleDateString("vi-VN")} -{" "}
+            {new Date(trip.enddate).toLocaleTimeString("vi-VN", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+
+          <button style={buttonStyles}>📝 Cập nhật</button>
+        </div>
+      </li>
+      <button style={addButtonStyles} onClick={handleAddTrip}>
+        ➕ Thêm chuyến đi
+      </button>
+    </div>
+  );
+};
+
+// Component for displaying a list of trips
+const TripList = ({ trips }) => {
+  const listStyles = {
+    listStyleType: "none",
+    padding: 0,
+    margin: 0,
+  };
+
+  return (
+    <ul style={listStyles}>
+      {trips.map((trip) => (
+        <TripItem key={trip.id} trip={trip} />
+      ))}
+    </ul>
+  );
+};
+
+// Main page component
+const TripPage = () => {
+  const [trips, setTrips] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const username = Cookies.get("username");
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:8080/api/user/trip/tripplace/${username}`)
+      .then((response) => {
+        setTrips(response.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError("Không thể tải danh sách chuyến đi");
+        setLoading(false);
+      });
+  }, [username]);
+
+  const pageStyles = {
+    maxWidth: "900px",
+    margin: "0 auto",
+    padding: "40px 20px",
+    backgroundColor: "#f9f9f9",
+    minHeight: "100vh",
+  };
+
+  const headerStyles = {
+    fontSize: "28px",
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: "30px",
+    color: "#333",
+  };
+
+  if (loading)
+    return <p style={{ textAlign: "center" }}>Đang tải chuyến đi...</p>;
+  if (error)
+    return <p style={{ textAlign: "center", color: "red" }}>{error}</p>;
+
+  return (
+    <div style={pageStyles}>
+      <h2 style={headerStyles}>Danh sách chuyến đi:</h2>
+      <TripList trips={trips} />
+    </div>
+  );
+};
+
+export default TripPage;
