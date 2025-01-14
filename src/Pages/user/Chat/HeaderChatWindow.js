@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import CallWindow from "../../../Components/user/CallWindow";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const HeaderChatWindow = ({ username, avt, toggleAboutChat }) => {
-    const [callType, setCallType] = useState(null); // Audio/Video call state
-    const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
+    const [callType, setCallType] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const toggleCallWindow = () => {
         setIsModalOpen(false);
         setCallType(null);
     };
 
-    const handleCall = (type) => {
-        setCallType(type); // Set call type (audio/video)
-        setIsModalOpen(true); // Open modal
+    const handleCall = () => {
+        toast.info("Tính năng đang phát triển...");
     };
 
     return (
@@ -26,7 +27,7 @@ const HeaderChatWindow = ({ username, avt, toggleAboutChat }) => {
             <div className="flex space-x-4">
                 <button
                     title="Call"
-                    onClick={() => handleCall("audio")}
+                    onClick={() => handleCall()}
                     className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-lg hover:bg-green-100 transition duration-200"
                 >
                     <svg className="h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -36,7 +37,7 @@ const HeaderChatWindow = ({ username, avt, toggleAboutChat }) => {
                 </button>
                 <button
                     title="Video"
-                    onClick={() => handleCall("video")}
+                    onClick={() => handleCall()}
                     className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-lg hover:bg-red-100 transition duration-200"
                 >
                     <svg className="h-6 w-6 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -54,13 +55,6 @@ const HeaderChatWindow = ({ username, avt, toggleAboutChat }) => {
                     </svg>
                 </button>
             </div>
-
-            {isModalOpen && (
-                <CallWindow
-                    isVideoCall={callType === "video"}
-                    toggleCallWindow={toggleCallWindow}
-                />
-            )}
         </header>
     );
 };

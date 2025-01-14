@@ -6,7 +6,7 @@ import ChatService from "../../../Services/user/ChatService";
 import AboutChat from "./about";
 import Cookies from "js-cookie";
 import WebSocketService from "../../../Services/WebSocketService";
-
+import { ToastContainer } from "react-toastify";
 function Chat() {
   const [messages, setMessages] = useState([]);
   const [selectedFriend, setSelectedFriend] = useState(null);
@@ -57,25 +57,28 @@ function Chat() {
     }
   };
 
-  const handleSendMessage = (newMessageContent) => {
-    const newMessage = {
-      sender: userFromCookie,
+  const handleSendMessage = (newMessage) => {
+    const messageToSend = {
+      sender: newMessage.sender,
       receiver: selectedFriend.friendUserName,
-      content: newMessageContent,
+      content: newMessage.content,
       time: new Date(),
+      type: newMessage.type,
     };
-    WebSocketService.send("/app/chat.sendMessage", newMessage); // Send message using WebSocket
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    WebSocketService.send("/app/chat.sendMessage", messageToSend);
+    setMessages((prevMessages) => [...prevMessages, messageToSend]);
   };
 
   const toggleAboutChat = () => {
-    setShowAbout(!showAbout); // Toggle About modal visibility
+    setShowAbout(!showAbout);
   };
 
   return (
     <div className="flex flex-col sm:flex-row h-screen bg-white text-blue-900">
+    
       <Sidebar onSelectFriend={handleSelectFriend} />
       <div className="flex flex-col flex-1 bg-white overflow-hidden border-l border-blue-200 h-full">
+      <ToastContainer />
         <HeaderChatWindow
           username={selectedFriend?.friendName}
           avt={selectedFriend?.friendAvatar}
@@ -107,7 +110,7 @@ function Chat() {
           )}
         </div>
       </div>
-      {showAbout && <AboutChat toggleAboutChat={toggleAboutChat} />}
+      {showAbout && <AboutChat toggleAboutChat={toggleAboutChat} selectedFriend={selectedFriend} />}
     </div>
   );
 }

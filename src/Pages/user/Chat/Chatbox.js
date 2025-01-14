@@ -3,13 +3,14 @@ import Cookies from "js-cookie";
 import WebSocketService from "../../../Services/WebSocketService";
 import ChatService from "../../../Services/user/ChatService";
 import Message from "./Message";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 function Chatbox({ chat, onClose }) {
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(false);
     const [username, setUsername] = useState("");
     const [currentFriendChannel, setCurrentFriendChannel] = useState(null);
-
     const userFromCookie = Cookies.get('username');
 
     useEffect(() => {
@@ -17,7 +18,6 @@ function Chatbox({ chat, onClose }) {
             setUsername(userFromCookie);
             WebSocketService.connect("http://localhost:8080/ws");
         }
-
         return () => {
             if (currentFriendChannel) {
                 WebSocketService.unsubscribe(currentFriendChannel);
@@ -94,8 +94,7 @@ function Chatbox({ chat, onClose }) {
                     <span className="text-xs text-blue-100">Online</span>
                 </div>
                 <div className="ml-auto flex space-x-2">
-                    <button className="text-white text-sm">📞</button>
-                    <button className="text-white text-sm">📹</button>
+                  
                     <button className="text-white text-sm" onClick={onClose}>✖</button>
                 </div>
             </div>

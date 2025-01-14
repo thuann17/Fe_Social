@@ -10,7 +10,6 @@ const DetailsPlan = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log({ tripTitle, startDate, endDate, description });
-    // Clear form fields after submission
     setTripTitle('');
     setStartDate('');
     setEndDate('');

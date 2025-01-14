@@ -27,7 +27,7 @@ function Message({ avt, messages = [], setMessages, handleSendMessage }) {
 
   const handleSendMessageClick = () => {
     if (uploading) return;
-
+  
     if (image) {
       const storageRef = ref(storage, `Images/${image.name}`);
       const uploadTask = uploadBytesResumable(storageRef, image);
@@ -46,9 +46,9 @@ function Message({ avt, messages = [], setMessages, handleSendMessage }) {
             content: url,
             time: new Date(),
             read: false,
-            type: "image",
+            type: "image", // Type for image
           };
-          handleSendMessage(newMessage.content);
+          handleSendMessage(newMessage); // Send message
           setImage(null);
           setPreviewImage(null);
           setUploading(false);
@@ -60,9 +60,9 @@ function Message({ avt, messages = [], setMessages, handleSendMessage }) {
         content: message.trim(),
         time: new Date(),
         read: false,
-        type: "text",
+        type: "text", // Type for text message
       };
-      handleSendMessage(newMessage.content);
+      handleSendMessage(newMessage); // Send message
       setMessage("");
     } else {
       const newMessage = {
@@ -70,11 +70,12 @@ function Message({ avt, messages = [], setMessages, handleSendMessage }) {
         content: "❤️",
         time: new Date(),
         read: false,
-        type: "emoji",
+        type: "emoji", // Type for emoji message
       };
-      handleSendMessage(newMessage.content);
+      handleSendMessage(newMessage); // Send emoji message
     }
   };
+  
 
   const handleEmojiSelect = (emoji) => {
     setMessage((prev) => prev + emoji.native);

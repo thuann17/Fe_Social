@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import axios from "axios";
-import { useParams, useNavigate, useLocation } from "react-router-dom"; // Fixed duplicate import
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import Cookies from "js-cookie";
+import TripService from "../../../Services/user/TripService";
 
 const truncateText = (text, maxLength) => {
   if (text.length > maxLength) {
@@ -38,6 +40,7 @@ const DetailsPlace = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const selectedDate = location.state?.selectedDate;
+  const username = Cookies.get("username");
 
   useEffect(() => {
     getDetailPlace();
@@ -57,6 +60,7 @@ const DetailsPlace = () => {
   };
 
   const openModal = (card) => {
+    console.log(card.id);
     setSelectedCard(card);
     setModalVisible(true);
   };
@@ -68,22 +72,45 @@ const DetailsPlace = () => {
 
   const handleSaveTrip = (e) => {
     e.preventDefault();
-    console.log("Trip Saved:", {
-      tripName,
-      startDate,
-      endDate,
-      tripDescription,
-      description: selectedCard.description,
-    });
+    if (!startDate || !endDate) {
+      alert("Please provide both start and end times.");
+      return;
+    }
 
+    const startDateTime = new Date(`${selectedDate}T${startDate}`);
+    const endDateTime = new Date(`${selectedDate}T${endDate}`);
+
+    if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+      alert("Invalid time values.");
+      return;
+    }
+
+    const tripData = {
+      tripName: "Chuyến đi mơi",
+      startDate: startDateTime.toISOString(),
+      endDate: endDateTime.toISOString(),
+      description: selectedCard.description,
+      placeId: selectedCard.id,
+      note: tripDescription,
+    };
+
+    TripService.createTrip(username, tripData)
+      .then((response) => {
+        console.log("Trip created successfully:", response);
+        closeModal();
+      })
+      .catch((error) => {
+        console.error("Error creating trip:", error);
+      });
+
+    // Reset form
     setTripName("");
     setStartDate("");
     setEndDate("");
     setTripDescription("");
-    closeModal();
   };
 
-  // Function to format date and extract time (HH:MM)
+
   const formatTime = (dateTime) => {
     if (!dateTime) return "";
     const date = new Date(dateTime);
@@ -91,6 +118,7 @@ const DetailsPlace = () => {
     const minutes = String(date.getMinutes()).padStart(2, "0");
     return `${hours}:${minutes}`;
   };
+
 
   return (
     <div className="container mx-auto">
@@ -135,7 +163,7 @@ const DetailsPlace = () => {
                 </label>
                 <input
                   type="time"
-                  value={startDate || formatTime(selectedDate)} // Use formatted time or startDate value
+                  value={startDate || formatTime(selectedDate)}
                   onChange={(e) => setStartDate(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -147,7 +175,7 @@ const DetailsPlace = () => {
                 </label>
                 <input
                   type="time"
-                  value={endDate || formatTime(selectedDate)} // Use formatted time or endDate value
+                  value={endDate || formatTime(selectedDate)}
                   onChange={(e) => setEndDate(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
