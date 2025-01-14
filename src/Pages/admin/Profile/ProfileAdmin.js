@@ -4,6 +4,7 @@ import ProfileService from "../../../Services/admin/ProfileService";
 import UserService from "../../../Services/user/UserService";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
+
 const ProfileAdmin = () => {
     const [userInfo, setUserInfo] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -13,14 +14,14 @@ const ProfileAdmin = () => {
         lastname: "",
         email: "",
         hometown: "",
-
     });
     const [updatePassword, setUpdatePassword] = useState({
-        currentPassword: "",
         oldPassword: "",
         newPassword: "",
+        confirmPassword: "",
     });
     const [activeTab, setActiveTab] = useState("info");
+
     useEffect(() => {
         UserService.getInfo(Cookies.get("username"))
             .then((data) => {
@@ -32,13 +33,14 @@ const ProfileAdmin = () => {
                     hometown: data.hometown || "",
                 });
                 setLoading(false);
+                console.log(data);
+
             })
             .catch((err) => {
                 setError(err.message || "Failed to load user data");
                 setLoading(false);
             });
     }, []);
-
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -69,16 +71,12 @@ const ProfileAdmin = () => {
                 setUserInfo((prev) => ({ ...prev, ...updateInfo }));
             })
             .catch((err) => {
-                console.log(err);
 
-                toast.error("Có lỗi xảy ra khi cập nhật thông tin: " + (err.response?.data?.message || "Không xác định"));
             });
     };
 
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
-
-        // Kiểm tra mật khẩu mới và mật khẩu xác nhận có khớp không
         if (updatePassword.newPassword !== updatePassword.confirmPassword) {
             toast.error("Mật khẩu xác nhận không khớp.");
             return;
@@ -87,15 +85,16 @@ const ProfileAdmin = () => {
             toast.error("Mật khẩu mới phải có ít nhất 6 ký tự.");
             return;
         }
-
-        ProfileService.updatePassword(Cookies.get("username"), updatePassword)
+        ProfileService.updatePassword(Cookies.get("username"), updatePassword.oldPassword, updatePassword.newPassword)
             .then(() => {
                 toast.success("Mật khẩu đã được cập nhật thành công.");
-                setUpdatePassword({ currentPassword: "", oldPassword: "", newPassword: "" });
+                setUpdatePassword({ oldPassword: "", newPassword: "", confirmPassword: "" });
             })
             .catch((err) => {
-                toast.error("Có lỗi xảy ra khi cập nhật mật khẩu: " + (err.response?.data?.message || err.message || "Không xác định"));
+                console.log(err.response.data);
+                toast.error("Mật khẩu hiện tại không đúng.");
             });
+
     };
 
     if (loading) {
@@ -109,23 +108,25 @@ const ProfileAdmin = () => {
     if (!userInfo) {
         return <p>User not found.</p>;
     }
+
     const formattedBirthday = userInfo.birthday ? format(new Date(userInfo.birthday), 'dd/MM/yyyy') : 'Chưa có';
 
     return (
-        <div className="bg-white p-6 py-11 rounded-lg shadow-md mx-auto flex gap-8 relative ">
-            <div className="w-1/3 bg-gradient-to-r from-blue-100 to-blue-300   p-4 rounded-lg shadow-md">
+        <div className="bg-white p-6 py-11 rounded-lg shadow-md mx-auto flex gap-8 relative">
+            <div className="w-1/3 bg-gradient-to-r from-blue-100 to-blue-300 p-4 rounded-lg shadow-md">
                 <div className="flex flex-col items-center">
                     <div className="bg-white rounded-full p-2 shadow-lg">
                         <img
                             src={userInfo.avatarUrl}
-                            alt=""
+                            alt="User Avatar"
                             className="rounded-full w-32 h-32 border-4 border-white object-cover"
                         />
                     </div>
                     <div className="mt-4 text-center">
                         <h2 className="text-2xl font-semibold">
                             {userInfo.lastname} {userInfo.firstname}
-                        </h2><p className="text-gray-700"> {formattedBirthday}</p>
+                        </h2>
+                        <p className="text-gray-700">{formattedBirthday}</p>
                         <p className="text-gray-500">📧 {userInfo.email}</p>
                         <p className="text-gray-700">🏡 {userInfo.hometown}</p>
                         <p className="text-gray-700">Bio: {userInfo.bio}</p>
@@ -210,8 +211,8 @@ const ProfileAdmin = () => {
                             <label className="block text-sm font-medium text-gray-700">Mật khẩu hiện tại</label>
                             <input
                                 type="password"
-                                name="currentPassword"
-                                value={updatePassword.currentPassword}
+                                name="oldPassword"
+                                value={updatePassword.oldPassword}
                                 onChange={handlePasswordChange}
                                 className="w-full p-2 border rounded-md"
                             />
