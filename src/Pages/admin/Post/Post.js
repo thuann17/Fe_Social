@@ -31,7 +31,6 @@ const Post = ({ postId }) => {
                 setLoading(false);
             } catch (err) {
                 setLoading(false);
-                console.error("Error fetching post:", err);
             }
         };
 
@@ -44,7 +43,6 @@ const Post = ({ postId }) => {
     const toggleComments = () => {
         setShowComments((prevShowComments) => !prevShowComments);
     };
-    // Hàm ẩn bài viết
     const handleHidePost = () => {
         setIsHidden(true);
         setMenuVisible(false);
@@ -53,45 +51,30 @@ const Post = ({ postId }) => {
     return (
         <div className="mt-6 post bg-white shadow-lg rounded-lg p-6 mb-6 relative">
             <div className="post-header flex items-center mb-4">
-                <div className="flex-grow">
-                    <p className="post-username">
-                        {post.username?.lastname} {post.username?.firstname}
-                    </p>
-                    <p className="post-timestamp">{formatTimestamp(post.createdate)}</p>
-                </div>
-
-                {/* Nút 3 chấm */}
-                <div className="relative">
-                    <button
-                        onClick={() => setMenuVisible((prev) => !prev)}
-                        className="text-gray-600 hover:text-gray-1500"
-                    >
-                        ⋮
-                    </button>
-                    {menuVisible && (
-                        <div
-                            ref={menuRef}
-                            className="absolute right-0 bg-white shadow-md rounded-md py-3 px-4 z-10 min-w-[180px]"
-                        >
-                            <button
-                                onClick={handleHidePost}
-                                className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 w-full text-left"
-                            >
-                                Ẩn bài viết
-                            </button>
-
-                        </div>
-
-                    )}
+                <div className="flex items-center gap-4">
+                    <img
+                        src={
+                            post.username.images[0]?.avatarrurl ||
+                            "https://firebasestorage.googleapis.com/v0/b/socialmedia-8bff2.appspot.com/o/ThuanImage%2Favt.jpg?alt=media"
+                        }
+                        alt={post.username}
+                        className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div className="flex flex-col justify-center">
+                        <p className="font-medium text-sm">
+                            {post.username?.lastname} {post.username?.firstname}
+                        </p>
+                        <p className="text-gray-500 text-xs">{formatTimestamp(post.createdate)}</p>
+                    </div>
                 </div>
             </div>
 
             {post.content && <p>{post.content}</p>}
-
-            <div>
+            <div className="flex justify-evenly" >
                 {post.postimages?.length > 0 && (
                     post.postimages.map((img) => (
                         <img
+
                             key={img.id}
                             src={img.image}
                             alt="Bài viết"
@@ -115,7 +98,7 @@ const Post = ({ postId }) => {
 
             </div>
 
-            {showComments && ( // Conditional rendering based on showComments state
+            {showComments && (
                 <div className="comments mt-4">
                     {post.comments?.length > 0 && (
                         post.comments.map((comment) => (

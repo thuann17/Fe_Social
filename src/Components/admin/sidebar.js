@@ -13,7 +13,7 @@ const SidebarAdmin = () => {
         { name: "Quản lý địa điểm", icon: UserGroupIcon, href: "/admin/place" },
         { name: "Quản lý tài khoản", icon: UserGroupIcon, href: "/admin/account" },
         { name: "Quản lý bài đăng", icon: ChartBarIcon, href: "/admin/post" },
-        { name: "Đăng ký tài khoản", icon: CogIcon, href: "/admin/register-admin" },
+        { name: "Cấp tài khoản quản lý", icon: CogIcon, href: "/admin/register-admin" },
     ];
 
     return (

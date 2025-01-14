@@ -30,7 +30,6 @@ function PostAdmin() {
     const togglePostStatus = async (postId, currentStatus) => {
         try {
             const updatedStatus = !currentStatus;
-            console.log(updatedStatus);
             await PostService.updatePostStatus(postId, updatedStatus);
             setPosts((prevPosts) =>
                 prevPosts.map((post) =>
@@ -165,13 +164,14 @@ function PostAdmin() {
                                     <td className="px-4 items-center">{index + 1}</td>
                                     <td className="px-4 py-3 flex items-center space-x-3">
                                         <img
-                                            src={post.username.images || "https://firebasestorage.googleapis.com/v0/b/socialmedia-8bff2.appspot.com/o/ThuanImage%2Favt.jpg?alt=media"}
+                                            src={post.username.images[0].avatarrurl
+                                                || "https://firebasestorage.googleapis.com/v0/b/socialmedia-8bff2.appspot.com/o/ThuanImage%2Favt.jpg?alt=media"}
                                             alt={post.username}
                                             className="w-10 h-10 rounded-full"
                                         />
                                         <div>
                                             <p className="text-sm font-medium text-gray-700">
-                                                {post.username.lastname} {post.username.firstname}
+                                                {post.username.lastname} {post.username.firstname}  {post.id}
                                             </p>
                                             <p className="text-sm text-gray-500">
                                                 {post.username.email}

@@ -54,6 +54,9 @@ function AccountAdmin() {
                     : await AccountService.getAdminAccounts(cookieUsername, params);
 
             setAccounts(response.data.content);
+            console.log(response.data.content);
+            console.log(response.data.content.avatarrurl);
+
             setTotalPages(response.data.totalPages);
         } catch (error) {
             toast.error("Đã có lỗi xảy ra khi tải dữ liệu tài khoản.");
@@ -80,14 +83,7 @@ function AccountAdmin() {
             toast.error("Vui lòng nhập mật khẩu!");
             return;
         }
-        if (userRole !== "Admin") {
-            toast.error("Bạn không có quyền thực hiện thao tác này.");
-            return;
-        }
-        if (userRole === "Admin" && selectedAccount?.roles?.role === "Admin") {
-            toast.error("Bạn không có quyền thực hiện thao tác này với tài khoản Admin.");
-            return;
-        }
+
         try {
             const usernameCookie = Cookies.get('username');
             const isValidPassword = await AccountService.lockUnlockAccount(usernameCookie, password);
@@ -95,6 +91,7 @@ function AccountAdmin() {
                 toast.error("Mật khẩu không đúng! Vui lòng thử lại.");
                 return;
             }
+
             const { username, active } = selectedAccount;
             const updatedStatus = !active;
             await AccountService.updateAccountStatus(username, updatedStatus);
@@ -104,6 +101,14 @@ function AccountAdmin() {
             toast.success("Cập nhật trạng thái tài khoản thành công.");
         } catch (error) {
             toast.error("Sai mật khẩu. Vui lòng thử lại.");
+        }
+    };
+    const openPasswordPopup = (account) => {
+        if (account?.roles?.role !== "Admin") {
+            setSelectedAccount(account);
+            setShowPopup(true);
+        } else {
+            toast.error("Bạn không có quyền thực hiện thao tác này với tài khoản Admin.");
         }
     };
     const handleViewDetails = (account) => {
@@ -227,7 +232,7 @@ function AccountAdmin() {
                                     <td className="px-4 items-center">{index + 1}</td>
                                     <td className=" py-3 flex items-center space-x-3">
                                         <img
-                                            src={account.images || "https://firebasestorage.googleapis.com/v0/b/socialmedia-8bff2.appspot.com/o/ThuanImage%2Favt.jpg?alt=media"}
+                                            src={account.images[0].avatarrurl || "https://firebasestorage.googleapis.com/v0/b/socialmedia-8bff2.appspot.com/o/ThuanImage%2Favt.jpg?alt=media"}
                                             alt={account.username}
                                             className="w-10 h-10 rounded-full"
                                         />
@@ -254,7 +259,7 @@ function AccountAdmin() {
                                                 checked={account.active}
                                                 onChange={() => {
                                                     setSelectedAccount(account);
-                                                    setShowPopup(true);
+                                                    openPasswordPopup(account)
                                                 }}
                                             />
                                             <div className="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 transition-all dark:border-gray-600 peer-checked:bg-teal-600"></div>
@@ -265,6 +270,7 @@ function AccountAdmin() {
                                             <button
                                                 className="text-blue-500 hover:text-blue-700"
                                                 onClick={() => handleViewDetails(account)}
+
                                             >
                                                 Xem thông tin
                                             </button>
@@ -283,27 +289,28 @@ function AccountAdmin() {
                 </p>
                 {renderPagination()}
             </div>
-
             {showPopup && (
-                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center">
-                    <div className="bg-white rounded-lg p-6 w-96">
-                        <h3 className="text-lg font-semibold mb-4">Nhập mật khẩu để xác nhận</h3>
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-96 max-w-sm">
+                        <h3 className="text-xl font-semibold mb-6 text-center text-gray-800">
+                            Bạn muốn {selectedAccount?.active ? "kích hoạt" : "tạm ngưng"} tài khoản {selectedAccount?.username}?
+                        </h3>
                         <input
                             type="password"
                             placeholder="Mật khẩu"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full border border-gray-300 rounded-md px-4 py-2 mb-4"
+                            className="w-full border border-gray-300 rounded-md px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                         />
-                        <div className="flex justify-end space-x-2">
+                        <div className="flex justify-end items-center">
                             <button
-                                className="bg-gray-300 px-4 py-2 rounded-md"
+                                className="bg-gray-200 me-3 text-gray-700 hover:bg-gray-300 transition rounded-md px-6 py-2"
                                 onClick={() => setShowPopup(false)}
                             >
                                 Hủy
                             </button>
                             <button
-                                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                                className="bg-blue-600 text-white hover:bg-blue-700 transition rounded-md px-6 py-2"
                                 onClick={handleLockUnlock}
                             >
                                 Xác nhận
@@ -312,6 +319,8 @@ function AccountAdmin() {
                     </div>
                 </div>
             )}
+
+
         </div>
     );
 }

@@ -7,7 +7,11 @@ class ProfileService {
     updateInfo(username, data) {
         return axios.put(`${API_BASE_URL}/api/admin/profile/${username}`, data);
     }
-    updatePassword(username, data) {
+    updatePassword(username, oldPassword, newPassword) {
+        const data = {
+            oldPassword: oldPassword,
+            newPassword: newPassword
+        };
         return axios.put(`${API_BASE_URL}/api/admin/profile/${username}/password`, data);
     }
 

@@ -1,7 +1,7 @@
 import { Disclosure } from "@headlessui/react";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { useNavigate, useLocation } from "react-router-dom";
-
+import Cookies from "js-cookie"
 const navigation = [
   { name: "Trang chủ", href: "/user/index" },
   { name: "Lịch trình", href: "/user/cal" },
@@ -15,12 +15,12 @@ function classNames(...classes) {
 
 export default function Example() {
   const navigate = useNavigate();
-  const location = useLocation();  // Hook to get current URL path
+  const location = useLocation();
 
-  // Handle sign-out logic
   const handleSignOut = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
+    Cookies.remove("role")
+    Cookies.remove("token")
+    Cookies.remove("username")
     navigate("/login");
   };
 
@@ -90,6 +90,13 @@ export default function Example() {
               </div>
             </div>
           </div>
+          <button
+            onClick={handleSignOut}
+            className="block px-6 py-3 text-base font-semibold text-white bg-indigo-600 rounded-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:scale-105 ml-auto"
+          >
+            Đăng xuất
+          </button>
+
         </div>
       </div>
 
