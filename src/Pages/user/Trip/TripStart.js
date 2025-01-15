@@ -153,7 +153,7 @@ const TripPage = () => {
   }, [username]);
 
   const handleAddTrip = () => {
-    navigate(`/user/cal`);
+    navigate(`/cal`);
   };
 
   const handleAddFriends = (trip) => {

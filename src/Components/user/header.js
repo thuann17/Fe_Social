@@ -3,10 +3,10 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
 import { useNavigate, useLocation } from "react-router-dom";
 import Cookies from "js-cookie"
 const navigation = [
-  { name: "Trang chủ", href: "/user/index" },
-  { name: "Lịch trình", href: "/user/cal" },
-  { name: "Bạn bè", href: "/user/friends" },
-  { name: "Trang cá nhân", href: "/user/profile" },
+  { name: "Trang chủ", href: "/index" },
+  { name: "Lịch trình", href: "/cal" },
+  { name: "Bạn bè", href: "/friends" },
+  { name: "Trang cá nhân", href: "/profile" },
 ];
 
 function classNames(...classes) {

@@ -81,9 +81,9 @@ const LoginForm = () => {
 
       setTimeout(() => {
         if (role === "Admin") {
-          navigate("/admin/dashboard");
+          navigate("/dashboard");
         } else {
-          navigate("/user/index");
+          navigate("/index");
         }
       }, 2000);
     } catch (error) {

@@ -4,8 +4,10 @@ import PostService from "../../../Services/user/PostService";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
-const Post = ({ post, onDelete, onNewPost, onNewShare }) => {
+const Post = ({ post, onDelete, onNewShare }) => {
+  const navigate = useNavigate();
   const [likes, setLikes] = useState(post.countLike || 0);
   const [comments, setComments] = useState(post.comments || []);
   const [newComment, setNewComment] = useState("");
@@ -16,12 +18,17 @@ const Post = ({ post, onDelete, onNewPost, onNewShare }) => {
   const [showCommentMenu, setShowCommentMenu] = useState(null);
   const [commentToDelete, setCommentToDelete] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [shareContent, setShareContent] = useState(""); // Content for sharing
+  const [shareContent, setShareContent] = useState("");
+  const currentUser = Cookies.get("username");
 
   const menuRef = useRef(null);
   // websocket
   const handleLikeNotification = (message) => {
     toast.info(message);  // Hiển thị thông báo
+  };
+
+  const handleClick = (username) => {
+    navigate(`/friendprofile/${username}`, {});
   };
 
   // Like Post Handler
@@ -127,12 +134,11 @@ const Post = ({ post, onDelete, onNewPost, onNewShare }) => {
     try {
       const model = { content: shareContent };
       await PostService.addShare(username, post.id, model);
-      
-      onNewShare(); 
+
+      onNewShare();
       toast.info("🔗 Đã chia sẻ bài viết!");
       setShowShareModal(false); // Close the modal after sharing
     } catch (error) {
-      console.error("Error while sharing the post:", error);
       toast.error("❌ Chia sẻ bài viết thất bại!");
     }
   };
@@ -145,7 +151,6 @@ const Post = ({ post, onDelete, onNewPost, onNewShare }) => {
       setShowConfirmModal(false); // Close confirmation modal
       toast.success("Đã xóa bài viết thành công!");
     } catch (error) {
-      console.error("Error while deleting the post:", error);
       toast.error("❌ Xóa bài viết thất bại!");
     }
   };
@@ -170,7 +175,7 @@ const Post = ({ post, onDelete, onNewPost, onNewShare }) => {
   return (
     <div className="mt-6 post bg-white shadow-lg rounded-lg p-6 mb-6 relative">
       {/* Post Header */}
-      <div className="post-header flex items-center mb-4">
+      <div className="post-header flex items-center mb-4 cursor-pointer">
         <div>
           {post.username?.images?.length > 0 ? (
             post.username.images.map((image) => (
@@ -179,6 +184,7 @@ const Post = ({ post, onDelete, onNewPost, onNewShare }) => {
                 src={image.avatarrurl}
                 alt="Avatar"
                 className="post-avatar"
+                onClick={() => handleClick(post.username.username)}
               />
             ))
           ) : (
@@ -190,18 +196,23 @@ const Post = ({ post, onDelete, onNewPost, onNewShare }) => {
           )}
         </div>
         <div className="flex-grow">
-          <p className="post-username">
+          <p
+            className="post-username"
+            onClick={() => handleClick(post.username.username)}
+          >
             {post.username.lastname} {post.username.firstname}
           </p>
-          <p className="post-timestamp">{(post.createdate)}</p>
+          <p className="post-timestamp">{formatTimestamp(post.createdate)}</p>
         </div>
         <div className="relative">
-          <button
-            onClick={() => setMenuVisible(!menuVisible)}
-            className="text-gray-600"
-          >
-            ⋯
-          </button>
+          {currentUser === post.username.username && (
+            <button
+              onClick={() => setMenuVisible(!menuVisible)}
+              className="text-gray-600"
+            >
+              ⋯
+            </button>
+          )}
           {menuVisible && (
             <div
               ref={menuRef}
@@ -212,12 +223,6 @@ const Post = ({ post, onDelete, onNewPost, onNewShare }) => {
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100"
               >
                 Xóa bài viết
-              </button>
-              <button
-                onClick={() => alert("Ẩn bài viết chưa khả dụng!")}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-              >
-                Ẩn bài viết
               </button>
             </div>
           )}

@@ -3,13 +3,13 @@ import { FaUserFriends, FaUsers, FaVideo, FaClock, FaEnvelope } from "react-icon
 
 const Sidebar = () => {
     const mainSections = [
-        { name: "Bạn bè", icon: <FaUserFriends className="text-blue-500" />, href: "/user/friends"  },
-        { name: "Bài đăng", icon: <FaVideo className="text-red-500" />,  href: "/user/profile"  },
+        { name: "Bạn bè", icon: <FaUserFriends className="text-blue-500" />, href: "/friends"  },
+        { name: "Bài đăng", icon: <FaVideo className="text-red-500" />,  href: "/profile"  },
     ];
 
     const yourMomentsSections = [
-        { name: "Lịch trình", icon: <FaClock className="text-purple-500" />,  href: "/user/tripstart"  },
-        { name: "Tin nhắn", icon: <FaEnvelope className="text-orange-500" />,  href: "/user/chat"  },
+        { name: "Lịch trình", icon: <FaClock className="text-purple-500" />,  href: "/tripstart"  },
+        { name: "Tin nhắn", icon: <FaEnvelope className="text-orange-500" />,  href: "/chat"  },
     ];
 
     return (
