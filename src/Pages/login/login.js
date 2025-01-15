@@ -116,7 +116,7 @@ const LoginForm = () => {
             <img className="logo mx-auto" src="logoreback.png" alt="Buckety" />
           </div>
           <p className="login-description text-lg mb-6">
-            FShark là nền tảng mạng xã hội du lịch đầu tiên tại Việt Nam. Nơi lưu giữ và chia sẻ những chuyến đi và hành trình tuyệt vời của bạn.
+            FShark là nền tảng mạng xã hội du lịch tại Việt Nam. Nơi lưu giữ và chia sẻ những chuyến đi và hành trình tuyệt vời của bạn.
           </p>
           <button
             className="register-button bg-purple-800 text-white py-2 px-4 rounded-lg transition-colors hover:bg-blue-600"
