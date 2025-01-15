@@ -4,6 +4,7 @@ import axios from "axios";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import TripService from "../../../Services/user/TripService";
+import { toast } from "react-toastify";
 
 const truncateText = (text, maxLength) => {
   if (text.length > maxLength) {
@@ -86,7 +87,7 @@ const DetailsPlace = () => {
     }
 
     const tripData = {
-      tripName: "Chuyến đi mơi",
+      tripName: "Chuyến đi " +selectedCard?.placeid?.nameplace,
       startDate: startDateTime.toISOString(),
       endDate: endDateTime.toISOString(),
       description: selectedCard.description,
@@ -98,6 +99,7 @@ const DetailsPlace = () => {
       .then((response) => {
         console.log("Trip created successfully:", response);
         closeModal();
+        toast.success("Đã thêm chuyến đi");
       })
       .catch((error) => {
         console.error("Error creating trip:", error);

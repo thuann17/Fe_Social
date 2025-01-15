@@ -3,13 +3,13 @@ import { FaUserFriends, FaUsers, FaVideo, FaClock, FaEnvelope } from "react-icon
 
 const Sidebar = () => {
     const mainSections = [
-        { name: "Bạn bè", icon: <FaUserFriends className="text-blue-500" /> },
-        { name: "Bài đăng", icon: <FaVideo className="text-red-500" /> },
+        { name: "Bạn bè", icon: <FaUserFriends className="text-blue-500" />, href: "/user/friends"  },
+        { name: "Bài đăng", icon: <FaVideo className="text-red-500" />,  href: "/user/profile"  },
     ];
 
     const yourMomentsSections = [
-        { name: "Lịch trình", icon: <FaClock className="text-purple-500" /> },
-        { name: "Tin nhắn", icon: <FaEnvelope className="text-orange-500" /> },
+        { name: "Lịch trình", icon: <FaClock className="text-purple-500" />,  href: "/user/tripstart"  },
+        { name: "Tin nhắn", icon: <FaEnvelope className="text-orange-500" />,  href: "/user/chat"  },
     ];
 
     return (
@@ -30,8 +30,8 @@ const Sidebar = () => {
                         key={index}
                         className="flex items-center p-2 hover:bg-gray-100 transition duration-200 rounded-lg"
                     >
-                        <a className="text-xl mr-2 cursor-pointer">{section.icon}</a>
-                        <a className="font-medium cursor-pointer">{section.name}</a>
+                        <a href={section.href} className="text-xl mr-2 cursor-pointer">{section.icon}</a>
+                        <a href={section.href} className="font-medium cursor-pointer">{section.name}</a>
                     </div>
                 ))}
             </div>
@@ -44,8 +44,8 @@ const Sidebar = () => {
                         key={index}
                         className="flex items-center p-2 hover:bg-gray-100 transition duration-200 rounded-lg"
                     >
-                        <a className="text-xl mr-2 cursor-pointer">{section.icon}</a>
-                        <a className="font-medium cursor-pointer">{section.name}</a>
+                        <a href={section.href} className="text-xl mr-2 cursor-pointer">{section.icon}</a>
+                        <a href={section.href} className="font-medium cursor-pointer">{section.name}</a>
                     </div>
                 ))}
             </div>
