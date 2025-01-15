@@ -41,9 +41,9 @@ export default function Example() {
                         </div>
                     </div>
                     <div className="absolute inset-y-0 right-0 flex items-center space-x-4 pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                        <Menu as="div" className="relative">
+                        <h1 className="text-white">Xin chào: {userInfo?.lastname} {userInfo?.firstname}
+                            </h1>  <Menu as="div" className="relative">
                             <Menu.Button className="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                                <span className="sr-only">Open user menu</span>
                                 <img
                                     className="h-10 w-10 rounded-full"
                                     src={userInfo?.images?.[userInfo.images.length - 1]?.avatarrurl}
