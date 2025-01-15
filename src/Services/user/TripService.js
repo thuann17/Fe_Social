@@ -14,6 +14,18 @@ class TripService {
         throw error;
       });
   }
+  deleteTrip(tripId) {
+    const url = `${API_BASE_URL}/api/user/trip/delete/${tripId}`;
+    return axios.delete(url)
+      .then(response => {
+        console.log("Trip deleted successfully:", response);
+        return response;
+      })
+      .catch(error => {
+        console.error("There was an error deleting the trip:", error);
+        throw error;
+      });
+  }
 }
 
 export default new TripService();

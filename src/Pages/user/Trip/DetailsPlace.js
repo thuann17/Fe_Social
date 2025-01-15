@@ -61,8 +61,8 @@ const DetailsPlace = () => {
   };
 
   const openModal = (card) => {
-    console.log(card.id);
     setSelectedCard(card);
+    setTripName(`Chuyến đi ${card.nameplace}`);
     setModalVisible(true);
   };
 
@@ -72,22 +72,28 @@ const DetailsPlace = () => {
   };
 
   const handleSaveTrip = (e) => {
-    e.preventDefault();
-    if (!startDate || !endDate) {
-      alert("Please provide both start and end times.");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Remove time portion for comparison
+
+    // Convert the start and end date times to Date objects
+    const startDateTime = new Date(startDate);
+    const endDateTime = new Date(endDate);
+
+    // Validate if the start date is after today
+    if (startDateTime <= today) {
+      toast.error("Ngày bắt đầu phải sau hôm nay.");
       return;
     }
 
-    const startDateTime = new Date(`${selectedDate}T${startDate}`);
-    const endDateTime = new Date(`${selectedDate}T${endDate}`);
-
-    if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
-      alert("Invalid time values.");
+    // Validate if the end date is after the start date
+    if (endDateTime <= startDateTime) {
+      toast.error("Ngày kết thúc phải sau ngày bắt đầu.");
       return;
     }
 
+    // Create the trip data object
     const tripData = {
-      tripName: "Chuyến đi " +selectedCard?.placeid?.nameplace,
+      tripName,
       startDate: startDateTime.toISOString(),
       endDate: endDateTime.toISOString(),
       description: selectedCard.description,
@@ -95,6 +101,7 @@ const DetailsPlace = () => {
       note: tripDescription,
     };
 
+    // Call the TripService API to create the trip
     TripService.createTrip(username, tripData)
       .then((response) => {
         console.log("Trip created successfully:", response);
@@ -103,6 +110,7 @@ const DetailsPlace = () => {
       })
       .catch((error) => {
         console.error("Error creating trip:", error);
+        toast.error("Lỗi khi thêm chuyến đi.");
       });
 
     // Reset form
@@ -171,10 +179,18 @@ const DetailsPlace = () => {
                   required
                 />
               </div>
+              <input
+                type="hidden"
+                value={selectedCard.nameplace}
+                onChange={(e) => setTripName(e.target.value)} // Update tripName
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
               <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-2">
                   Thời Gian Kết Thúc: {selectedDate}
                 </label>
+
                 <input
                   type="time"
                   value={endDate || formatTime(selectedDate)}

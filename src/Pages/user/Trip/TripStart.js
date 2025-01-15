@@ -3,103 +3,54 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { FaRegClock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify"; // Assuming you are using react-toastify for notifications
+import { toast } from "react-toastify";
+import TripService from "../../../Services/user/TripService";
+import ConfirmationModal from "../../../Components/nofi/ConfirmationModal";
 
-// Component for displaying a single trip
-const TripItem = ({ trip, onDelete }) => {
-  const navigate = useNavigate();
-
-  const itemStyles = {
-    margin: "20px 0",
-    padding: "20px",
-    backgroundColor: "#fff",
-    borderRadius: "10px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    transition: "transform 0.2s, box-shadow 0.2s",
-    position: "relative",  // Relative position for dot button
-  };
-
-  const imgStyles = {
-    width: "180px",
-    height: "180px",
-    objectFit: "cover",
-    borderRadius: "10px",
-    marginRight: "20px",
-  };
-
-  const contentStyles = {
-    flex: 1,
-  };
-
-  const titleStyles = {
-    fontSize: "22px",
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: "8px",
-  };
-
-  const descStyles = {
-    fontSize: "16px",
-    color: "#666",
-    marginBottom: "10px",
-    lineHeight: "1.5",
-  };
-
-  const dateStyles = {
-    fontSize: "14px",
-    color: "#888",
-    marginBottom: "5px",
-  };
-
-  const buttonStyles = {
-    backgroundColor: "green",
-    color: "#fff",
-    border: "none",
-    float: "right",
-    padding: "10px 20px",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontSize: "14px",
-    transition: "background-color 0.2s",
-  };
-
-  const dotButtonStyles = {
-    backgroundColor: "transparent",
-    border: "none",
-    fontSize: "20px",
-    color: "#555",
-    cursor: "pointer",
-    position: "absolute",  // Positioning it relative to its parent
-    top: "10px",           // Adjust the distance from the top
-    right: "10px",         // Adjust the distance from the right
-  };
-
-  const handleDelete = () => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa chuyến đi này?")) {
-      onDelete(trip.id);  // Trigger delete function from parent
-    }
-  };
-
-  const avatarUrl = trip.users?.[0]?.images?.[0]?.avatarrurl || null;
+const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
   const placeImageUrl = trip.placetrips?.[0]?.placeid?.placeimages?.[0]?.image;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleDelete = (tripid) => {
+    TripService.deleteTrip(tripid)
+      .then(() => {
+        onDelete(tripid);
+        toast.success("Xoá chuyến đi thành công.");
+        handleCloseModal();
+      })
+      .catch(() => {
+        toast.error("Không thể xoá chuyến đi này.");
+      });
+  };
 
   return (
-    <div>
-      <li style={itemStyles}>
+    <>
+      <li className="relative flex p-5 bg-white rounded-lg shadow-md mb-5">
         <img
           src={placeImageUrl || "default-image-url.jpg"}
           alt={trip.tripname}
-          style={imgStyles}
+          className="w-44 h-44 object-cover rounded-lg mr-5"
         />
-        <div style={contentStyles}>
-          <h3 style={titleStyles}>{trip.tripname}</h3>
-          <p style={descStyles}>{trip.description}</p>
+        <div className="flex-1">
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">{trip.tripname}</h3>
+          <button
+            onClick={handleOpenModal}
+            className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-2xl font-bold"
+          >
+            ❌
+          </button>
+          <p className="text-lg text-gray-600 mb-3">{trip.description}</p>
 
-          <p style={{ ...dateStyles, display: "flex", alignItems: "center" }}>
-            <FaRegClock style={{ marginRight: "6px", color: "#555" }} />
+          <p className="text-sm text-gray-600 flex items-center mb-2">
+            <FaRegClock className="mr-2 text-gray-500" />
             <strong>Bắt đầu:</strong>&nbsp;
             {new Date(trip.startdate).toLocaleDateString("vi-VN")} -{" "}
             {new Date(trip.startdate).toLocaleTimeString("vi-VN", {
@@ -108,8 +59,8 @@ const TripItem = ({ trip, onDelete }) => {
             })}
           </p>
 
-          <p style={{ ...dateStyles, display: "flex", alignItems: "center" }}>
-            <FaRegClock style={{ marginRight: "6px", color: "#555" }} />
+          <p className="text-sm text-gray-600 flex items-center mb-2">
+            <FaRegClock className="mr-2 text-gray-500" />
             <strong>Kết thúc:</strong>&nbsp;
             {new Date(trip.enddate).toLocaleDateString("vi-VN")} -{" "}
             {new Date(trip.enddate).toLocaleTimeString("vi-VN", {
@@ -118,40 +69,66 @@ const TripItem = ({ trip, onDelete }) => {
             })}
           </p>
 
-          <button style={buttonStyles}>📝 Cập nhật</button>
-          <button style={dotButtonStyles} onClick={handleDelete}>
-            ...
-          </button>
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => onAddFriends(trip)}
+              className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
+            >
+              Thêm bạn bè vào chuyến đi
+            </button>
+            <button
+              onClick={() => onUpdate(trip)}
+              className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+            >
+              📝 Cập nhật
+            </button>
+          </div>
         </div>
       </li>
-    </div>
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onConfirm={() => handleDelete(trip.tripid)}
+        onCancel={handleCloseModal}
+        message="Bạn có chắc chắn muốn xóa chuyến đi này?"
+      />
+    </>
   );
 };
 
-// Component for displaying a list of trips
-const TripList = ({ trips, onDelete }) => {
-  const listStyles = {
-    listStyleType: "none",
-    padding: 0,
-    margin: 0,
-  };
-
+const TripList = ({ trips, onDelete, onUpdate, onAddFriends }) => {
   return (
-    <ul style={listStyles}>
-      {trips.map((trip) => (
-        <TripItem key={trip.id} trip={trip} onDelete={onDelete} />
+    <ul className="list-none p-0 m-0">
+      {trips.map((trip, index) => (
+        <TripItem
+          key={trip.tripid || index}
+          trip={trip}
+          onDelete={onDelete}
+          onUpdate={onUpdate}
+          onAddFriends={onAddFriends}
+        />
       ))}
     </ul>
   );
 };
 
-// Main page component
 const TripPage = () => {
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const username = Cookies.get("username");
+  const [showAddFriendsModal, setShowAddFriendsModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [selectedTrip, setSelectedTrip] = useState(null);
+  const [friends, setFriends] = useState([]);
+  const [selectedFriend, setSelectedFriend] = useState("");
+  const [tripDetails, setTripDetails] = useState({
+    tripname: "",
+    description: "",
+    startdate: "",
+    enddate: "",
+    createdate: "",
+  });
   const navigate = useNavigate();
+  const username = Cookies.get("username");
 
   useEffect(() => {
     axios
@@ -160,69 +137,190 @@ const TripPage = () => {
         setTrips(response.data);
         setLoading(false);
       })
-      .catch((err) => {
+      .catch(() => {
         setError("Không thể tải danh sách chuyến đi");
         setLoading(false);
       });
-  }, [username]);
 
-  const handleDeleteTrip = (tripId) => {
     axios
-      .delete(`http://localhost:8080/api/trips/${tripId}`)
-      .then(() => {
-        setTrips(trips.filter((trip) => trip.id !== tripId));
-        toast.success("Chuyến đi đã được xóa.");
+      .get(`http://localhost:8080/api/friend-requests/${username}`)
+      .then((response) => {
+        setFriends(response.data);
       })
-      .catch((error) => {
-        toast.error("Xóa chuyến đi không thành công.");
+      .catch(() => {
+        toast.error("Không thể tải danh sách bạn bè.");
       });
-  };
-
-  const pageStyles = {
-    maxWidth: "900px",
-    margin: "0 auto",
-    padding: "40px 20px",
-    backgroundColor: "#f9f9f9",
-    minHeight: "100vh",
-  };
-
-  const headerStyles = {
-    fontSize: "28px",
-    fontWeight: "700",
-    textAlign: "center",
-    marginBottom: "30px",
-    color: "#333",
-  };
-
-  const addButtonStyles = {
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    padding: "12px 25px",
-    cursor: "pointer",
-    fontSize: "15px",
-    position: "fixed",
-    bottom: "30px",
-    right: "300px",
-    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
-    transition: "background-color 0.2s",
-  };
+  }, [username]);
 
   const handleAddTrip = () => {
     navigate(`/user/cal`);
   };
 
-  if (loading)
-    return <p style={{ textAlign: "center" }}>Đang tải chuyến đi...</p>;
-  if (error)
-    return <p style={{ textAlign: "center", color: "red" }}>{error}</p>;
+  const handleAddFriends = (trip) => {
+    setSelectedTrip(trip);
+    setShowAddFriendsModal(true);
+  };
+
+  const handleUpdateTrip = (trip) => {
+    setSelectedTrip(trip);
+    setTripDetails({
+      tripname: trip.tripname,
+      description: trip.description,
+      startdate: trip.startdate,
+      enddate: trip.enddate,
+      createdate: trip.createdate,
+    });
+    setShowUpdateModal(true);
+  };
+
+  const handleDeleteTrip = (tripid) => {
+    setTrips((prevTrips) => prevTrips.filter((trip) => trip.tripid !== tripid));
+  };
+
+  const handleAddFriendToTrip = () => {
+    if (selectedFriend) {
+      axios
+        .post(`http://localhost:8080/api/trips/${selectedTrip.id}/add-friend`, {
+          friendId: selectedFriend,
+        })
+        .then(() => {
+          toast.success("Bạn đã thêm bạn đồng hành vào chuyến đi.");
+          setShowAddFriendsModal(false);
+        })
+        .catch(() => {
+          toast.error("Thêm bạn đồng hành thất bại.");
+        });
+    } else {
+      toast.warning("Chưa chọn bạn bè.");
+    }
+  };
+
+  const handleUpdateTripDetails = () => {
+    const { description, startDate, endDate } = tripDetails;
+    const formattedStartDate = new Date(startDate).toISOString().slice(0, 19).replace("T", " ");
+    const formattedEndDate = new Date(endDate).toISOString().slice(0, 19).replace("T", " ");
+
+    console.log("Formatted Start Date:", formattedStartDate);
+    console.log("Formatted End Date:", formattedEndDate);
+
+    if (selectedTrip) {
+      axios
+        .put(`http://localhost:8080/api/user/trip/${selectedTrip.tripid}`, {
+          description,
+          startDate: formattedStartDate, 
+          endDate: formattedEndDate, 
+        })
+        .then(() => {
+          toast.success("Cập nhật chuyến đi thành công.");
+          setShowUpdateModal(false);
+        })
+        .catch(() => {
+          toast.error("Cập nhật chuyến đi thất bại.");
+        });
+    }
+  };
+
+  if (loading) return <p className="text-center">Đang tải chuyến đi...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <div style={pageStyles}>
-      <h2 style={headerStyles}>Danh sách chuyến đi:</h2>
-      <TripList trips={trips} onDelete={handleDeleteTrip} />
-      {/* Add Trip Button */}
-      <button style={addButtonStyles} onClick={handleAddTrip}>
+    <div className="max-w-4xl mx-auto p-8 bg-gray-100 min-h-screen">
+      <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">Danh sách chuyến đi:</h2>
+      <TripList
+        trips={trips}
+        onDelete={handleDeleteTrip}
+        onUpdate={handleUpdateTrip}
+        onAddFriends={handleAddFriends}
+      />
+      {showAddFriendsModal && selectedTrip && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg w-96">
+            <h3 className="text-xl font-semibold mb-4">Thêm bạn bè vào chuyến đi</h3>
+            <select
+              value={selectedFriend}
+              onChange={(e) => setSelectedFriend(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-md mb-4"
+            >
+              <option value="">Chọn bạn bè</option>
+              {friends.map((friend) => (
+                <option key={friend.friendUserName} value={friend.friendUserName}>
+                  {friend.friendName}
+                </option>
+              ))}
+            </select>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={handleAddFriendToTrip}
+                className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
+              >
+                Thêm
+              </button>
+              <button
+                onClick={() => setShowAddFriendsModal(false)}
+                className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showUpdateModal && selectedTrip && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg w-96">
+            <h3 className="text-xl font-semibold mb-4">Cập nhật chuyến đi</h3>
+            <label className="block text-sm font-semibold text-gray-700">Tên chuyến đi:</label>
+            <input
+              type="text"
+              value={tripDetails.tripname}
+              disabled
+              onChange={(e) => setTripDetails({ ...tripDetails, tripname: e.target.value })}
+              className="w-full p-3 border border-gray-300 rounded-md mb-4"
+            />
+            <label className="block text-sm font-semibold text-gray-700">Ngày bắt đầu:</label>
+            <input
+              type="datetime-local"
+              value={tripDetails.startdate}
+              onChange={(e) => setTripDetails({ ...tripDetails, startdate: e.target.value })}
+              className="w-full p-3 border border-gray-300 rounded-md mb-4"
+            />
+            <label className="block text-sm font-semibold text-gray-700">Ngày kết thúc:</label>
+            <input
+              type="datetime-local"
+              value={tripDetails.enddate}
+              onChange={(e) => setTripDetails({ ...tripDetails, enddate: e.target.value })}
+              className="w-full p-3 border border-gray-300 rounded-md mb-4"
+            />
+            <label className="block text-sm font-semibold text-gray-700">Mô tả:</label>
+            <textarea
+              value={tripDetails.description}
+              onChange={(e) => setTripDetails({ ...tripDetails, description: e.target.value })}
+              className="w-full p-3 border border-gray-300 rounded-md mb-4"
+            />
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={handleUpdateTripDetails}
+                className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+              >
+                Cập nhật
+              </button>
+              <button
+                onClick={() => setShowUpdateModal(false)}
+                className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <button
+        onClick={handleAddTrip}
+        className="fixed bottom-8 right-15 bg-blue-600 text-white py-3 px-6 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+      >
         ➕ Thêm chuyến đi
       </button>
     </div>
