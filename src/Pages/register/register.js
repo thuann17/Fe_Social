@@ -210,7 +210,7 @@ const RegisterForm = () => {
           </div>
           <h1 className="text-4xl font-bold mb-6">ĐĂNG KÝ</h1>
           <p className="text-lg">
-            FShark là nền tảng mạng xã hội du lịch đầu tiên tại Việt Nam. Nơi
+            FShark là nền tảng mạng xã hội du lịch tại Việt Nam. Nơi
             lưu giữ và chia sẻ những chuyến đi và hành trình tuyệt vời của bạn.
           </p>
         </div>

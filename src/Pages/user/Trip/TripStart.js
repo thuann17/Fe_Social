@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 // Component for displaying a single trip
 const TripItem = ({ trip }) => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const itemStyles = {
     margin: "20px 0",
     padding: "20px",
@@ -78,13 +78,11 @@ const TripItem = ({ trip }) => {
   };
 
   const handleAddTrip = () => {
-    navigate("user/places");  
+    navigate(`/user/place`);
   };
-  
-  const avatarUrl =
-    trip.users[0]?.images[0]?.avatarrurl;
-  const placeImageUrl =
-    trip.places[0]?.placeimages[0]?.image;
+
+  const avatarUrl = trip.users[0]?.images[0]?.avatarrurl;
+  const placeImageUrl = trip.places[0]?.placeimages[0]?.image;
 
   return (
     <div>
@@ -94,9 +92,9 @@ const TripItem = ({ trip }) => {
           <h3 style={titleStyles}>{trip.tripname}</h3>
           <p style={descStyles}>{trip.description}</p>
 
-          <p style={dateStyles}>
+          <p style={{ ...dateStyles, display: "flex", alignItems: "center" }}>
             <FaRegClock style={{ marginRight: "6px", color: "#555" }} />
-            <strong>Bắt đầu:</strong>{" "}
+            <strong>Bắt đầu:</strong>&nbsp;
             {new Date(trip.startdate).toLocaleDateString("vi-VN")} -{" "}
             {new Date(trip.startdate).toLocaleTimeString("vi-VN", {
               hour: "2-digit",
@@ -104,9 +102,9 @@ const TripItem = ({ trip }) => {
             })}
           </p>
 
-          <p style={dateStyles}>
+          <p style={{ ...dateStyles, display: "flex", alignItems: "center" }}>
             <FaRegClock style={{ marginRight: "6px", color: "#555" }} />
-            <strong>Kết thúc:</strong>{" "}
+            <strong>Kết thúc:</strong>&nbsp;
             {new Date(trip.enddate).toLocaleDateString("vi-VN")} -{" "}
             {new Date(trip.enddate).toLocaleTimeString("vi-VN", {
               hour: "2-digit",

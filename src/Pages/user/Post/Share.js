@@ -5,19 +5,24 @@ import "react-toastify/dist/ReactToastify.css";
 import { FaEllipsisH } from "react-icons/fa";
 import PostService from "../../../Services/user/PostService";
 
-const Share = ({ share, onDelete }) => {
+const Share = ({ share, onDelete, onNewShare }) => {
   const [isOptionsVisible, setIsOptionsVisible] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const formatTimestamp = (timestamp) => {
+    const options = {
+      weekday: "short", // Weekday in Vietnamese
+      year: "numeric", // Year in numeric format
+      month: "short", // Month in short format (e.g., Jan, Feb)
+      day: "numeric", // Day in numeric format
+      hour: "2-digit", // Hour in 2-digit format
+      minute: "2-digit", // Minute in 2-digit format
+      second: "2-digit", // Second in 2-digit format
+      hour12: false, // Use 24-hour time format (Vietnam typically uses 24-hour format)
+    };
     return new Date(timestamp).toLocaleString("vi-VN", {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZone: "Asia/Ho_Chi_Minh",
+      ...options,
+      timeZone: "Asia/Ho_Chi_Minh", // Ensure correct timezone (Vietnam)
     });
   };
 
@@ -50,7 +55,7 @@ const Share = ({ share, onDelete }) => {
             {share.username?.lastname} {share.username?.firstname}
           </h4>
           <span className="text-gray-500 text-sm">
-            Đã chia sẻ vào {formatTimestamp(share.createdate)}
+            Đã chia sẻ vào {(share.createdate)}
           </span>
         </div>
         <div className="ml-auto relative">
@@ -112,7 +117,7 @@ const Share = ({ share, onDelete }) => {
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
-            <p>Bạn có chắc muốn xóa bài viết này không?</p>
+            <p>Bạn có chắc muốn xóa bài chia sẻ này không?</p>
             <div className="mt-4 flex justify-end">
               <button
                 onClick={() => setShowConfirmModal(false)}

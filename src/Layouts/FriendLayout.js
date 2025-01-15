@@ -1,6 +1,5 @@
 import React from "react"; 
 import FriendProfile from "../Pages/user/Profile/FriendProfile"; 
-import PostList from "../Pages/user/Post/PostList";  
 
 const FriendLayout = () => { 
     return (
