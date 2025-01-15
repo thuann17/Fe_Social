@@ -61,8 +61,8 @@ const DetailsPlace = () => {
   };
 
   const openModal = (card) => {
-    setSelectedCard(card);
     setTripName(`Chuyến đi ${card.nameplace}`);
+    setSelectedCard(card);
     setModalVisible(true);
   };
 
@@ -72,26 +72,20 @@ const DetailsPlace = () => {
   };
 
   const handleSaveTrip = (e) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Remove time portion for comparison
-
-    // Convert the start and end date times to Date objects
-    const startDateTime = new Date(startDate);
-    const endDateTime = new Date(endDate);
-
-    // Validate if the start date is after today
-    if (startDateTime <= today) {
-      toast.error("Ngày bắt đầu phải sau hôm nay.");
+    e.preventDefault();
+    if (!startDate || !endDate) {
+      alert("Please provide both start and end times.");
       return;
     }
 
-    // Validate if the end date is after the start date
-    if (endDateTime <= startDateTime) {
-      toast.error("Ngày kết thúc phải sau ngày bắt đầu.");
+    const startDateTime = new Date(`${selectedDate}T${startDate}`);
+    const endDateTime = new Date(`${selectedDate}T${endDate}`);
+
+    if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+      alert("Invalid time values.");
       return;
     }
 
-    // Create the trip data object
     const tripData = {
       tripName,
       startDate: startDateTime.toISOString(),
@@ -101,7 +95,6 @@ const DetailsPlace = () => {
       note: tripDescription,
     };
 
-    // Call the TripService API to create the trip
     TripService.createTrip(username, tripData)
       .then((response) => {
         console.log("Trip created successfully:", response);
@@ -110,7 +103,6 @@ const DetailsPlace = () => {
       })
       .catch((error) => {
         console.error("Error creating trip:", error);
-        toast.error("Lỗi khi thêm chuyến đi.");
       });
 
     // Reset form
@@ -127,15 +119,6 @@ const DetailsPlace = () => {
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
     return `${hours}:${minutes}`;
-  };
-
-  const formatDate = (date) => {
-    const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, '0'); // Get day and pad if needed
-    const month = String(d.getMonth() + 1).padStart(2, '0'); // Get month (1-based) and pad
-    const year = d.getFullYear(); // Get year
-  
-    return `${day}-${month}-${year}`;
   };
 
 
@@ -176,9 +159,16 @@ const DetailsPlace = () => {
               <span className="text-gray-700">{selectedCard.description}</span>
             </div>
             <form onSubmit={handleSaveTrip}>
+            <input
+                type="hidden"
+                value={selectedCard.nameplace}
+                onChange={(e) => setTripName(e.target.value)} // Update tripName
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
               <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-2">
-                  Thời Gian Bắt Đầu: {formatDate(selectedDate) }
+                  Thời Gian Bắt Đầu: {selectedDate}
                 </label>
                 <input
                   type="time"
@@ -188,18 +178,10 @@ const DetailsPlace = () => {
                   required
                 />
               </div>
-              <input
-                type="hidden"
-                value={selectedCard.nameplace}
-                onChange={(e) => setTripName(e.target.value)} // Update tripName
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
               <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-2">
-                  Thời Gian Kết Thúc: {formatDate(selectedDate) }
+                  Thời Gian Kết Thúc: {selectedDate}
                 </label>
-
                 <input
                   type="time"
                   value={endDate || formatTime(selectedDate)}
