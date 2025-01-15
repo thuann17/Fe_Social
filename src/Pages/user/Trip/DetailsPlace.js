@@ -121,6 +121,15 @@ const DetailsPlace = () => {
     return `${hours}:${minutes}`;
   };
 
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0'); // Get day and pad if needed
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Get month (1-based) and pad
+    const year = d.getFullYear(); // Get year
+  
+    return `${day}-${month}-${year}`;
+  };
+
 
   return (
     <div className="container mx-auto">
@@ -161,7 +170,7 @@ const DetailsPlace = () => {
             <form onSubmit={handleSaveTrip}>
               <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-2">
-                  Thời Gian Bắt Đầu: {selectedDate}
+                  Thời Gian Bắt Đầu: {formatDate(selectedDate) }
                 </label>
                 <input
                   type="time"
@@ -173,7 +182,7 @@ const DetailsPlace = () => {
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-2">
-                  Thời Gian Kết Thúc: {selectedDate}
+                  Thời Gian Kết Thúc: {formatDate(selectedDate) }
                 </label>
                 <input
                   type="time"

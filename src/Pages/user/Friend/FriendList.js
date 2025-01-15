@@ -14,7 +14,7 @@ const CombinedFriendComponents = () => {
   const itemsPerPage = 6;
 
   const handleImageClick = (username) => {
-    navigate(`/user/friendprofile/${username}`, {});
+    navigate(`/friendprofile/${username}`, {});
   };
 
   const navigate = useNavigate();

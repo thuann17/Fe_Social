@@ -29,7 +29,7 @@ const TripPlanner = () => {
   const handleDateSelect = (selectInfo) => {
     setSelectedDate(selectInfo.startStr);
     setIsModalOpen(true);
-    navigate(`/user/place`, {
+    navigate(`/place`, {
       state: { selectedDate: selectInfo.startStr },
     }
       );
@@ -38,7 +38,7 @@ const TripPlanner = () => {
   const navigate = useNavigate();
 
   const handleImageClick = () => {
-    navigate(`/user/place`);
+    navigate(`/place`);
   };
 
   const handleCloseModal = () => {

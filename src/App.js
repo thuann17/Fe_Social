@@ -55,7 +55,7 @@ function App() {
     createRoutesFromElements(
       <>
         {/* Định tuyến User */}
-        <Route path="/user" element={<ProtectedRoute requiredRole="User"><UserLayout /></ProtectedRoute>}>
+        <Route path="/" element={<ProtectedRoute requiredRole="User"><UserLayout /></ProtectedRoute>}>
           <Route path="index" element={<PostList />} />
           <Route path="cal" element={<TripPlanner />} />
           <Route path="profile" element={<MyProfileLayout />} />
@@ -69,7 +69,7 @@ function App() {
 
         {/* Định tuyến Admin */}
         <Route
-          path="/admin"
+          path="/"
           element={
             <ProtectedRoute requiredRole="Admin">
               <AdminLayout />
@@ -89,7 +89,7 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/forgot" element={<ForgotPassword />} />
-        <Route path="/user/chat" element={<Chat />} />
+        <Route path="/chat" element={<Chat />} />
         {/* Định tuyến cho Register */}
         <Route path="/register" element={<RegisterForm />} />
         <Route path="*" element={<Navigate to="/login" />} />

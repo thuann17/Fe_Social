@@ -61,7 +61,7 @@ const PlaceTrip = () => {
 
   const handleImageClick = (path) => {
     
-    navigate(`/user/detailsplace/${path}`, {
+    navigate(`/detailsplace/${path}`, {
       state: { selectedDate: selectedDate },
     }); 
   };

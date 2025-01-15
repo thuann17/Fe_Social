@@ -72,14 +72,14 @@ const TripItem = ({ trip, onDelete }) => {
     fontSize: "20px",
     color: "#555",
     cursor: "pointer",
-    position: "absolute",  // Positioning it relative to its parent
-    top: "10px",           // Adjust the distance from the top
-    right: "10px",         // Adjust the distance from the right
+    position: "absolute",  
+    top: "10px",           
+    right: "10px",        
   };
 
   const handleDelete = () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa chuyến đi này?")) {
-      onDelete(trip.id);  // Trigger delete function from parent
+      onDelete(trip.id); 
     }
   };
 
@@ -120,7 +120,7 @@ const TripItem = ({ trip, onDelete }) => {
 
           <button style={buttonStyles}>📝 Cập nhật</button>
           <button style={dotButtonStyles} onClick={handleDelete}>
-            ...
+          🗑️
           </button>
         </div>
       </li>
@@ -168,7 +168,7 @@ const TripPage = () => {
 
   const handleDeleteTrip = (tripId) => {
     axios
-      .delete(`http://localhost:8080/api/trips/${tripId}`)
+      .delete(`http://localhost:8080/api/trip/delete/${tripId}`)
       .then(() => {
         setTrips(trips.filter((trip) => trip.id !== tripId));
         toast.success("Chuyến đi đã được xóa.");
@@ -209,7 +209,7 @@ const TripPage = () => {
   };
 
   const handleAddTrip = () => {
-    navigate(`/user/cal`);
+    navigate(`/cal`);
   };
 
   if (loading)

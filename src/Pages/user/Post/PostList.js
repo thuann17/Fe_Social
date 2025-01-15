@@ -30,6 +30,7 @@ const PostList = () => {
   // Fetch posts and shares
   const fetchData = async () => {
     setLoading(true);
+  
 
     try {
       // Fetch posts
