@@ -4,7 +4,7 @@ import PostService from "../../../Services/user/PostService";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
-
+import WebSocketService from "../../../Services/WebSocketService";
 const Post = ({ post, onDelete }) => {
   const [likes, setLikes] = useState(post.countLike || 0);
   const [comments, setComments] = useState(post.comments || []);
@@ -19,7 +19,30 @@ const Post = ({ post, onDelete }) => {
   const [shareContent, setShareContent] = useState(""); // State to manage the content for sharing
 
   const menuRef = useRef(null);
+  // websocket
+  const handleLikeNotification = (message) => {
+    toast.info(message);  // Hiển thị thông báo
+  };
 
+  useEffect(() => {
+    // Subscribe vào WebSocket khi component được render
+    const postId = post.id;
+    WebSocketService.connect(
+      "http://localhost:8080/ws",
+      () => {
+        // Subscribe vào topic của bài viết
+        WebSocketService.subscribe(`/topic/post/${postId}`, handleLikeNotification);
+      },
+      (error) => console.error("WebSocket Error:", error)
+    );
+
+    // Cleanup khi component bị unmount
+    return () => {
+      WebSocketService.unsubscribe(`/topic/post/${postId}`);
+      WebSocketService.disconnect();
+    };
+  }, [post.id]);
+  // websocket
   const handleLike = async () => {
     try {
       setLikes((prev) => (isLiked ? prev - 1 : prev + 1));
@@ -247,7 +270,7 @@ const Post = ({ post, onDelete }) => {
               )}
             </div>
           ))}
-           <div className="add-comment mt-2 flex items-center">
+          <div className="add-comment mt-2 flex items-center">
             <input
               type="text"
               placeholder="Bình luận..."
