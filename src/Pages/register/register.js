@@ -50,7 +50,22 @@ const RegisterForm = () => {
       alert("Đăng ký thành công!");
       navigate("/login");
     } catch (err) {
-      setErrors({ general: "Đã có lỗi xảy ra, vui lòng thử lại!" });
+      if (err.response) {
+        if (err.response.data.username) {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            username: "Tên người dùng đã tồn tại!"
+          }));
+        }
+        if (err.response.data.email) {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            email: "Email đã tồn tại!"
+          }));
+        }
+      } else {
+        setErrors({ general: "Đã có lỗi xảy ra, vui lòng thử lại!" });
+      }
     } finally {
       setIsSubmitting(false);
     }
