@@ -16,7 +16,7 @@ export default function Example() {
         Cookies.remove("username");
         Cookies.remove("role");
         Cookies.remove("token");
-        navigate("/login");
+        navigate("/");
     };
     useEffect(() => {
         if (username) {
@@ -56,7 +56,7 @@ export default function Example() {
                                 <Menu.Item>
                                     {({ active }) => (
                                         <a
-                                            onClick={() => navigate("/admin/profile")}
+                                            onClick={() => navigate("/profile")}
                                             className={classNames(
                                                 active ? "bg-gray-100" : "",
                                                 "block px-4 py-2 text-sm text-gray-700",

@@ -8,7 +8,7 @@ const AboutChat = ({ toggleAboutChat, selectedFriend }) => {
     const goToProfile = () => {
 
         if (selectedFriend) {
-            navigate(`/user/friendprofile/${selectedFriend.friendUserName}`);
+            navigate(`/friendprofile/${selectedFriend.friendUserName}`);
         }
     };
     useEffect(() => {
