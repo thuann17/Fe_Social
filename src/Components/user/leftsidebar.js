@@ -4,7 +4,7 @@ import { FaUserFriends, FaUsers, FaVideo, FaClock, FaEnvelope } from "react-icon
 const Sidebar = () => {
     const mainSections = [
         { name: "Bạn bè", icon: <FaUserFriends className="text-blue-500" />, href: "/friends"  },
-        { name: "Bài đăng", icon: <FaVideo className="text-red-500" />,  href: "/profile"  },
+     
     ];
 
     const yourMomentsSections = [

@@ -13,6 +13,13 @@ class UserService {
                 throw error.response ? error.response.data : error.message; // Xử lý lỗi
             });
     }
+    uploadProfileImage(username, formData) {
+        return axios.post(`${API_BASE_URL}/api/admin/profile/${username}/uImage`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+    }
 }
 
 export default new UserService();

@@ -19,7 +19,7 @@ const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 const uploadImageToFirebase = async (file) => {
   try {
-    const storageRef = ref(storage, `images/${Date.now()}_${file.name}`);
+    const storageRef = ref(storage, `Images/${Date.now()}_${file.name}`);
     const snapshot = await uploadBytes(storageRef, file);
     const downloadURL = await getDownloadURL(snapshot.ref);
 

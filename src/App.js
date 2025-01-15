@@ -35,46 +35,66 @@ import AccountDetail from "./Pages/admin/Account/accountdetail";
 import ProfileAdmin from "./Pages/admin/Profile/ProfileAdmin";
 import Dashboard from "./Pages/admin/Home/dashboard";
 import { useNavigate } from "react-router-dom";
+import HoSo from "./Pages/user/Profile/HoSo";
 const ProtectedRoute = ({ children, requiredRole }) => {
-  const navigate = useNavigate(); 
-  const token = Cookies.get("token");
   const userRole = Cookies.get("role");
 
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
 
   if (requiredRole && userRole !== requiredRole) {
-    return <Navigate to="/login" replace />;
+    if (userRole === "Admin") {
+      return <Navigate to="/dashboard" replace />;
+    } else if (userRole === "User") {
+      return <Navigate to="/index" replace />;
+    } else {
+      return <Navigate to="/login" replace />;
+    }
   }
+
   return children;
 };
 
 function App() {
+  const token = Cookies.get("token");
+  const userRole = Cookies.get("role");
+
+  const defaultRoute = () => {
+    if (!token) {
+      return "/login";
+    }
+    return userRole === "Admin" ? "/dashboard" : "/index";
+  };
+
   const router = createBrowserRouter(
     createRoutesFromElements(
       <>
-        {/* Định tuyến User */}
-        <Route path="/" element={<ProtectedRoute requiredRole="User"><UserLayout /></ProtectedRoute>}>
+        <Route path="/" element={<Navigate to={defaultRoute()} replace />} />
+        <Route
+          path=""
+          element={<ProtectedRoute requiredRole="User"><UserLayout /></ProtectedRoute>}
+        >
           <Route path="index" element={<PostList />} />
           <Route path="cal" element={<TripPlanner />} />
-          <Route path="profile" element={<MyProfileLayout />} />
+          <Route path="myprofile" element={<MyProfileLayout />} />
           <Route path="friendprofile/:username" element={<FriendLayout />} />
           <Route path="friends" element={<FriendList />} />
+          <Route path="friends" element={<FriendList />} />
           <Route path="place" element={<TripLayout />} />
+          <Route path="hoso" element={<HoSo />} />
           <Route path="tripstart" element={<TripStart />} />
           <Route path="detailsplan" element={<DetailsPlan />} />
           <Route path="detailsplace/:addressFilter" element={<DetailsPlace />} />
         </Route>
-
-        {/* Định tuyến Admin */}
         <Route
-          path="/"
+          path="/chat"
           element={
-            <ProtectedRoute requiredRole="Admin">
-              <AdminLayout />
+            <ProtectedRoute requiredRole="User">
+              <Chat />
             </ProtectedRoute>
           }
+        />
+        <Route
+          path="/"
+          element={<ProtectedRoute requiredRole="Admin"><AdminLayout /></ProtectedRoute>}
         >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="place" element={<PlacesManager />} />
@@ -83,16 +103,12 @@ function App() {
           <Route path="post" element={<PostAdmin />} />
           <Route path="register-admin" element={<RegisterAdminForm />} />
           <Route path="profile" element={<ProfileAdmin />} />
-
-
         </Route>
 
+        {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/forgot" element={<ForgotPassword />} />
-        <Route path="/chat" element={<Chat />} />
-        {/* Định tuyến cho Register */}
         <Route path="/register" element={<RegisterForm />} />
-        <Route path="*" element={<Navigate to="/login" />} />
       </>
     )
   );

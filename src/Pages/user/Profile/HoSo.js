@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { format } from "date-fns";
 import { uploadImageToFirebase, deleteImageFromFirebase } from "../../../Services/firebase";
 
-const ProfileAdmin = () => {
+const HoSo = () => {
     const [userInfo, setUserInfo] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -299,4 +299,4 @@ const ProfileAdmin = () => {
     );
 };
 
-export default ProfileAdmin;
+export default HoSo;
