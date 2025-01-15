@@ -197,29 +197,40 @@ const TripPage = () => {
 
   const handleUpdateTripDetails = () => {
     const { description, startDate, endDate } = tripDetails;
-    const formattedStartDate = new Date(startDate).toISOString().slice(0, 19).replace("T", " ");
-    const formattedEndDate = new Date(endDate).toISOString().slice(0, 19).replace("T", " ");
-
+  
+    // Chuyển đổi ngày bắt đầu và kết thúc thành đối tượng Date
+    const startDateTime = new Date(startDate);
+    const endDateTime = new Date(endDate);
+  
+    // Kiểm tra nếu ngày bắt đầu sau ngày kết thúc
+    if (startDateTime >= endDateTime) {
+      toast.error("❗ Ngày bắt đầu phải trước ngày kết thúc.");
+      return;
+    }
+  
+    const formattedStartDate = startDateTime.toISOString().slice(0, 19).replace("T", " ");
+    const formattedEndDate = endDateTime.toISOString().slice(0, 19).replace("T", " ");
+  
     console.log("Formatted Start Date:", formattedStartDate);
     console.log("Formatted End Date:", formattedEndDate);
-
+  
     if (selectedTrip) {
       axios
         .put(`http://localhost:8080/api/user/trip/${selectedTrip.tripid}`, {
           description,
-          startDate: formattedStartDate, 
-          endDate: formattedEndDate, 
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
         })
         .then(() => {
-          toast.success("Cập nhật chuyến đi thành công.");
+          toast.success(" Cập nhật chuyến đi thành công.");
           setShowUpdateModal(false);
         })
         .catch(() => {
-          toast.error("Cập nhật chuyến đi thất bại.");
+          toast.error(" Cập nhật chuyến đi thất bại.");
         });
     }
   };
-
+  
   if (loading) return <p className="text-center">Đang tải chuyến đi...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 

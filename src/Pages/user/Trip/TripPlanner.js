@@ -1,19 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import { FaPlus, FaTimes, FaCalendarAlt, FaMapMarkerAlt, FaStar } from "react-icons/fa";
+import TripService from "../../../Services/user/TripService"; // Import your TripService
+import { toast } from "react-toastify"; // Assuming you're using toast notifications
 
 const initialTrips = [
-  // Initial trips data...
+  // Initial trip data (if needed)
 ];
-
-const allHours = Array.from({ length: 24 }, (_, i) => {
-  const hour = i < 10 ? `0${i}:00` : `${i}:00`;
-  return hour;
-});
 
 const TripPlanner = () => {
   const [tripDetails, setTripDetails] = useState({ trips: initialTrips });
@@ -26,16 +23,31 @@ const TripPlanner = () => {
   const [endDate, setEndDate] = useState("");
   const [description, setDescription] = useState("");
 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch trips data from API
+    TripService.getTripStartDates()
+      .then((response) => {
+        const trips = response.map((trip) => ({
+          title: trip.tripname, 
+          start: new Date(trip.startdate).toISOString(), 
+        }));
+
+        setTripDetails({ trips });
+      })
+      .catch(() => {
+        toast.error("Không thể lấy dữ liệu ngày bắt đầu chuyến đi.");
+      });
+  }, []);
+
   const handleDateSelect = (selectInfo) => {
     setSelectedDate(selectInfo.startStr);
     setIsModalOpen(true);
     navigate(`/place`, {
       state: { selectedDate: selectInfo.startStr },
-    }
-      );
+    });
   };
-
-  const navigate = useNavigate();
 
   const handleImageClick = () => {
     navigate(`/place`);
@@ -109,70 +121,18 @@ const TripPlanner = () => {
             selectable
             editable
             locale="vi"
-            events={tripDetails.trips}
+            events={tripDetails.trips} // Add events data here from state
             select={handleDateSelect}
+            eventContent={(eventInfo) => (
+              <div className="event-content flex items-center ml-6">
+                <FaMapMarkerAlt className="mr-2 text-red-500" size="30px"/> {/* Map icon */}
+              </div>
+            )}
           />
         </div>
       </div>
 
-      {/* Modal for Trip Details */}
-      <Dialog
-        open={isModalOpen}
-        onClose={handleCloseModal}
-        className="relative z-50"
-      >
-        <DialogBackdrop className="fixed inset-0 bg-gray-500/75 transition-opacity" />
-        <div className="fixed inset-0 overflow-y-auto flex items-center justify-center">
-          <DialogPanel className="bg-white rounded-lg shadow-xl p-8 transition-all w-11/12 md:w-1/2">
-            <h3 className="text-2xl font-semibold mb-6 text-center">
-              Chuyến đi hôm nay
-            </h3>
-            <div className="h-96 overflow-y-auto border-t border-gray-300">
-              {allHours.map((hour) => (
-                <div
-                  key={hour}
-                  className="border-b py-6 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
-                >
-                  <p className="font-bold text-gray-800 text-lg">⏰ {hour}</p>
-                  {filterTripsByHour(hour).length > 0 ? (
-                    filterTripsByHour(hour).map((trip) => (
-                      <div
-                        key={trip.id}
-                        className="mt-2 p-2 rounded-md"
-                        style={{
-                          backgroundColor:
-                            getTripStatus(trip.start) === "upcoming"
-                              ? "rgb(255, 165, 0)"
-                              : "rgb(255, 99, 71)",
-                        }}
-                      >
-                        {trip.title}
-                      </div>
-                    ))
-                  ) : (
-                    <p
-                      className="mt-2 text-gray-500 cursor-pointer"
-                      onClick={() => handleImageClick()}
-                    >
-                      <FaPlus className="inline mr-1" />
-                      Không có chuyến đi được lên. Thêm lịch trình mới
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end mt-6">
-              <button
-                onClick={handleCloseModal}
-                className="px-6 py-3 bg-gray-300 rounded-lg flex items-center hover:bg-gray-400 transition"
-              >
-                <FaTimes className="mr-2" />
-                Đóng
-              </button>
-            </div>
-          </DialogPanel>
-        </div>
-      </Dialog>
+     
     </>
   );
 };
