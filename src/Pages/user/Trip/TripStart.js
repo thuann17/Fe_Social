@@ -3,10 +3,12 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { FaRegClock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; // Assuming you are using react-toastify for notifications
 
 // Component for displaying a single trip
-const TripItem = ({ trip }) => {
+const TripItem = ({ trip, onDelete }) => {
   const navigate = useNavigate();
+
   const itemStyles = {
     margin: "20px 0",
     padding: "20px",
@@ -17,6 +19,7 @@ const TripItem = ({ trip }) => {
     flexDirection: "row",
     alignItems: "center",
     transition: "transform 0.2s, box-shadow 0.2s",
+    position: "relative",  // Relative position for dot button
   };
 
   const imgStyles = {
@@ -63,31 +66,34 @@ const TripItem = ({ trip }) => {
     transition: "background-color 0.2s",
   };
 
-  const addButtonStyles = {
-    backgroundColor: "#007bff",
-    color: "#fff",
+  const dotButtonStyles = {
+    backgroundColor: "transparent",
     border: "none",
-    float: "right",
-    padding: "12px 25px",
-    borderRadius: "5px",
+    fontSize: "20px",
+    color: "#555",
     cursor: "pointer",
-    fontSize: "16px",
-    display: "block",
-    margin: "30px auto 0",
-    transition: "background-color 0.2s",
+    position: "absolute",  // Positioning it relative to its parent
+    top: "10px",           // Adjust the distance from the top
+    right: "10px",         // Adjust the distance from the right
   };
 
-  const handleAddTrip = () => {
-    navigate(`/user/place`);
+  const handleDelete = () => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa chuyến đi này?")) {
+      onDelete(trip.id);  // Trigger delete function from parent
+    }
   };
 
-  const avatarUrl = trip.users[0]?.images[0]?.avatarrurl;
-  const placeImageUrl = trip.places[0]?.placeimages[0]?.image;
+  const avatarUrl = trip.users?.[0]?.images?.[0]?.avatarrurl || null;
+  const placeImageUrl = trip.placetrips?.[0]?.placeid?.placeimages?.[0]?.image;
 
   return (
     <div>
       <li style={itemStyles}>
-        <img src={placeImageUrl} alt={trip.tripname} style={imgStyles} />
+        <img
+          src={placeImageUrl || "default-image-url.jpg"}
+          alt={trip.tripname}
+          style={imgStyles}
+        />
         <div style={contentStyles}>
           <h3 style={titleStyles}>{trip.tripname}</h3>
           <p style={descStyles}>{trip.description}</p>
@@ -113,17 +119,17 @@ const TripItem = ({ trip }) => {
           </p>
 
           <button style={buttonStyles}>📝 Cập nhật</button>
+          <button style={dotButtonStyles} onClick={handleDelete}>
+            ...
+          </button>
         </div>
       </li>
-      <button style={addButtonStyles} onClick={handleAddTrip}>
-        ➕ Thêm chuyến đi
-      </button>
     </div>
   );
 };
 
 // Component for displaying a list of trips
-const TripList = ({ trips }) => {
+const TripList = ({ trips, onDelete }) => {
   const listStyles = {
     listStyleType: "none",
     padding: 0,
@@ -133,7 +139,7 @@ const TripList = ({ trips }) => {
   return (
     <ul style={listStyles}>
       {trips.map((trip) => (
-        <TripItem key={trip.id} trip={trip} />
+        <TripItem key={trip.id} trip={trip} onDelete={onDelete} />
       ))}
     </ul>
   );
@@ -145,6 +151,7 @@ const TripPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const username = Cookies.get("username");
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -158,6 +165,18 @@ const TripPage = () => {
         setLoading(false);
       });
   }, [username]);
+
+  const handleDeleteTrip = (tripId) => {
+    axios
+      .delete(`http://localhost:8080/api/trips/${tripId}`)
+      .then(() => {
+        setTrips(trips.filter((trip) => trip.id !== tripId));
+        toast.success("Chuyến đi đã được xóa.");
+      })
+      .catch((error) => {
+        toast.error("Xóa chuyến đi không thành công.");
+      });
+  };
 
   const pageStyles = {
     maxWidth: "900px",
@@ -175,6 +194,24 @@ const TripPage = () => {
     color: "#333",
   };
 
+  const addButtonStyles = {
+    backgroundColor: "#007bff",
+    color: "#fff",
+    border: "none",
+    padding: "12px 25px",
+    cursor: "pointer",
+    fontSize: "15px",
+    position: "fixed",
+    bottom: "30px",
+    right: "300px",
+    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+    transition: "background-color 0.2s",
+  };
+
+  const handleAddTrip = () => {
+    navigate(`/user/cal`);
+  };
+
   if (loading)
     return <p style={{ textAlign: "center" }}>Đang tải chuyến đi...</p>;
   if (error)
@@ -183,7 +220,11 @@ const TripPage = () => {
   return (
     <div style={pageStyles}>
       <h2 style={headerStyles}>Danh sách chuyến đi:</h2>
-      <TripList trips={trips} />
+      <TripList trips={trips} onDelete={handleDeleteTrip} />
+      {/* Add Trip Button */}
+      <button style={addButtonStyles} onClick={handleAddTrip}>
+        ➕ Thêm chuyến đi
+      </button>
     </div>
   );
 };
