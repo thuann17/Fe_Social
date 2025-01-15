@@ -10,6 +10,16 @@ import ConfirmationModal from "../../../Components/nofi/ConfirmationModal";
 const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
   const placeImageUrl = trip.placetrips?.[0]?.placeid?.placeimages?.[0]?.image;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const isPastTrip = (startDate, endDate) => {
+    const currentDate = new Date();
+    const tripStartDate = new Date(startDate);
+    const tripEndDate = new Date(endDate);
+
+    // Check if both start and end dates are in the past
+    return tripStartDate < currentDate && tripEndDate < currentDate;
+  };
+
+  const tripIsPast = isPastTrip(trip.startdate, trip.enddate);  
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -33,14 +43,20 @@ const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
 
   return (
     <>
-      <li className="relative flex p-5 bg-white rounded-lg shadow-md mb-5">
+       <li
+        className={`relative flex p-5 bg-white rounded-lg shadow-md mb-5 ${
+          tripIsPast ? "opacity-50 bg-gray-500" : "" // Apply dimming if it's a past trip
+        }`}
+      >
         <img
           src={placeImageUrl || "default-image-url.jpg"}
           alt={trip.tripname}
           className="w-44 h-44 object-cover rounded-lg mr-5"
         />
         <div className="flex-1">
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">{trip.tripname}</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            {trip.tripname}
+          </h3>
           <button
             onClick={handleOpenModal}
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-2xl font-bold"
@@ -127,6 +143,12 @@ const TripPage = () => {
     enddate: "",
     createdate: "",
   });
+  const [filteredTrips, setFilteredTrips] = useState([]);
+  const [filterStartDate, setFilterStartDate] = useState("");
+
+    // Function to check if the trip's start and end dates are in the past
+   
+
   const navigate = useNavigate();
   const username = Cookies.get("username");
 
@@ -134,7 +156,11 @@ const TripPage = () => {
     axios
       .get(`http://localhost:8080/api/user/trip/tripplace/${username}`)
       .then((response) => {
-        setTrips(response.data);
+        const sortedTrips = response.data.sort(
+          (a, b) => new Date(b.startdate) - new Date(a.startdate)
+        );
+        setTrips(sortedTrips);
+        setFilteredTrips(sortedTrips);
         setLoading(false);
       })
       .catch(() => {
@@ -197,23 +223,24 @@ const TripPage = () => {
 
   const handleUpdateTripDetails = () => {
     const { description, startDate, endDate } = tripDetails;
-  
-    // Chuyển đổi ngày bắt đầu và kết thúc thành đối tượng Date
+
     const startDateTime = new Date(startDate);
     const endDateTime = new Date(endDate);
-  
-    // Kiểm tra nếu ngày bắt đầu sau ngày kết thúc
+
     if (startDateTime >= endDateTime) {
       toast.error("❗ Ngày bắt đầu phải trước ngày kết thúc.");
       return;
     }
-  
-    const formattedStartDate = startDateTime.toISOString().slice(0, 19).replace("T", " ");
-    const formattedEndDate = endDateTime.toISOString().slice(0, 19).replace("T", " ");
-  
-    console.log("Formatted Start Date:", formattedStartDate);
-    console.log("Formatted End Date:", formattedEndDate);
-  
+
+    const formattedStartDate = startDateTime
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+    const formattedEndDate = endDateTime
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+
     if (selectedTrip) {
       axios
         .put(`http://localhost:8080/api/user/trip/${selectedTrip.tripid}`, {
@@ -230,15 +257,47 @@ const TripPage = () => {
         });
     }
   };
-  
+
+  const handleFilterByStartDate = () => {
+    if (filterStartDate) {
+      const filtered = trips.filter(
+        (trip) =>
+          new Date(trip.startdate).toLocaleDateString("vi-VN") ===
+          new Date(filterStartDate).toLocaleDateString("vi-VN")
+      );
+      setFilteredTrips(filtered);
+    } else {
+      setFilteredTrips(trips);
+    }
+  };
+
   if (loading) return <p className="text-center">Đang tải chuyến đi...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-gray-100 min-h-screen">
-      <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">Danh sách chuyến đi:</h2>
+      <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">
+        Danh sách chuyến đi:
+      </h2>
+      <div className="mb-4 flex items-center">
+        <label className="block text-sm font-semibold text-gray-700 mr-4">
+          Tìm kiếm chuyến đi theo ngày:
+        </label>
+        <input
+          type="date"
+          value={filterStartDate}
+          onChange={(e) => setFilterStartDate(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-md mr-4"
+        />
+        <button
+          onClick={handleFilterByStartDate}
+          className="bg-blue-300 text-white py-2 px-4 rounded-md hover:bg-blue-500"
+        >
+          🔍
+        </button>
+      </div>
       <TripList
-        trips={trips}
+        trips={filteredTrips}
         onDelete={handleDeleteTrip}
         onUpdate={handleUpdateTrip}
         onAddFriends={handleAddFriends}
@@ -246,7 +305,9 @@ const TripPage = () => {
       {showAddFriendsModal && selectedTrip && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg w-96">
-            <h3 className="text-xl font-semibold mb-4">Thêm bạn bè vào chuyến đi</h3>
+            <h3 className="text-xl font-semibold mb-4">
+              Thêm bạn bè vào chuyến đi
+            </h3>
             <select
               value={selectedFriend}
               onChange={(e) => setSelectedFriend(e.target.value)}
@@ -254,7 +315,10 @@ const TripPage = () => {
             >
               <option value="">Chọn bạn bè</option>
               {friends.map((friend) => (
-                <option key={friend.friendUserName} value={friend.friendUserName}>
+                <option
+                  key={friend.friendUserName}
+                  value={friend.friendUserName}
+                >
                   {friend.friendName}
                 </option>
               ))}
@@ -281,39 +345,55 @@ const TripPage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg w-96">
             <h3 className="text-xl font-semibold mb-4">Cập nhật chuyến đi</h3>
-            <label className="block text-sm font-semibold text-gray-700">Tên chuyến đi:</label>
+            <label className="block text-sm font-semibold text-gray-700">
+              Tên chuyến đi:
+            </label>
             <input
               type="text"
               value={tripDetails.tripname}
               disabled
-              onChange={(e) => setTripDetails({ ...tripDetails, tripname: e.target.value })}
+              onChange={(e) =>
+                setTripDetails({ ...tripDetails, tripname: e.target.value })
+              }
               className="w-full p-3 border border-gray-300 rounded-md mb-4"
             />
-            <label className="block text-sm font-semibold text-gray-700">Ngày bắt đầu:</label>
+            <label className="block text-sm font-semibold text-gray-700">
+              Ngày bắt đầu:
+            </label>
             <input
               type="datetime-local"
               value={tripDetails.startdate}
-              onChange={(e) => setTripDetails({ ...tripDetails, startdate: e.target.value })}
+              onChange={(e) =>
+                setTripDetails({ ...tripDetails, startdate: e.target.value })
+              }
               className="w-full p-3 border border-gray-300 rounded-md mb-4"
             />
-            <label className="block text-sm font-semibold text-gray-700">Ngày kết thúc:</label>
+            <label className="block text-sm font-semibold text-gray-700">
+              Ngày kết thúc:
+            </label>
             <input
               type="datetime-local"
               value={tripDetails.enddate}
-              onChange={(e) => setTripDetails({ ...tripDetails, enddate: e.target.value })}
+              onChange={(e) =>
+                setTripDetails({ ...tripDetails, enddate: e.target.value })
+              }
               className="w-full p-3 border border-gray-300 rounded-md mb-4"
             />
-            <label className="block text-sm font-semibold text-gray-700">Mô tả:</label>
+            <label className="block text-sm font-semibold text-gray-700">
+              Mô tả:
+            </label>
             <textarea
               value={tripDetails.description}
-              onChange={(e) => setTripDetails({ ...tripDetails, description: e.target.value })}
+              onChange={(e) =>
+                setTripDetails({ ...tripDetails, description: e.target.value })
+              }
               className="w-full p-3 border border-gray-300 rounded-md mb-4"
+              rows="4"
             />
-
             <div className="flex justify-end gap-2">
               <button
                 onClick={handleUpdateTripDetails}
-                className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
               >
                 Cập nhật
               </button>
@@ -327,7 +407,6 @@ const TripPage = () => {
           </div>
         </div>
       )}
-
       <button
         onClick={handleAddTrip}
         className="fixed bottom-8 right-15 bg-blue-600 text-white py-3 px-6 rounded-full shadow-lg hover:bg-blue-700 transition-colors"

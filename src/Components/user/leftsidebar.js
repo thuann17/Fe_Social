@@ -8,7 +8,7 @@ const Sidebar = () => {
     ];
 
     const yourMomentsSections = [
-        { name: "Lịch trình", icon: <FaClock className="text-purple-500" />,  href: "/tripstart"  },
+        { name: "Lịch trình chi tiết", icon: <FaClock className="text-purple-500" />,  href: "/tripstart"  },
         { name: "Tin nhắn", icon: <FaEnvelope className="text-orange-500" />,  href: "/chat"  },
     ];
 
