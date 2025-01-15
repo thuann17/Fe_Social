@@ -187,7 +187,7 @@ const Dashboard = () => {
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-center text-gray-500">Không có dữ liệu</p>
+                            <p className="text-center text-gray-500">Tháng này không có người dùng đăng bài nhiều nhất</p>
                         )}
                     </div>
                 </div>
