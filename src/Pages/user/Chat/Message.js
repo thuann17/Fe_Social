@@ -27,7 +27,7 @@ function Message({ avt, messages = [], setMessages, handleSendMessage }) {
 
   const handleSendMessageClick = () => {
     if (uploading) return;
-  
+
     if (image) {
       const storageRef = ref(storage, `Images/${image.name}`);
       const uploadTask = uploadBytesResumable(storageRef, image);
@@ -75,7 +75,7 @@ function Message({ avt, messages = [], setMessages, handleSendMessage }) {
       handleSendMessage(newMessage); // Send emoji message
     }
   };
-  
+
 
   const handleEmojiSelect = (emoji) => {
     setMessage((prev) => prev + emoji.native);
@@ -127,7 +127,7 @@ function Message({ avt, messages = [], setMessages, handleSendMessage }) {
                   } ${msg.content === "❤️" ? "bg-transparent border-0 text-4xl" : ""}`}
               >
                 {msg.type === "image" ? (
-                  <img src={msg.content} alt="Sent Image" className="w-full h-auto rounded-lg" />
+                  <img src={msg.content} alt="Sent Image" className="w-full h-20 rounded-lg" />
                 ) : (
                   <p>{msg.content}</p>
                 )}
