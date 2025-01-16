@@ -73,26 +73,25 @@ const DetailsPlace = () => {
 
   const handleSaveTrip = (e) => {
     e.preventDefault();
-  
+
     if (!startDate || !endDate) {
       toast.error("Vui lòng nhập đầy đủ thời gian bắt đầu và kết thúc.");
       return;
     }
-  
+
     const startDateTime = new Date(`${selectedDate}T${startDate}`);
     const endDateTime = new Date(`${selectedDate}T${endDate}`);
-  
+
     if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
       toast.error("Giá trị thời gian không hợp lệ.");
       return;
     }
-  
-    // ⚠️ Kiểm tra ngày bắt đầu phải trước ngày kết thúc
+
     if (startDateTime >= endDateTime) {
       toast.error("Thời gian bắt đầu phải trước thời gian kết thúc.");
       return;
     }
-  
+
     const tripData = {
       tripName,
       startDate: startDateTime.toISOString(),
@@ -101,24 +100,27 @@ const DetailsPlace = () => {
       placeId: selectedCard.id,
       note: tripDescription,
     };
-  
+
     TripService.createTrip(username, tripData)
       .then((response) => {
         closeModal();
-        toast.success("Đã thêm chuyến đi");
+        toast.success("Đã thêm chuyến đi thành công");
       })
       .catch((error) => {
-        console.error("Error creating trip:", error);
-        toast.error("Lỗi khi thêm chuyến đi.");
+        if (error.response && error.response.data && error.response.data.message) {
+          closeModal();
+          toast.error(error.response.data.message);
+        }
       });
-  
+
     // Reset form
     setTripName("");
     setStartDate("");
     setEndDate("");
     setTripDescription("");
   };
-  
+
+
 
   const formatTime = (dateTime) => {
     if (!dateTime) return "";
@@ -130,12 +132,12 @@ const DetailsPlace = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
-  
+
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng tính từ 0
     const year = date.getFullYear();
-  
+
     return `${day}-${month}-${year}`;
   };
 
@@ -177,7 +179,7 @@ const DetailsPlace = () => {
               <span className="text-gray-700">{selectedCard.description}</span>
             </div>
             <form onSubmit={handleSaveTrip}>
-            <input
+              <input
                 type="hidden"
                 value={selectedCard.nameplace}
                 onChange={(e) => setTripName(e.target.value)} // Update tripName
@@ -186,7 +188,7 @@ const DetailsPlace = () => {
               />
               <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-2">
-                  Thời Gian Bắt Đầu: {formatDate(selectedDate) }
+                  Thời Gian Bắt Đầu: {formatDate(selectedDate)}
                 </label>
                 <input
                   type="time"
@@ -198,7 +200,7 @@ const DetailsPlace = () => {
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-2">
-                  Thời Gian Kết Thúc: { formatDate(selectedDate)}
+                  Thời Gian Kết Thúc: {formatDate(selectedDate)}
                 </label>
                 <input
                   type="time"

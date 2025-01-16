@@ -1,23 +1,29 @@
 import axios from 'axios';
-
+import { toast } from 'react-toastify';
 const API_BASE_URL = 'http://localhost:8080';
 
 class TripService {
-  // Create a new trip
+  // Tạo chuyến đi mới
   createTrip(username, tripData) {
     const url = `${API_BASE_URL}/api/user/trip/${username}`;
     return axios.post(url, tripData)
       .then(response => {
-        console.log("Trip created successfully:", response.data);
+        console.log("Chuyến đi đã được tạo thành công:", response.data);
         return response.data;
       })
       .catch(error => {
-        console.error("There was an error creating the trip:", error);
+        console.error("Có lỗi khi tạo chuyến đi:", error);
+        if (error.response && error.response.data) {
+          const errorMessage = error.response.data.message
+            || "Vui lòng chọn khung giờ khác. Vì trong giờ bạn chọn đã có chuyến đi khác.";
+          toast.error(errorMessage);
+        } else {
+          toast.error("Lỗi khi thêm chuyến đi.");
+        }
         throw error;
       });
   }
 
-  // Get all trip start dates
   getTripStartDates() {
     return axios.get(`${API_BASE_URL}/api/user/trip/start-dates`)
       .then(response => {
