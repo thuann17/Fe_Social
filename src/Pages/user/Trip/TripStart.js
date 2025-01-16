@@ -55,9 +55,8 @@ const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
   return (
     <>
       <li
-        className={`relative flex p-5 bg-white rounded-lg shadow-md mb-5 ${
-          tripIsPast ? "opacity-50 bg-gray-500" : "" // Apply dimming if it's a past trip
-        }`}
+        className={`relative flex p-5 bg-white rounded-lg shadow-md mb-5 ${tripIsPast ? "opacity-50 bg-gray-500" : "" // Apply dimming if it's a past trip
+          }`}
       >
         <img
           src={placeImageUrl || "default-image-url.jpg"}
@@ -215,7 +214,7 @@ const TripPage = () => {
   const handleDeleteTrip = (tripid) => {
     // Instead of calling the delete API, simply call fetchTrips() to reload the data.
     fetchTrips();
-  //  toast.success("Chuyến đi đã được xóa.");
+    //  toast.success("Chuyến đi đã được xóa.");
   };
   const handleUpdateTripDetails = () => {
     const { description, startdate, enddate } = tripDetails;
@@ -226,12 +225,19 @@ const TripPage = () => {
     const endDateTime = enddate
       ? new Date(enddate)
       : new Date(selectedTrip.endDate);
-
-    // Check if start date is before end date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     if (startDateTime >= endDateTime) {
-      toast.error("Ngày bắt đầu phải trước ngày kết thúc.");
+      toast.error("Ngày kết thúc phải sau ngày bắt đầu.");
       return;
     }
+    // Check if the start date is before today
+    if (startDateTime < today) {
+      toast.error("Ngày bắt đầu không thể trước ngày hôm nay.");
+      return;
+    }
+    // Check if start date is before end date
+
 
     // Check if end time is at least 30 minutes after start time
     const timeDifference = endDateTime - startDateTime;
