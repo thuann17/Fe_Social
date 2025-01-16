@@ -105,6 +105,18 @@ const DetailsPlace = () => {
       toast.error("Giá trị thời gian không hợp lệ.");
       return;
     }
+
+    const currentDateTime = new Date(); 
+    const formattedCurrentDateTime = currentDateTime.toLocaleString('vi-VN', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    if (startDateTime <= currentDateTime) {
+      toast.error("Thời gian bắt đầu phải sau " + formattedCurrentDateTime);
+      return;
+    }
+
+
     if (startDateTime >= endDateTime) {
       toast.error("Thời gian kết thúc phải sau thời gian bắt đầu.");
       return;
