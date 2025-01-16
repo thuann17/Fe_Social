@@ -5,12 +5,14 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import UserService from "../../../Services/user/UserService";
 
 const Post = ({ post, onDelete, onNewShare }) => {
   const navigate = useNavigate();
   const [likes, setLikes] = useState(post.countLike || 0);
   const [comments, setComments] = useState(post.comments || []);
   const [newComment, setNewComment] = useState("");
+  const [createDate, setCreateDate] = useState("");
   const [isLiked, setIsLiked] = useState(post.likedByUser || false);
   const [showComments, setShowComments] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -19,12 +21,15 @@ const Post = ({ post, onDelete, onNewShare }) => {
   const [commentToDelete, setCommentToDelete] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareContent, setShareContent] = useState("");
+  const [userInfo, setUserInfo] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const currentUser = Cookies.get("username");
 
   const menuRef = useRef(null);
   // websocket
   const handleLikeNotification = (message) => {
-    toast.info(message);  // Hiển thị thông báo
+    toast.info(message); // Hiển thị thông báo
   };
 
   const handleClick = (username) => {
@@ -34,15 +39,15 @@ const Post = ({ post, onDelete, onNewShare }) => {
   // Like Post Handler
   const likePost = async (postId) => {
     const username = Cookies.get("username");
-    setLikes((prevLikes) => prevLikes + 1); // Optimistic UI
-    setIsLiked(true); // Immediately mark as liked
+    setLikes((prevLikes) => prevLikes + 1);
+    setIsLiked(true);
     try {
       await PostService.likePost(postId, username);
-      toast.success("👍 Đã thích bài viết!");
+      toast.success("Đã thích bài viết!");
     } catch (error) {
       console.error("Error while liking the post:", error);
-      toast.error("❌ Lỗi khi thích bài viết!");
-      setLikes((prevLikes) => prevLikes - 1); // Revert UI on error
+      toast.error("Lỗi khi thích bài viết!");
+      setLikes((prevLikes) => prevLikes - 1);
       setIsLiked(false);
     }
   };
@@ -54,10 +59,10 @@ const Post = ({ post, onDelete, onNewShare }) => {
       await PostService.unLikePost(postId, username);
       setLikes((prev) => prev - 1);
       setIsLiked(false);
-      toast.success("👎 Đã bỏ thích bài viết!");
+      toast.success("Đã bỏ thích bài viết!");
     } catch (error) {
       console.error("Error while unliking the post:", error);
-      toast.error("❌ Lỗi khi bỏ thích bài viết!");
+      toast.error("Lỗi khi bỏ thích bài viết!");
     }
   };
 
@@ -75,37 +80,49 @@ const Post = ({ post, onDelete, onNewShare }) => {
     }
   };
 
-  // Handle Comment Submission
   const handleComment = async () => {
-    if (newComment.trim()) {
-      try {
-        await PostService.commentPost(post.id, newComment);
-        const user = {
-          lastname: post.username.lastname,
-          firstname: post.username.firstname,
-        };
-        const newCommentObject = {
-          id: Date.now(),
-          username: user,
-          content: newComment,
-        };
+    const username = Cookies.get("username");
+  
+    try {
+      // Fetch user information
+      const userData = await UserService.getInfo(username);
+      setUserInfo(userData);
+    
+      await PostService.commentPost(post.id, newComment);
+      
+      const user = {
+        lastname: userData.lastname,
+        firstname: userData.firstname,
+        avatar: userData.avatarUrl,  
+      };
+  
+      const formattedTime = new Date().toLocaleString();
+  
+      const newCommentObject = {
+        id: Date.now(),
+        username: user,
+        content: newComment,
+        avatar: user.avatar,
+        time: formattedTime,
+        createdate: new Date(),
+      };
 
-        setComments((prev) => {
-          const updatedComments = [newCommentObject, ...prev];
-          return updatedComments.sort((a, b) => b.id - a.id); // New comment goes to the top
-        });
-
-        setNewComment(""); // Clear comment input after submission
-      } catch (error) {
-        console.error("Error while commenting on the post:", error);
-      }
+      // Update comments list with the new comment
+      setComments((prev) => {
+        const updatedComments = [newCommentObject, ...prev];
+        return updatedComments.sort((a, b) => b.id - a.id);
+      });
+  
+      // Clear the input field after posting
+      setNewComment("");
+    } catch (err) {
+      console.error("Error while posting comment:", err);
     }
   };
+  
 
-  // Toggle Comments Visibility
   const toggleComments = () => setShowComments((prev) => !prev);
 
-  // Format Timestamp
   const formatTimestamp = (timestamp) => {
     const options = {
       weekday: "short",
@@ -123,12 +140,10 @@ const Post = ({ post, onDelete, onNewShare }) => {
     });
   };
 
-  // Handle Share Button Click
   const handleShare = () => {
-    setShowShareModal(true); // Show the share modal
+    setShowShareModal(true);
   };
 
-  // Handle Share Submission
   const handleSubmitShare = async () => {
     const username = Cookies.get("username");
     try {
@@ -137,25 +152,23 @@ const Post = ({ post, onDelete, onNewShare }) => {
 
       onNewShare();
       toast.info("🔗 Đã chia sẻ bài viết!");
-      setShowShareModal(false); // Close the modal after sharing
+      setShowShareModal(false);
     } catch (error) {
       toast.error("❌ Chia sẻ bài viết thất bại!");
     }
   };
 
-  // Handle Post Deletion
   const handleDelete = async () => {
     try {
       await PostService.deletePost(post.id);
       onDelete(post.id);
-      setShowConfirmModal(false); // Close confirmation modal
+      setShowConfirmModal(false);
       toast.success("Đã xóa bài viết thành công!");
     } catch (error) {
       toast.error("❌ Xóa bài viết thất bại!");
     }
   };
 
-  // Handle Comment Deletion
   const handleDeleteComment = async () => {
     if (commentToDelete) {
       try {
@@ -163,7 +176,7 @@ const Post = ({ post, onDelete, onNewShare }) => {
         setComments((prev) =>
           prev.filter((comment) => comment.id !== commentToDelete.id)
         );
-        setShowCommentMenu(null); // Hide comment menu
+        setShowCommentMenu(null);
         toast.success("Đã xóa bình luận thành công!");
       } catch (error) {
         console.error("Error while deleting the comment:", error);
@@ -180,7 +193,7 @@ const Post = ({ post, onDelete, onNewShare }) => {
           {post.username?.images?.length > 0 ? (
             post.username.images.map((image) => (
               <img
-                key={image.id}
+                key={image.avatarrurl}
                 src={image.avatarrurl}
                 alt="Avatar"
                 className="post-avatar"
@@ -242,7 +255,7 @@ const Post = ({ post, onDelete, onNewShare }) => {
           {post.postimages &&
             post.postimages.map((img) => (
               <img
-                key={img.id}
+                key={img.image}
                 src={img.image}
                 alt="Post"
                 className="w-full h-40 object-cover rounded-lg"
@@ -280,13 +293,26 @@ const Post = ({ post, onDelete, onNewShare }) => {
                 key={comment.id}
                 className="comment-item bg-white rounded-xl shadow-md p-4 mb-4 flex items-start relative"
               >
+                <div className="flex-shrink-0">
+                  <img
+                    src={
+                      Array.isArray(comment.username.images) &&
+                      comment.username.images.length > 0
+                        ? comment.username.images[0]?.avatarrurl
+                        : "/default-avatar.png" // Use default avatar if no images found
+                    }
+                    alt="Avatar"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                </div>
                 <div className="ml-4 flex-grow">
                   <p className="font-semibold text-gray-800">
                     {comment.username.lastname} {comment.username.firstname}
                   </p>
                   <p className="text-gray-700">{comment.content}</p>
                   <p className="text-xs text-gray-500 mt-1">
-                    {formatTimestamp(comment.createdate)}
+                    {formatTimestamp(comment.createdate)}{" "}
+                    {/* Ensure this is formatted correctly */}
                   </p>
                 </div>
                 <button
@@ -322,6 +348,7 @@ const Post = ({ post, onDelete, onNewShare }) => {
               className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
             <button
+              type="submit"
               onClick={handleComment}
               className="ml-4 bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
             >
@@ -362,14 +389,13 @@ const Post = ({ post, onDelete, onNewShare }) => {
             <textarea
               value={shareContent}
               onChange={(e) => setShareContent(e.target.value)}
-              placeholder="Nội dung chia sẻ..."
-              rows="4"
-              className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
+              className="w-full border border-gray-300 p-3 rounded-lg mt-4"
+              placeholder="Viết một cái gì đó trước khi chia sẻ..."
+            ></textarea>
             <div className="modal-buttons mt-4">
               <button
                 onClick={handleSubmitShare}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg mr-2"
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
               >
                 Chia sẻ
               </button>

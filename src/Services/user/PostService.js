@@ -22,11 +22,11 @@ class PostService {
       `${API_BASE_URL}/api/user/post/likes/${postId}?username=${username}`
     );
   }
-  commentPost(postId, content) {
+  commentPost(postId, content, createDate) {
     const username = Cookies.get("username");
     return axios.post(
       `${API_BASE_URL}/api/user/post/comments/${postId}?username=${username}`,
-      { content }
+      { content, createDate }
     );
   }
   getComments(postId) {

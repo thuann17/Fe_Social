@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import FriendService from "../../../Services/user/FriendService";
 import Cookies from "js-cookie";
@@ -15,7 +14,6 @@ const CombinedFriendComponents = () => {
     navigate(`/friendprofile/${username}`, {});
   };
 
-
   const navigate = useNavigate();
   const [friends, setFriends] = useState([]);
   const [followers, setFollowers] = useState([]);
@@ -26,17 +24,42 @@ const CombinedFriendComponents = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState(null);
   const [requestToAdd, setRequestToAdd] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
+  // Tính toán dữ liệu cần hiển thị cho trang hiện tại
+  const indexOfLastFriend = currentPage * itemsPerPage;
+  const indexOfFirstFriend = indexOfLastFriend - itemsPerPage;
+  const currentSuggestedFriends = suggestedFriends.slice(
+    indexOfFirstFriend,
+    indexOfLastFriend
+  );
+
+  // Tính tổng số trang
+  const totalPages = Math.ceil(suggestedFriends.length / itemsPerPage);
+
+  // Xử lý chuyển trang
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Fetch data từ backend
   const fetchData = () => {
-
-
     const username = Cookies.get("username");
     if (!username) {
       setError("Username is required to fetch data.");
       return;
     }
 
-    setLoading(true); // Show loading indicator
+    setLoading(true);
 
     Promise.all([
       FriendService.getFriend(),
@@ -57,90 +80,94 @@ const CombinedFriendComponents = () => {
   };
 
   useEffect(() => {
-    fetchData(); // Fetch data when the component mounts
+    fetchData(); // Tự động load dữ liệu khi component mount
   }, []);
 
+  // Xử lý xóa lời mời kết bạn
   const handleDeleteRequest = (id) => {
+    
     setRequestToDelete(id);
     setIsModalOpen(true);
+  
   };
 
- 
-  const confirmDelete = () => {
+  const confirmDelete = (event) => {
+    event.preventDefault();
     FriendService.deleteFriendRequest(requestToDelete)
       .then(() => {
-        fetchData();
+        // Safeguard the state to ensure it's an array
+        setFriends((prevFriends) => Array.isArray(prevFriends) ? prevFriends.filter((friend) => friend.id !== requestToDelete) : []);
+        setFollowers((prevFollowers) => Array.isArray(prevFollowers) ? prevFollowers.filter((follower) => follower.id !== requestToDelete) : []);
+        setSuggestedFriends((prevSuggested) => 
+          Array.isArray(prevSuggested) ? prevSuggested.filter((suggestedFriend) => suggestedFriend.id !== requestToDelete) : []
+        );
         setIsModalOpen(false);
-        toast.success("Xóa thành công!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        toast.success("Xóa thành công!");
       })
       .catch((err) => {
         setError("Failed to delete: " + err.message);
         console.error(err);
-        toast.error("Xóa thất bại.", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        toast.error("Xóa thất bại.");
         setIsModalOpen(false);
       });
   };
+  
 
   const cancelDelete = () => setIsModalOpen(false);
 
-  const handleRequestToAddFriend = (usernameTarget) => {
+  // Xử lý gửi yêu cầu kết bạn
+  const handleRequestToAddFriend = (usernameTarget, event) => {
     setRequestToAdd(usernameTarget);
     setIsAddModalOpen(true);
   };
 
-  const confirmAddFriend = () => {
+  const confirmAddFriend = (event) => {
+    event.preventDefault();
     FriendService.handleAddFriend(requestToAdd)
       .then(() => {
-        // Reload the data after add friend operation
-        fetchData();
-        toast.success("Đã gửi yêu cầu kết bạn!");
+        // Add the new friend to the friends list
+        const newFriend = suggestedFriends.find(
+          (friend) => friend.username === requestToAdd
+        );
+        if (newFriend) {
+          setSuggestedFriends((prevSuggested) =>
+            prevSuggested.filter((friend) => friend.username !== requestToAdd)
+          );
+        }
         setIsAddModalOpen(false);
+        toast.success("Đã gửi yêu cầu kết bạn!");
       })
       .catch((err) => {
         setError("Failed to send friend request: " + err.message);
         console.error(err);
-        toast.error("Failed to send friend request.");
+        toast.error("Gửi yêu cầu thất bại.");
         setIsAddModalOpen(false);
       });
   };
 
   const cancelAddFriend = () => setIsAddModalOpen(false);
 
-  const handleUpdateStatus = (id) => {
+  // Xử lý chấp nhận yêu cầu kết bạn
+  const handleUpdateStatus = (id, event) => {
+    event.preventDefault();
     FriendService.acceptFriendRequest(id)
-      .then((updatedFriend) => {
-        setFollowers((prev) =>
-          prev.map((follower) =>
-            follower.id === id ? updatedFriend : follower
-          )
+      .then(() => {
+        // Move the accepted request from followers to friends
+        const acceptedRequest = followers.find(
+          (follower) => follower.id === id
         );
-
-        fetchData();
-
+        if (acceptedRequest) {
+          setFollowers((prevFollowers) =>
+            prevFollowers.filter((follower) => follower.id !== id)
+          );
+          setFriends((prevFriends) => [...prevFriends, acceptedRequest]);
+        }
         toast.success("Đã chấp nhận yêu cầu kết bạn");
       })
       .catch((err) => {
         setError("Failed to update status: " + err.message);
         console.error(err);
-        toast.error("Failed to accept friend request.");
+        toast.error("Chấp nhận thất bại.");
       });
   };
 
@@ -171,7 +198,8 @@ const CombinedFriendComponents = () => {
                 {friend.friendName || "Unnamed"}
               </div>
               <button
-                onClick={() => handleDeleteRequest(friend.id)}
+                type="button"
+                onClick={(e) => handleDeleteRequest(friend.id, e)}
                 className="bg-gray-600 py-2 rounded-lg w-full hover:bg-gray-700"
               >
                 Hủy kết bạn
@@ -196,20 +224,22 @@ const CombinedFriendComponents = () => {
                 src={follower.friendAvatar}
                 alt={follower.friendName}
                 className="w-full h-48 object-cover rounded-lg mb-4"
-                onClick={() => handleImageClick(follower.friendUserName)}// Add the click handler here
+                onClick={() => handleImageClick(follower.friendUserName)} // Add the click handler here
               />
               <div className="text-lg mb-2">
                 {follower.friendName || "Unnamed"}
               </div>
               <button
-                onClick={() => handleUpdateStatus(follower.id)}
+                type="button"
+                onClick={(e) => handleUpdateStatus(follower.id, e)}
                 className="bg-blue-600 py-2 mb-3 rounded-lg w-full hover:bg-blue-700"
               >
                 Đồng ý
               </button>
               <br />
               <button
-                onClick={() => handleDeleteRequest(follower.id)}
+                type="button"
+                onClick={(e) => handleDeleteRequest(follower.id, e)}
                 className="bg-gray-600 py-2 rounded-lg w-full hover:bg-gray-700"
               >
                 Hủy yêu cầu
@@ -225,35 +255,77 @@ const CombinedFriendComponents = () => {
       <h2 className="text-3xl font-bold mt-12 mb-6">
         Những người bạn có thể biết:
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mt-6">
-        {suggestedFriends.length > 0 ? (
-          suggestedFriends.map((friend) => (
-            <div
-              key={friend.username}
-              className="bg-purple-500 rounded-lg p-4 text-center shadow-lg"
-            >
-              <img
-                src={friend.images[0]?.avatarrurl}
-                alt={friend.username}
-                className="w-full h-48 object-cover rounded-lg mb-4"
-                onClick={() => handleImageClick(friend.username)}
-              />
-              <div className="text-lg mb-2">
-                {friend.lastname} {friend.firstname}
-              </div>
-              <button
-                onClick={() => handleRequestToAddFriend(friend.username)}
-                className="bg-blue-600 py-2 rounded-lg w-full hover:bg-blue-700"
+      <div>
+        {currentSuggestedFriends.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mt-6">
+            {currentSuggestedFriends.map((friend) => (
+              <div
+                key={friend.username}
+                className="bg-purple-500 rounded-lg p-4 text-center shadow-lg"
               >
-                Thêm bạn bè
-              </button>
-            </div>
-          ))
+                <img
+                  src={friend.images[0]?.avatarrurl}
+                  alt={friend.username}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                  onClick={() => handleImageClick(friend.username)}
+                />
+                <div className="text-lg mb-2">
+                  {friend.lastname} {friend.firstname}
+                </div>
+                <button
+                  type="button"
+                  onClick={(e) => handleRequestToAddFriend(friend.username, e)}
+                  className="bg-blue-600 py-2 rounded-lg w-full hover:bg-blue-700"
+                >
+                  Thêm bạn bè
+                </button>
+              </div>
+            ))}
+          </div>
         ) : (
           <p>Không có gợi ý kết bạn.</p>
         )}
       </div>
 
+      <div>
+        {suggestedFriends.length > itemsPerPage && (
+          <div
+            className="mt-6 p-4 bg-purple-500 rounded-lg"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "16px",
+              position: "relative",
+            }}
+          >
+            <button
+              type="button"
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="bg-blue-600 py-2 px-6 rounded-lg hover:bg-blue-700 text-white"
+              style={{
+                cursor: currentPage === 1 ? "not-allowed" : "pointer",
+              }}
+            >
+              Trang trước
+            </button>
+            <span className="text-white font-semibold mt-2">
+              Trang {currentPage} / {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="bg-blue-600 py-2 px-6 rounded-lg hover:bg-blue-700 text-white"
+              style={{
+                cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+              }}
+            >
+              Trang sau
+            </button>
+          </div>
+        )}
+      </div>
       {/* Modal for Confirming Add Friend Request */}
       <Modal
         isOpen={isAddModalOpen}
@@ -263,6 +335,7 @@ const CombinedFriendComponents = () => {
         overlayClassName="overlay fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       >
         <button
+          type="button"
           className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
           onClick={cancelAddFriend}
         >
@@ -276,12 +349,14 @@ const CombinedFriendComponents = () => {
         </p>
         <div className="flex justify-end gap-4 mt-6">
           <button
+            type="button"
             className="bg-gray-0 text-white py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors"
             onClick={cancelAddFriend}
           >
             Hủy
           </button>
           <button
+            type="button"
             className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors"
             onClick={confirmAddFriend}
           >
@@ -299,6 +374,7 @@ const CombinedFriendComponents = () => {
         overlayClassName="overlay fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       >
         <button
+          type="button"
           className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
           onClick={cancelDelete}
         >
@@ -310,12 +386,14 @@ const CombinedFriendComponents = () => {
         </p>
         <div className="flex justify-end gap-4 mt-6">
           <button
+            type="button"
             className="bg-gray-0 text-white py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors"
             onClick={cancelDelete}
           >
             Hủy
           </button>
           <button
+            type="button"
             className="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 transition-colors"
             onClick={confirmDelete}
           >

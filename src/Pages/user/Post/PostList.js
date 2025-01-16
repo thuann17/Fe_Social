@@ -99,7 +99,7 @@ const PostList = () => {
               createdAtFormatted={content.createdAtFormatted} // Pass formatted time
             />
           ) : (
-            <Share
+            <Share 
               key={content.id}
               share={content}
               onDelete={() => handleDelete(content.id, "share")}
