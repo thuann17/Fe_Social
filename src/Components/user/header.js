@@ -72,22 +72,6 @@ export default function Example() {
           {/* Search Box */}
           <div className="hidden sm:block sm:ml-6">
             <div className="relative">
-            
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                <svg
-                  className="h-5 w-5 text-gray-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M13.293 14.707a8 8 0 111.414-1.414l3.75 3.75a1 1 0 01-1.414 1.414l-3.75-3.75zM8 14a6 6 0 100-12 6 6 0 000 12z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
             </div>
           </div>
           <button
