@@ -18,16 +18,6 @@ const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
     // Check if both start and end dates are in the past
     return tripStartDate < currentDate && tripEndDate < currentDate;
   };
-  const formatDateTime = (dateTime) => {
-    const date = new Date(dateTime);
-    return `${date.toLocaleDateString("vi-VN")} - ${date.toLocaleTimeString(
-      "vi-VN",
-      {
-        hour: "2-digit",
-        minute: "2-digit",
-      }
-    )}`;
-  };
 
   const tripIsPast = isPastTrip(trip.startdate, trip.enddate);
 
@@ -77,13 +67,21 @@ const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
           <p className="text-sm text-gray-600 flex items-center mb-2">
             <FaRegClock className="mr-2 text-gray-500" />
             <strong>Bắt đầu:</strong>&nbsp;
-            {formatDateTime(trip.startdate)}
+            {new Date(trip.startdate).toLocaleDateString("vi-VN")} -{" "}
+            {new Date(trip.startdate).toLocaleTimeString("vi-VN", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </p>
 
           <p className="text-sm text-gray-600 flex items-center mb-2">
             <FaRegClock className="mr-2 text-gray-500" />
             <strong>Kết thúc:</strong>&nbsp;
-            {formatDateTime(trip.enddate)}
+            {new Date(trip.enddate).toLocaleDateString("vi-VN")} -{" "}
+            {new Date(trip.enddate).toLocaleTimeString("vi-VN", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </p>
 
           <div className="flex justify-end gap-2">
@@ -145,6 +143,10 @@ const TripPage = () => {
     createdate: "",
   });
   const [filterStartDate, setFilterStartDate] = useState("");
+  const [filterEndDate, setFilterEndDate] = useState("");
+  const [filteredTrips, setFilteredTrips] = useState(trips);
+
+
   const navigate = useNavigate();
   const username = Cookies.get("username");
 
@@ -216,33 +218,40 @@ const TripPage = () => {
       toast.warning("Chưa chọn bạn bè.");
     }
   };
-  const handleUpdateTripDetails = () => {
-    const { description, startdate, enddate } = tripDetails;
 
-    const startDateTime = new Date(startdate);
-    const endDateTime = new Date(enddate);
+  const handleUpdateTripDetails = () => {
+    const { description, startDate, endDate } = tripDetails;
+
+    const startDateTime = new Date(startDate);
+    const endDateTime = new Date(endDate);
 
     if (startDateTime >= endDateTime) {
       toast.error("❗ Ngày bắt đầu phải trước ngày kết thúc.");
       return;
     }
 
-    const formattedStartDate = startDateTime.toISOString().slice(0, 16);
-    const formattedEndDate = endDateTime.toISOString().slice(0, 16);
+    const formattedStartDate = startDateTime
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+    const formattedEndDate = endDateTime
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
 
     if (selectedTrip) {
       axios
         .put(`http://localhost:8080/api/user/trip/${selectedTrip.tripid}`, {
           description,
-          startdate: formattedStartDate,
-          enddate: formattedEndDate,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
         })
         .then(() => {
-          toast.success("Cập nhật chuyến đi thành công.");
+          toast.success(" Cập nhật chuyến đi thành công.");
           setShowUpdateModal(false);
         })
         .catch(() => {
-          toast.error("Cập nhật chuyến đi thất bại.");
+          toast.error(" Cập nhật chuyến đi thất bại.");
         });
     }
   };
@@ -363,9 +372,7 @@ const TripPage = () => {
             </label>
             <input
               type="datetime-local"
-              value={
-                tripDetails.startdate ? tripDetails.startdate.slice(0, 16) : ""
-              }
+              value={tripDetails.startdate}
               onChange={(e) =>
                 setTripDetails({ ...tripDetails, startdate: e.target.value })
               }
@@ -376,9 +383,7 @@ const TripPage = () => {
             </label>
             <input
               type="datetime-local"
-              value={
-                tripDetails.enddate ? tripDetails.enddate.slice(0, 16) : ""
-              }
+              value={tripDetails.enddate}
               onChange={(e) =>
                 setTripDetails({ ...tripDetails, enddate: e.target.value })
               }
