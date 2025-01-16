@@ -166,24 +166,25 @@ const TripPage = () => {
     });
   };
 
+  const fetchTrips = () => {
+    axios
+      .get(`http://localhost:8080/api/user/trip/tripplace/${username}`)
+      .then((response) => {
+        const sortedTrips = response.data.sort(
+          (a, b) => new Date(b.startdate) - new Date(a.startdate)
+        );
+        setTrips(sortedTrips);
+        setFilteredTrips(sortedTrips);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Không thể tải danh sách chuyến đi");
+        setLoading(false);
+      });
+  };
+
   useEffect(() => {
-    const fetchTrips = () => {
-      axios
-        .get(`http://localhost:8080/api/user/trip/tripplace/${username}`)
-        .then((response) => {
-          const sortedTrips = response.data.sort(
-            (a, b) => new Date(b.startdate) - new Date(a.startdate)
-          );
-          setTrips(sortedTrips);
-          setFilteredTrips(sortedTrips);
-          setLoading(false);
-        })
-        .catch(() => {
-          setError("Không thể tải danh sách chuyến đi");
-          setLoading(false);
-        });
-    };
-    fetchTrips();
+    fetchTrips(); // Fetch trips when component mounts
   }, [username]);
 
   const handleAddTrip = () => {
@@ -196,31 +197,10 @@ const TripPage = () => {
   };
 
   const handleUpdateTrip = (trip) => {
-    // Hàm định dạng timestamp thành chuỗi ngày giờ cụ thể
-    const formatTimestamp = (timestamp) => {
-      const options = {
-        weekday: "short", // Hiển thị thứ
-        year: "numeric", // Hiển thị năm
-        month: "short", // Hiển thị tháng (viết tắt)
-        day: "numeric", // Hiển thị ngày
-        hour: "2-digit", // Hiển thị giờ
-        minute: "2-digit", // Hiển thị phút
-        second: "2-digit", // Hiển thị giây
-        hour12: false, // Sử dụng định dạng 24 giờ
-      };
-      return new Date(timestamp).toLocaleString("vi-VN", {
-        ...options,
-        timeZone: "Asia/Ho_Chi_Minh", // Đặt múi giờ Việt Nam
-      });
-    };
-
-    // Định dạng các thời điểm trong trip
     const formattedStartDate = formatTimestamp(trip.startdate);
     const formattedEndDate = formatTimestamp(trip.enddate);
     const formattedCreateDate = formatTimestamp(trip.createdate);
-    const formattedTime = formatTimestamp(new Date()); // Thời điểm hiện tại
 
-    // Cập nhật trạng thái
     setSelectedTrip(trip);
     setTripDetails({
       tripname: trip.tripname,
@@ -233,9 +213,10 @@ const TripPage = () => {
   };
 
   const handleDeleteTrip = (tripid) => {
-    setTrips((prevTrips) => prevTrips.filter((trip) => trip.tripid !== tripid));
+    // Instead of calling the delete API, simply call fetchTrips() to reload the data.
+    fetchTrips();
+  //  toast.success("Chuyến đi đã được xóa.");
   };
-
   const handleUpdateTripDetails = () => {
     const { description, startdate, enddate } = tripDetails;
 
@@ -246,13 +227,13 @@ const TripPage = () => {
       ? new Date(enddate)
       : new Date(selectedTrip.endDate);
 
-    // Kiểm tra nếu ngày bắt đầu >= ngày kết thúc
+    // Check if start date is before end date
     if (startDateTime >= endDateTime) {
       toast.error("Ngày bắt đầu phải trước ngày kết thúc.");
       return;
     }
 
-    // Kiểm tra nếu thời gian kết thúc ít nhất 30 phút sau thời gian bắt đầu
+    // Check if end time is at least 30 minutes after start time
     const timeDifference = endDateTime - startDateTime;
     const thirtyMinutesInMilliseconds = 30 * 60 * 1000;
 
@@ -273,6 +254,7 @@ const TripPage = () => {
         .then(() => {
           toast.success("Cập nhật chuyến đi thành công.");
           setShowUpdateModal(false);
+          fetchTrips(); // Refresh the trips list after update
         })
         .catch(() => {
           toast.error("Cập nhật chuyến đi thất bại.");
@@ -285,11 +267,10 @@ const TripPage = () => {
       let filterStart = new Date(filterStartDate);
       let filterEnd = new Date(filterEndDate);
 
-      // Tự động đặt filterEndDate là ngày tiếp theo của filterStartDate nếu filterEndDate nhỏ hơn filterStartDate
       if (filterEnd < filterStart) {
         filterEnd = new Date(filterStart);
-        filterEnd.setDate(filterEnd.getDate() + 1); // Thêm 1 ngày
-        setFilterEndDate(filterEnd.toISOString().split("T")[0]); // Cập nhật state với định dạng YYYY-MM-DD
+        filterEnd.setDate(filterEnd.getDate() + 1);
+        setFilterEndDate(filterEnd.toISOString().split("T")[0]);
       }
 
       const filtered = trips.filter((trip) => {
@@ -301,17 +282,10 @@ const TripPage = () => {
 
       setFilteredTrips(filtered);
     } else {
-      setFilteredTrips(trips); // Hiển thị tất cả nếu không có bộ lọc
+      setFilteredTrips(trips);
     }
   };
-  const isFormatted = (date) => {
-    if (!date) return false; // Kiểm tra giá trị null hoặc undefined
 
-    // Kiểm tra định dạng "DD/MM/YYYY" hoặc "YYYY-MM-DD"
-    const formattedRegex = /^\d{2}\/\d{2}\/\d{4}$|^\d{4}-\d{2}-\d{2}$/;
-
-    return formattedRegex.test(date);
-  };
   const handleFilterByStartDate = () => {
     if (filterStartDate) {
       const filtered = trips.filter(
@@ -403,28 +377,31 @@ const TripPage = () => {
               className="w-full p-3 border border-gray-300 rounded-md mb-4"
             />
             <label className="block text-sm font-semibold text-gray-700">
-              Mô tả:
+              Mô tả chuyến đi:
             </label>
             <textarea
+              rows={4}
               value={tripDetails.description}
               onChange={(e) =>
-                setTripDetails({ ...tripDetails, description: e.target.value })
+                setTripDetails({
+                  ...tripDetails,
+                  description: e.target.value,
+                })
               }
               className="w-full p-3 border border-gray-300 rounded-md mb-4"
-              rows="4"
             />
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-between items-center">
               <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
                 onClick={handleUpdateTripDetails}
-                className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
               >
                 Cập nhật
               </button>
               <button
+                className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-600"
                 onClick={() => setShowUpdateModal(false)}
-                className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400"
               >
-                Đóng
+                Hủy
               </button>
             </div>
           </div>
