@@ -80,6 +80,7 @@ const Post = ({ post, onDelete, onNewShare }) => {
     }
   };
 
+
   const handleComment = async () => {
     const username = Cookies.get("username");
   
@@ -95,6 +96,7 @@ const Post = ({ post, onDelete, onNewShare }) => {
         firstname: userData.firstname,
         avatar: userData.avatarUrl,  
       };
+      console.log(userData.avatarUrl);
   
       const formattedTime = new Date().toLocaleString();
   
@@ -102,7 +104,7 @@ const Post = ({ post, onDelete, onNewShare }) => {
         id: Date.now(),
         username: user,
         content: newComment,
-        avatar: user.avatar,
+        avatar: userData.avatarUrl,
         time: formattedTime,
         createdate: new Date(),
       };
@@ -110,9 +112,10 @@ const Post = ({ post, onDelete, onNewShare }) => {
       // Update comments list with the new comment
       setComments((prev) => {
         const updatedComments = [newCommentObject, ...prev];
-        return updatedComments.sort((a, b) => b.id - a.id);
+        return updatedComments.sort((a, b) => b.createdate - a.createdate); // Sort based on createdate (Date object)
       });
-  
+     
+      
       // Clear the input field after posting
       setNewComment("");
     } catch (err) {

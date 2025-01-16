@@ -57,15 +57,15 @@ const PostList = () => {
       setContents(sortedData);
       setError(null); 
     } catch (error) {
-      setError("Error fetching data: " + error.message); // Handle errors
+      setError("Error fetching data: " + error.message); 
     } finally {
-      setLoading(false); // Set loading to false after data fetching is complete
+      setLoading(false); 
     }
   };
 
   useEffect(() => {
-    fetchData(); // Fetch data when the component mounts
-  }, []); // Only fetch data once on mount
+    fetchData(); 
+  }, []); 
 
   // Handle delete post or share
   const handleDelete = (id, type) => {
