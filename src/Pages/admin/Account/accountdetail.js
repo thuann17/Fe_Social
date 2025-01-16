@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import ProfileUserService from "../../../Services/admin/ProfileUserService";
 import PostService from '../../../Services/user/PostService';
-import css from "../Post/post.css";
 
 const formatTimestamp = (timestamp) => {
     return new Date(timestamp).toLocaleString("vi-VN", {
@@ -45,7 +44,7 @@ const AccountDetail = () => {
                 setUserError(null);
             })
             .catch((error) => {
-                setUserError(error.message || "Error fetching user info.");
+              
                 setUserInfo(null);
             })
             .finally(() => setLoadingUserInfo(false));
@@ -62,7 +61,6 @@ const AccountDetail = () => {
                 setPostsError(null);
             })
             .catch((error) => {
-                setPostsError(error.message || "Error fetching posts.");
                 setPosts([]);
             })
             .finally(() => setLoadingPosts(false));

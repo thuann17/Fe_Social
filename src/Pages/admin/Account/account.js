@@ -3,8 +3,8 @@ import AccountService from "../../../Services/admin/AccountService";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
 
+import { useNavigate } from "react-router-dom";
 const ACCOUNT_TYPES = [
     { label: "Người dùng", value: "User" },
     { label: "Quản trị viên", value: "Admin" },
@@ -16,7 +16,7 @@ const TABS = [
     { label: "Tạm ngưng hoạt động", value: "unmonitored" },
 ];
 
-const TABLE_HEAD = ["STT", "Người dùng", "Vai trò", "Ngày sinh", "Trạng thái", ""];
+const TABLE_HEAD = ["STT", "Tên đăng nhập", "Người dùng", "Vai trò", "Ngày sinh", "Trạng thái", ""];
 
 function AccountAdmin() {
     const [accountType, setAccountType] = useState("User");
@@ -32,10 +32,9 @@ function AccountAdmin() {
     const [selectedAccount, setSelectedAccount] = useState(null);
     const userRole = Cookies.get("role");
     const navigate = useNavigate();
-
     useEffect(() => {
         fetchAccounts();
-    }, [currentPage, accountType, activeTab]);
+    }, [currentPage, search, accountType, activeTab]);
 
     const fetchAccounts = async () => {
         setLoading(true);
@@ -44,6 +43,7 @@ function AccountAdmin() {
             const params = {
                 page: currentPage,
                 size: pageSize,
+                search,
                 active: activeTab === "all" ? null : activeTab === "monitored",
                 role: accountType === "User" ? "User" : "Admin",
             };
@@ -54,24 +54,15 @@ function AccountAdmin() {
                     : await AccountService.getAdminAccounts(cookieUsername, params);
 
             setAccounts(response.data.content);
+            console.log(response.data.content);
+            console.log(response.data.content.avatarrurl);
+
             setTotalPages(response.data.totalPages);
         } catch (error) {
             toast.error("Đã có lỗi xảy ra khi tải dữ liệu tài khoản.");
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleSearchChange = (e) => {
-        const query = e.target.value.toLowerCase();
-        setSearch(query);  // Update the search state
-
-        // Filter accounts by email (case-insensitive)
-        const filteredAccounts = accounts.filter((account) =>
-            account.email.toLowerCase().includes(query)
-        );
-
-        setAccounts(filteredAccounts);  // Update the accounts state with filtered results
     };
 
     const handlePageChange = (page) => {
@@ -84,6 +75,89 @@ function AccountAdmin() {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
         return date.toLocaleDateString("vi-VN");
+    };
+
+
+    const handleLockUnlock = async () => {
+        if (!password) {
+            toast.error("Vui lòng nhập mật khẩu!");
+            return;
+        }
+
+        try {
+            const usernameCookie = Cookies.get('username');
+            const isValidPassword = await AccountService.lockUnlockAccount(usernameCookie, password);
+            if (!isValidPassword) {
+                toast.error("Mật khẩu không đúng! Vui lòng thử lại.");
+                return;
+            }
+
+            const { username, active } = selectedAccount;
+            const updatedStatus = !active;
+            await AccountService.updateAccountStatus(username, updatedStatus);
+            setShowPopup(false);
+            setCurrentPage(0);
+            fetchAccounts();
+            toast.success("Cập nhật trạng thái tài khoản thành công.");
+        } catch (error) {
+            toast.error("Sai mật khẩu. Vui lòng thử lại.");
+        }
+    };
+    const openPasswordPopup = (account) => {
+        if (account?.roles?.role !== "Admin") {
+            setSelectedAccount(account);
+            setShowPopup(true);
+        } else {
+            toast.error("Bạn không có quyền thực hiện thao tác này với tài khoản Admin.");
+        }
+    };
+    const handleViewDetails = (account) => {
+        console.log(account.username);
+        navigate("/account-detail", { state: { accountId: account.username } });
+    };
+
+    const renderPagination = () => {
+        const pages = [];
+        for (let i = 0; i < totalPages; i++) {
+            if (
+                i === 0 ||
+                i === totalPages - 1 ||
+                (i >= currentPage - 2 && i <= currentPage + 2)
+            ) {
+                pages.push(i + 1);
+            }
+        }
+
+        return (
+            <div className="flex space-x-2">
+                <button
+                    onClick={() => handlePageChange(0)}
+                    disabled={currentPage === 0}
+                    className="border border-gray-300 text-gray-600 px-4 py-2 rounded-md text-sm hover:bg-gray-100"
+                >
+                    Đầu
+                </button>
+                {pages.map((page, index) => (
+                    <button
+                        key={index}
+                        onClick={() => handlePageChange(page - 1)}
+                        className={`px-4 py-2 text-sm font-medium rounded-md ${currentPage === page - 1
+                            ? "bg-blue-500 text-white"
+                            : "bg-white text-gray-600 hover:bg-gray-100"
+                            }`}
+                    >
+                        {page}
+                    </button>
+                ))}
+                <button
+                    onClick={() => handlePageChange(totalPages - 1)}
+                    disabled={currentPage === totalPages - 1}
+                    className="border border-gray-300 text-gray-600 px-4 py-2 rounded-md text-sm hover:bg-gray-100"
+                >
+                    Cuối
+                </button>
+            </div>
+        );
     };
 
     return (
@@ -126,9 +200,9 @@ function AccountAdmin() {
                 </div>
                 <input
                     type="text"
-                    placeholder="Tìm kiếm theo email..."
+                    placeholder="Tìm kiếm theo tên đăng nhập..."
                     value={search}
-                    onChange={handleSearchChange}  // Use the new handleSearchChange function
+                    onChange={(e) => setSearch(e.target.value)}
                     className="border border-gray-300 rounded-md px-4 py-2 text-sm w-64 focus:ring-2 focus:ring-blue-500"
                 />
             </div>
@@ -156,6 +230,7 @@ function AccountAdmin() {
                             {accounts.map((account, index) => (
                                 <tr key={index} className="hover:bg-gray-50">
                                     <td className="px-4 items-center">{index + 1}</td>
+                                    <td className="px-4 items-center">{account.username}</td>
                                     <td className=" py-3 flex items-center space-x-3">
                                         <img
                                             src={account.images[0].avatarrurl || "https://firebasestorage.googleapis.com/v0/b/socialmedia-8bff2.appspot.com/o/ThuanImage%2Favt.jpg?alt=media"}
@@ -164,7 +239,7 @@ function AccountAdmin() {
                                         />
                                         <div>
                                             <p className="text-sm font-medium text-gray-700">
-                                                {account.lastname} {account.firstname}
+                                                {account.lastname}      {account.firstname}
                                             </p>
                                             <p className="text-sm text-gray-500">
                                                 {account.email}
@@ -183,9 +258,24 @@ function AccountAdmin() {
                                                 type="checkbox"
                                                 className="sr-only peer"
                                                 checked={account.active}
-                                                onChange={() => { }}
+                                                onChange={() => {
+                                                    setSelectedAccount(account);
+                                                    openPasswordPopup(account)
+                                                }}
                                             />
+                                            <div className="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 transition-all dark:border-gray-600 peer-checked:bg-teal-600"></div>
                                         </label>
+                                    </td>
+                                    <td className="px-1 py-3 text-right">
+                                        {account.roles.role !== "Admin" && (
+                                            <button
+                                                className="text-blue-500 hover:text-blue-700"
+                                                onClick={() => handleViewDetails(account)}
+
+                                            >
+                                                Chi tiết
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -198,7 +288,45 @@ function AccountAdmin() {
                 <p className="text-sm text-gray-600">
                     Trang {currentPage + 1} / {totalPages}
                 </p>
+                {renderPagination()}
             </div>
+            {showPopup && (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-96 max-w-sm">
+                        <h3 className="text-xl font-semibold mb-6 text-center text-gray-800">
+                            Bạn muốn
+                            <span className="font-bold text-blue-500">
+                                {selectedAccount?.active ? " khoá " : " kích hoạt "}
+                            </span>
+                            tài khoản  {selectedAccount?.lastname} {selectedAccount?.firstname}?
+                        </h3>
+
+                        <input
+                            type="password"
+                            placeholder="Mật khẩu"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full border border-gray-300 rounded-md px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        />
+                        <div className="flex justify-end items-center">
+                            <button
+                                className="bg-gray-200 me-3 text-gray-700 hover:bg-gray-300 transition rounded-md px-6 py-2"
+                                onClick={() => setShowPopup(false)}
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                className="bg-blue-600 text-white hover:bg-blue-700 transition rounded-md px-6 py-2"
+                                onClick={handleLockUnlock}
+                            >
+                                Xác nhận
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
         </div>
     );
 }
