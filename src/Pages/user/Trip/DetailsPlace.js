@@ -106,7 +106,7 @@ const DetailsPlace = () => {
       return;
     }
 
-    const currentDateTime = new Date(); 
+    const currentDateTime = new Date();
     const formattedCurrentDateTime = currentDateTime.toLocaleString('vi-VN', {
       hour: '2-digit',
       minute: '2-digit',
@@ -132,9 +132,9 @@ const DetailsPlace = () => {
       tripName,
       startDate: startDateTime.toISOString(),
       endDate: endDateTime.toISOString(),
-      description: selectedCard.description,
+      description: tripDescription,
       placeId: selectedCard.id,
-      note: tripDescription,
+      note: selectedCard.description,
     };
 
     TripService.createTrip(username, tripData)

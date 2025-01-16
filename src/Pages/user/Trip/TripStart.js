@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import TripService from "../../../Services/user/TripService";
 import ConfirmationModal from "../../../Components/nofi/ConfirmationModal";
+import { formatDate } from "react-calendar/dist/cjs/shared/dateFormatter.js";
 
 const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
   const placeImageUrl = trip.placetrips?.[0]?.placeid?.placeimages?.[0]?.image;
@@ -27,6 +28,24 @@ const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
       }
     )}`;
   };
+
+  const formatTimestamp = (timestamp) => {
+    const options = {
+      weekday: "short",  // Hiển thị thứ
+      year: "numeric",   // Hiển thị năm
+      month: "short",    // Hiển thị tháng (viết tắt)
+      day: "numeric",    // Hiển thị ngày
+      hour: "2-digit",   // Hiển thị giờ
+      minute: "2-digit", // Hiển thị phút
+      second: "2-digit", // Hiển thị giây
+      hour12: false,     // Sử dụng định dạng 24 giờ
+    };
+    return new Date(timestamp).toLocaleString("vi-VN", {
+      ...options,
+      timeZone: "Asia/Ho_Chi_Minh", // Đặt múi giờ Việt Nam
+    });
+  };
+
 
   const tripIsPast = isPastTrip(trip.startdate, trip.enddate);
 
@@ -71,7 +90,7 @@ const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
           >
             ❌
           </button>
-          <p className="text-lg text-gray-600 mb-3">{trip.description}</p>
+          <p className="text-lg text-gray-600 mb-3">Ghi chú: {trip.description}</p>
 
           <p className="text-sm text-gray-600 flex items-center mb-2">
             <FaRegClock className="mr-2 text-gray-500" />
@@ -145,32 +164,47 @@ const TripPage = () => {
   const navigate = useNavigate();
   const username = Cookies.get("username");
 
-
+  const formatTimestamp = (timestamp) => {
+    const options = {
+      weekday: "short",  // Hiển thị thứ
+      year: "numeric",   // Hiển thị năm
+      month: "short",    // Hiển thị tháng (viết tắt)
+      day: "numeric",    // Hiển thị ngày
+      hour: "2-digit",   // Hiển thị giờ
+      minute: "2-digit", // Hiển thị phút
+      second: "2-digit", // Hiển thị giây
+      hour12: false,     // Sử dụng định dạng 24 giờ
+    };
+    return new Date(timestamp).toLocaleString("vi-VN", {
+      ...options,
+      timeZone: "Asia/Ho_Chi_Minh", // Đặt múi giờ Việt Nam
+    });
+  };
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:8080/api/user/trip/tripplace/${username}`)
-      .then((response) => {
-        const sortedTrips = response.data.sort(
-          (a, b) => new Date(b.startdate) - new Date(a.startdate)
-        );
-        setTrips(sortedTrips);
-        setFilteredTrips(sortedTrips);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Không thể tải danh sách chuyến đi");
-        setLoading(false);
-      });
+    const fetchTrips = () => {
+      axios
+        .get(`http://localhost:8080/api/user/trip/tripplace/${username}`)
+        .then((response) => {
+          const sortedTrips = response.data.sort(
+            (a, b) => new Date(b.startdate) - new Date(a.startdate)
+          );
+          setTrips(sortedTrips);
+          setFilteredTrips(sortedTrips);
+          setLoading(false);
+        })
+        .catch(() => {
+          setError("Không thể tải danh sách chuyến đi");
+          setLoading(false);
+        });
+    };
+    fetchTrips();
 
-    axios
-      .get(`http://localhost:8080/api/friend-requests/${username}`)
-      .then((response) => {
-        setFriends(response.data);
-      })
-      .catch(() => {
-        toast.error("Không thể tải danh sách bạn bè.");
-      });
+    const interval = setInterval(() => {
+      fetchTrips();
+    }, 1200);
+
+    return () => clearInterval(interval);
   }, [username]);
 
   const handleAddTrip = () => {
@@ -183,13 +217,38 @@ const TripPage = () => {
   };
 
   const handleUpdateTrip = (trip) => {
+    // Hàm định dạng timestamp thành chuỗi ngày giờ cụ thể
+    const formatTimestamp = (timestamp) => {
+      const options = {
+        weekday: "short",  // Hiển thị thứ
+        year: "numeric",   // Hiển thị năm
+        month: "short",    // Hiển thị tháng (viết tắt)
+        day: "numeric",    // Hiển thị ngày
+        hour: "2-digit",   // Hiển thị giờ
+        minute: "2-digit", // Hiển thị phút
+        second: "2-digit", // Hiển thị giây
+        hour12: false,     // Sử dụng định dạng 24 giờ
+      };
+      return new Date(timestamp).toLocaleString("vi-VN", {
+        ...options,
+        timeZone: "Asia/Ho_Chi_Minh", // Đặt múi giờ Việt Nam
+      });
+    };
+
+    // Định dạng các thời điểm trong trip
+    const formattedStartDate = formatTimestamp(trip.startdate);
+    const formattedEndDate = formatTimestamp(trip.enddate);
+    const formattedCreateDate = formatTimestamp(trip.createdate);
+    const formattedTime = formatTimestamp(new Date()); // Thời điểm hiện tại
+
+    // Cập nhật trạng thái
     setSelectedTrip(trip);
     setTripDetails({
       tripname: trip.tripname,
       description: trip.description,
-      startdate: trip.startdate,
-      enddate: trip.enddate,
-      createdate: trip.createdate,
+      startdate: formattedStartDate,
+      enddate: formattedEndDate,
+      createdate: formattedCreateDate,
     });
     setShowUpdateModal(true);
   };
@@ -198,48 +257,33 @@ const TripPage = () => {
     setTrips((prevTrips) => prevTrips.filter((trip) => trip.tripid !== tripid));
   };
 
-  const handleAddFriendToTrip = () => {
-    if (selectedFriend) {
-      axios
-        .post(`http://localhost:8080/api/trips/${selectedTrip.id}/add-friend`, {
-          friendId: selectedFriend,
-        })
-        .then(() => {
-          toast.success("Bạn đã thêm bạn đồng hành vào chuyến đi.");
-          setShowAddFriendsModal(false);
-        })
-        .catch(() => {
-          toast.error("Thêm bạn đồng hành thất bại.");
-        });
-    } else {
-      toast.warning("Chưa chọn bạn bè.");
-    }
-  };
   const handleUpdateTripDetails = () => {
     const { description, startdate, enddate } = tripDetails;
 
-    const startDateTime = new Date(startdate);
-    const endDateTime = new Date(enddate);
+    const startDateTime = startdate ? new Date(startdate) : new Date(selectedTrip.startDate);
+    const endDateTime = enddate ? new Date(enddate) : new Date(selectedTrip.endDate);
 
+    // Kiểm tra nếu ngày bắt đầu >= ngày kết thúc
     if (startDateTime >= endDateTime) {
-      toast.error("❗ Ngày bắt đầu phải trước ngày kết thúc.");
+      toast.error("Ngày bắt đầu phải trước ngày kết thúc.");
       return;
     }
-    const formattedStartDate = startDateTime.toLocaleString('vi-VN', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-    const formattedEndDate = endDateTime.toLocaleString('vi-VN', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+
+    // Kiểm tra nếu thời gian kết thúc ít nhất 30 phút sau thời gian bắt đầu
+    const timeDifference = endDateTime - startDateTime;
+    const thirtyMinutesInMilliseconds = 30 * 60 * 1000;
+
+    if (timeDifference < thirtyMinutesInMilliseconds) {
+      toast.error("Thời gian kết thúc phải sau ít nhất 30 phút từ thời gian bắt đầu.");
+      return;
+    }
 
     if (selectedTrip) {
       axios
         .put(`http://localhost:8080/api/user/trip/${selectedTrip.tripid}`, {
           description,
-          startdate: formattedStartDate,
-          enddate: formattedEndDate,
+          startDate: startDateTime,
+          endDate: endDateTime,
         })
         .then(() => {
           toast.success("Cập nhật chuyến đi thành công.");
@@ -250,6 +294,7 @@ const TripPage = () => {
         });
     }
   };
+
 
   const handleFilterByDate = () => {
     if (filterStartDate && filterEndDate) {
@@ -315,45 +360,6 @@ const TripPage = () => {
         onUpdate={handleUpdateTrip}
         onAddFriends={handleAddFriends}
       />
-      {showAddFriendsModal && selectedTrip && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h3 className="text-xl font-semibold mb-4">
-              Thêm bạn bè vào chuyến đi
-            </h3>
-            <select
-              value={selectedFriend}
-              onChange={(e) => setSelectedFriend(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-md mb-4"
-            >
-              <option value="">Chọn bạn bè</option>
-              {friends.map((friend) => (
-                <option
-                  key={friend.friendUserName}
-                  value={friend.friendUserName}
-                >
-                  {friend.friendName}
-                </option>
-              ))}
-            </select>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={handleAddFriendToTrip}
-                className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
-              >
-                Thêm
-              </button>
-              <button
-                onClick={() => setShowAddFriendsModal(false)}
-                className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400"
-              >
-                Đóng
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {showUpdateModal && selectedTrip && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg w-96">
@@ -370,26 +376,28 @@ const TripPage = () => {
               }
               className="w-full p-3 border border-gray-300 rounded-md mb-4"
             />
-            <label className="block text-sm font-semibold text-gray-700">
+            <label className="block text-sm font-semibold text-gray-700 flex items-center">
               Ngày bắt đầu:
+              <p className="m-0 p-0 ml-2"> {formatTimestamp(tripDetails.startdate)}</p>
             </label>
             <input
               type="datetime-local"
               value={
-                tripDetails.startdate ? tripDetails.startdate.slice(0, 16) : ""
+                tripDetails.startdate
               }
               onChange={(e) =>
                 setTripDetails({ ...tripDetails, startdate: e.target.value })
               }
               className="w-full p-3 border border-gray-300 rounded-md mb-4"
             />
-            <label className="block text-sm font-semibold text-gray-700">
+            <label className="block text-sm font-semibold text-gray-700 flex items-center">
               Ngày kết thúc:
+              <p className="m-0 p-0 ml-2">{formatTimestamp(tripDetails.enddate)}</p>
             </label>
             <input
               type="datetime-local"
               value={
-                tripDetails.enddate ? tripDetails.enddate.slice(0, 16) : ""
+                tripDetails.enddate
               }
               onChange={(e) =>
                 setTripDetails({ ...tripDetails, enddate: e.target.value })
