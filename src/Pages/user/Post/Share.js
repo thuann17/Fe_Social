@@ -11,20 +11,23 @@ const Share = ({ share, onDelete, onNewShare }) => {
 
   const formatTimestamp = (timestamp) => {
     const options = {
-      weekday: "short", // Weekday in Vietnamese
-      year: "numeric", // Year in numeric format
-      month: "short", // Month in short format (e.g., Jan, Feb)
-      day: "numeric", // Day in numeric format
-      hour: "2-digit", // Hour in 2-digit format
-      minute: "2-digit", // Minute in 2-digit format
-      second: "2-digit", // Second in 2-digit format
-      hour12: false, // Use 24-hour time format (Vietnam typically uses 24-hour format)
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
     };
     return new Date(timestamp).toLocaleString("vi-VN", {
       ...options,
-      timeZone: "Asia/Ho_Chi_Minh", // Ensure correct timezone (Vietnam)
+      timeZone: "Asia/Ho_Chi_Minh",
     });
   };
+
+
+  const formattedTime = new Date().toLocaleString();
 
   const toggleOptionsVisibility = () => {
     setIsOptionsVisible((prevState) => !prevState);
@@ -55,7 +58,7 @@ const Share = ({ share, onDelete, onNewShare }) => {
             {share.username?.lastname} {share.username?.firstname}
           </h4>
           <span className="text-gray-500 text-sm">
-            Đã chia sẻ vào {(share.createdate)}
+            Đã chia sẻ vào {formatTimestamp(formattedTime)}
           </span>
         </div>
         <div className="ml-auto relative">

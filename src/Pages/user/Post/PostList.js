@@ -4,7 +4,7 @@ import Share from "./Share";
 import PostInput from "./Posting";
 import Service from "../../../Services/user/PostService";
 
-// Helper function to format the timestamp
+// Helper function to format the timestamp for display
 const formatTimestamp = (timestamp) => {
   const options = {
     weekday: "short", // Weekday in Vietnamese
@@ -30,43 +30,42 @@ const PostList = () => {
   // Fetch posts and shares
   const fetchData = async () => {
     setLoading(true);
-  
-
     try {
       // Fetch posts
       const postsResponse = await Service.getListPost();
       const posts = (postsResponse.data || []).map((post) => ({
         ...post,
-        type: "post", // Mark as post
-        createdAtFormatted: formatTimestamp(post.createdAt), // Format createdAt for post
+        type: "post", // Mark the type as "post"
+        createdAt: new Date(post.createdate), // Ensure createdAt is a Date object
+        createdAtFormatted: formatTimestamp(post.createdate), // Format the creation date
       }));
 
       // Fetch shares
       const sharesResponse = await Service.getListShare();
       const shares = (sharesResponse.data || []).map((share) => ({
         ...share,
-        type: "share", // Mark as share
-        createdAtFormatted: formatTimestamp(share.createdAt) // Format createdAt for share
+        type: "share", 
+        createdAt: new Date(share.createdate),
+        createdAtFormatted: formatTimestamp(share.createdate), 
       }));
 
+    
       const combinedData = [...posts, ...shares];
 
-      const sortedData = combinedData.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
+      const sortedData = combinedData.sort((a, b) => b.createdAt - a.createdAt);
 
       setContents(sortedData);
-      setError(null);
+      setError(null); 
     } catch (error) {
-      setError("Error fetching data: " + error.message);
+      setError("Error fetching data: " + error.message); // Handle errors
     } finally {
-      setLoading(false);
+      setLoading(false); // Set loading to false after data fetching is complete
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, []); // Fetch data only once on component mount
+    fetchData(); // Fetch data when the component mounts
+  }, []); // Only fetch data once on mount
 
   // Handle delete post or share
   const handleDelete = (id, type) => {
@@ -99,7 +98,7 @@ const PostList = () => {
               createdAtFormatted={content.createdAtFormatted} // Pass formatted time
             />
           ) : (
-            <Share 
+            <Share
               key={content.id}
               share={content}
               onDelete={() => handleDelete(content.id, "share")}

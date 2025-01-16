@@ -1,152 +1,144 @@
-  import React, { useState, useEffect } from "react";
-  import FullCalendar from "@fullcalendar/react";
-  import dayGridPlugin from "@fullcalendar/daygrid";
-  import interactionPlugin from "@fullcalendar/interaction";
-  import { useNavigate } from "react-router-dom";
-  import { FaCalendarAlt, FaMapMarkerAlt } from "react-icons/fa";
-  import TripService from "../../../Services/user/TripService"; // Import your TripService
-  import { toast } from "react-toastify"; // Assuming you're using toast notifications
+import React, { useState, useEffect } from "react";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { useNavigate } from "react-router-dom";
+import { FaCalendarAlt, FaMapMarkerAlt } from "react-icons/fa"; // ✅ Thêm icon
+import TripService from "../../../Services/user/TripService";
+import { toast } from "react-toastify";
 
-  const initialTrips = [
-    // Initial trip data (if needed)
-  ];
+const initialTrips = [];
 
-  const TripPlanner = () => {
-    const [tripDetails, setTripDetails] = useState({ trips: initialTrips });
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedDate, setSelectedDate] = useState("");
-    const [tripTitle, setTripTitle] = useState("");
-    const [startTime, setStartTime] = useState("");
-    const [isAddTripModalOpen, setIsAddTripModalOpen] = useState(false);
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-    const [description, setDescription] = useState("");
+const TripPlanner = () => {
+  const [tripDetails, setTripDetails] = useState({ trips: initialTrips });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
-
-    useEffect(() => {
-      // Fetch trips data from API
-      TripService.getTripStartDates()
-        .then((response) => {
-          const trips = response.map((trip) => ({
-            title: trip.tripname,
-            start: new Date(trip.startdate).toISOString(),
-          }));
-          setTripDetails({ trips });
-        })
-        .catch((error) => {
-          toast.error("Không thể lấy dữ liệu ngày bắt đầu chuyến đi.");
-          console.error(error); // Log error for debugging
-        });
-    }, []);
-
-    const handleDateSelect = (selectInfo) => {
-      setSelectedDate(selectInfo.startStr);
-      setIsModalOpen(true);
-      navigate(`/place`, {
-        state: { selectedDate: selectInfo.startStr },
-      });
+  // ✅ Hàm format thời gian
+  const formatDateTime = (dateString, showTime = true) => {
+    const options = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
     };
 
-    const handleCloseModal = () => {
-      setIsModalOpen(false);
-      setTripTitle("");
-      setStartTime("");
-    };
+    if (showTime) {
+      options.hour = "2-digit";
+      options.minute = "2-digit";
+    }
 
-    const handleOpenAddTripModal = (hour) => {
-      setStartTime(hour);
-      setIsAddTripModalOpen(true);
-    };
+    return new Date(dateString).toLocaleString("vi-VN", options);
+  };
 
-    const handleCloseModalTrip = () => {
-      setIsAddTripModalOpen(false);
-      setTripTitle("");
-      setStartTime("");
-      setStartDate("");
-      setEndDate("");
-      setDescription("");
-    };
-
-    const handleSaveTrip = (e) => {
-      e.preventDefault();
-      if (tripTitle && startDate && endDate && description) {
-        const newTrip = {
-          id: String(tripDetails.trips.length + 1), // You may want to improve this for ID generation
-          title: tripTitle,
-          start: `${startDate}T${startTime}`,
-          end: `${endDate}`,
-          description: description,
-        };
-
-        setTripDetails({ trips: [...tripDetails.trips, newTrip] });
-        handleCloseModalTrip();
-      } else {
-        alert("Vui lòng nhập đầy đủ thông tin!");
+  // ✅ Lọc mỗi ngày chỉ đánh dấu 1 lần
+  const filterUniqueTripsByDate = (trips) => {
+    const uniqueDates = new Set();
+    return trips.filter((trip) => {
+      const tripDate = formatDateTime(trip.start, false);
+      if (!uniqueDates.has(tripDate)) {
+        uniqueDates.add(tripDate);
+        return true;
       }
-    };
+      return false;
+    });
+  };
 
-    // Filter trips by the same day
-    const groupTripsByDay = (date) => {
-      const tripsOnSameDay = tripDetails.trips.filter((trip) => {
-        // Convert the trip's start date to Vietnam time (UTC+7)
-        const tripDate = new Date(trip.start)
-          .toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" })
-          .split(",")[0]; // Get the date in "MM/DD/YYYY" format
+  // ✅ Fetch dữ liệu và thêm tiêu đề cho sự kiện
+  useEffect(() => {
+    TripService.getTripStartDates()
+      .then((response) => {
+        const trips = response.map((trip) => ({
+          start: new Date(trip.startdate).toISOString(),
+        }));
 
-        // Convert the selected date to Vietnam time (UTC+7)
-        const selectedDate = new Date(date)
-          .toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" })
-          .split(",")[0]; // Get the date in "MM/DD/YYYY" format
-
-          
-        return tripDate === selectedDate; // Compare the dates
+        const uniqueTrips = filterUniqueTripsByDate(trips);
+        setTripDetails({ trips: uniqueTrips });
+      })
+      .catch((error) => {
+        toast.error("Không thể lấy dữ liệu ngày bắt đầu chuyến đi.");
+        console.error(error);
       });
+  }, []);
 
-      console.log(tripsOnSameDay);
-      return tripsOnSameDay;
-    };
+  // ✅ Xử lý khi chọn ngày
+  const handleDateSelect = (selectInfo) => {
+    setSelectedDate(selectInfo.startStr);
+    setIsModalOpen(true);
+    navigate(`/place`, {
+      state: { selectedDate: selectInfo.startStr },
+    });
+  };
 
-    const getEventContent = (eventInfo) => {
-      // Get the trips for the same day
-      const tripsOnSameDay = groupTripsByDay(eventInfo.event.startStr);
-    
-      // Only render one icon for the day if there are trips
-      if (tripsOnSameDay.length > 0) {
-        return (
-          <div className="event-content flex items-center ml-6">
-            <FaMapMarkerAlt className="mr-2 text-red-500" size="30px" />
-          </div>
-        );
-      }
-    
-      return null; // No icon if no trips are available
-    };
-    
-
+  // ✅ Hiển thị nội dung tuỳ chỉnh trong ngày sự kiện
+  const renderEventContent = (eventInfo) => {
     return (
-      <>
-        <div className="flex flex-col md:flex-row gap-6 bg-[#ebc8fe] p-6">
-          {/* Calendar Component */}
-          <div className="w-full bg-white shadow-lg rounded-md p-4">
-            <label className="block text-gray-800 font-semibold mb-4 text-lg">
-              <FaCalendarAlt className="inline mr-2" />
-              Lên lịch trình
-            </label>
-            <FullCalendar
-              plugins={[dayGridPlugin, interactionPlugin]}
-              initialView="dayGridMonth"
-              selectable
-              editable
-              locale="vi"
-              events={tripDetails.trips} // Add events data here from state
-              select={handleDateSelect}
-              eventContent={getEventContent} // Render only one icon per day
-            />
-          </div>
-        </div>
-      </>
+      <div className="custom-event">
+        <FaMapMarkerAlt className="text-red-500 inline mr-1" /> {/* ✅ Icon */}
+        <strong>{eventInfo.event.title}</strong>
+      </div>
     );
   };
 
-  export default TripPlanner;
+  // ✅ Thêm class để đánh dấu ngày có sự kiện
+  const eventClassNames = () => {
+    return "highlight-trip-day";
+  };
+
+  return (
+    <>
+      <div className="flex flex-col md:flex-row gap-6 bg-[#ebc8fe] p-6">
+        <div className="w-full bg-white shadow-lg rounded-md p-4">
+          <label className="block text-gray-800 font-semibold mb-4 text-lg">
+            <FaCalendarAlt className="inline mr-2" />
+            Lên lịch trình
+          </label>
+          <FullCalendar
+            plugins={[dayGridPlugin, interactionPlugin]}
+            initialView="dayGridMonth"
+            selectable
+            editable
+            locale="vi"
+            events={tripDetails.trips}
+            select={handleDateSelect}
+            eventContent={renderEventContent} // ✅ Hiển thị nội dung tuỳ chỉnh
+            eventClassNames={eventClassNames}
+          />
+        </div>
+      </div>
+
+      {/* ✅ Style tuỳ chỉnh cho ngày có sự kiện */}
+      <style>
+        {`
+          .highlight-trip-day {
+            background-color: #ffe6f2 !important; /* Hồng nhạt */
+            color: #e91e63 !important; /* Hồng đậm */
+            border-radius: 10px;
+            border: 2px dashed #e91e63;
+            font-weight: bold;
+            width: 30px; /* Adjust width to make it more compact */
+            height: 30px;
+          }
+
+          .highlight-trip-day:hover {
+            background-color: #f06292 !important;
+            color: white !important;
+            transform: scale(1.1);
+            transition: all 0.2s ease-in-out;
+          }
+
+          .custom-event {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            margin-left: 5px;
+          
+          }
+        `}
+      </style>
+    </>
+  );
+};
+
+export default TripPlanner;
