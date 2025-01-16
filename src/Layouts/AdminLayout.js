@@ -4,9 +4,10 @@ import AdminHeader from "../Components/admin/header";
 import SidebarAdmin from "../Components/admin/sidebar";
 import { ToastContainer } from "react-toastify";
 function AdminLayout() {
-    return (
+    return (<>
+
         <div className="flex">
-            <ToastContainer
+            <SidebarAdmin />     <ToastContainer
                 position="top-right"
                 autoClose={3000}
                 hideProgressBar={false}
@@ -16,10 +17,8 @@ function AdminLayout() {
                 pauseOnFocusLoss
                 draggable
                 pauseOnHover
+                className={"z-50"}
             />
-
-            {/* Sidebar */}
-            <SidebarAdmin />
             {/* Main Content Area */}
             <div className="flex-1 flex flex-col ml-64">
                 <AdminHeader />
@@ -27,7 +26,7 @@ function AdminLayout() {
                     <Outlet />
                 </main>
             </div>
-        </div>
+        </div></>
     );
 }
 

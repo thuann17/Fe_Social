@@ -10,7 +10,7 @@ export const register = async (
     birthday
 ) => {
     try {
-        const response = await fetch(`${API_URL}/register`, {
+        const response = await fetch(`${API_URL}/register-admin`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

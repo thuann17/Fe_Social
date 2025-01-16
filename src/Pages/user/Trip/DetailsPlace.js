@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import axios from "axios";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -40,12 +40,31 @@ const DetailsPlace = () => {
   const [tripDescription, setTripDescription] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const selectedDate = location.state?.selectedDate;
+  const selectedDate = location.state?.selectedDate; // selectedDate is passed via navigation state
   const username = Cookies.get("username");
+
+  const modalRef = useRef(null); // Create a ref to the modal
 
   useEffect(() => {
     getDetailPlace();
   }, [addressFilter]);
+
+  useEffect(() => {
+    // Close the modal when clicking outside of it
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        closeModal();
+      }
+    };
+
+    // Add event listener for clicks outside of modal
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const getDetailPlace = () => {
     axios
@@ -86,9 +105,14 @@ const DetailsPlace = () => {
       toast.error("Giá trị thời gian không hợp lệ.");
       return;
     }
-
     if (startDateTime >= endDateTime) {
-      toast.error("Thời gian bắt đầu phải trước thời gian kết thúc.");
+      toast.error("Thời gian kết thúc phải sau thời gian bắt đầu.");
+      return;
+    }
+
+    const timeDifference = (endDateTime - startDateTime) / (1000 * 60);
+    if (timeDifference < 30) {
+      toast.error("Thời gian kết thúc phải sau ít nhất 30 phút so với thời gian bắt đầu.");
       return;
     }
 
@@ -120,8 +144,6 @@ const DetailsPlace = () => {
     setTripDescription("");
   };
 
-
-
   const formatTime = (dateTime) => {
     if (!dateTime) return "";
     const date = new Date(dateTime);
@@ -140,7 +162,6 @@ const DetailsPlace = () => {
 
     return `${day}-${month}-${year}`;
   };
-
 
   return (
     <div className="container mx-auto">
@@ -161,7 +182,10 @@ const DetailsPlace = () => {
 
       {isModalVisible && selectedCard && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-lg relative">
+          <div
+            ref={modalRef} // Assign ref to modal container
+            className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-lg relative"
+          >
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
               onClick={closeModal}
@@ -192,7 +216,7 @@ const DetailsPlace = () => {
                 </label>
                 <input
                   type="time"
-                  value={startDate || formatTime(selectedDate)}
+                  value={startDate || ""}
                   onChange={(e) => setStartDate(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -204,30 +228,26 @@ const DetailsPlace = () => {
                 </label>
                 <input
                   type="time"
-                  value={endDate || formatTime(selectedDate)}
+                  value={endDate || ""}
                   onChange={(e) => setEndDate(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 font-semibold mb-2">
-                  Mô Tả Lịch Trình:
-                </label>
+                <label className="block text-gray-700 font-semibold mb-2">Ghi Chú</label>
                 <textarea
                   value={tripDescription}
                   onChange={(e) => setTripDescription(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Nhập mô tả chi tiết"
-                  rows="4"
-                  required
+                  placeholder="Mô tả chuyến đi"
                 />
               </div>
               <button
                 type="submit"
-                className="w-full bg-blue-500 text-white p-2 rounded-md mt-4 hover:bg-blue-600 transition duration-200"
+                className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600"
               >
-                Lưu Lịch Trình
+                Lưu Chuyến Đi
               </button>
             </form>
           </div>

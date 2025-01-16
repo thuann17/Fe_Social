@@ -113,7 +113,7 @@ function AccountAdmin() {
     };
     const handleViewDetails = (account) => {
         console.log(account.username);
-        navigate("/admin/account-detail", { state: { accountId: account.username } });
+        navigate("/account-detail", { state: { accountId: account.username } });
     };
 
     const renderPagination = () => {
@@ -272,7 +272,7 @@ function AccountAdmin() {
                                                 onClick={() => handleViewDetails(account)}
 
                                             >
-                                                Xem thông tin
+                                                Chi tiết
                                             </button>
                                         )}
                                     </td>
@@ -293,8 +293,13 @@ function AccountAdmin() {
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white rounded-lg shadow-lg p-6 w-96 max-w-sm">
                         <h3 className="text-xl font-semibold mb-6 text-center text-gray-800">
-                            Bạn muốn {selectedAccount?.active ? "kích hoạt" : "tạm ngưng"} tài khoản {selectedAccount?.username}?
+                            Bạn muốn
+                            <span className="font-bold text-blue-500">
+                                {selectedAccount?.active ? " khoá " : " kích hoạt "}
+                            </span>
+                            tài khoản  {selectedAccount?.lastname} {selectedAccount?.firstname}?
                         </h3>
+
                         <input
                             type="password"
                             placeholder="Mật khẩu"

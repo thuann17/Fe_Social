@@ -181,7 +181,7 @@ const Dashboard = () => {
                                             {mostActiveUser.FullName}
                                         </h2>
                                         <p className="text-gray-700">{`Năm: ${mostActiveUser.Year}`}</p>
-                                        <p className="text-gray-500">📧 {mostActiveUser.USERNAME}</p>
+
                                         <p className="text-gray-500">Số bài viết: {mostActiveUser.PostCount}</p>
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ const Dashboard = () => {
                         <tr>
                             <th className="py-2 px-4">#</th>
                             <th className="py-2 px-4">Tài khoản</th>
-                            <th className="py-2 px-4">Mức độ phổ biến</th>
+                            <th className="py-2 px-4">Số bài đăng</th>
                         </tr>
                     </thead>
                     <tbody>

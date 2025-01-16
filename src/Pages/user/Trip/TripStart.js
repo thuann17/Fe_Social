@@ -19,7 +19,7 @@ const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
     return tripStartDate < currentDate && tripEndDate < currentDate;
   };
 
-  const tripIsPast = isPastTrip(trip.startdate, trip.enddate);  
+  const tripIsPast = isPastTrip(trip.startdate, trip.enddate);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -43,10 +43,9 @@ const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
 
   return (
     <>
-       <li
-        className={`relative flex p-5 bg-white rounded-lg shadow-md mb-5 ${
-          tripIsPast ? "opacity-50 bg-gray-500" : "" // Apply dimming if it's a past trip
-        }`}
+      <li
+        className={`relative flex p-5 bg-white rounded-lg shadow-md mb-5 ${tripIsPast ? "opacity-50 bg-gray-500" : "" // Apply dimming if it's a past trip
+          }`}
       >
         <img
           src={placeImageUrl || "default-image-url.jpg"}
@@ -143,11 +142,10 @@ const TripPage = () => {
     enddate: "",
     createdate: "",
   });
-  const [filteredTrips, setFilteredTrips] = useState([]);
   const [filterStartDate, setFilterStartDate] = useState("");
+  const [filterEndDate, setFilterEndDate] = useState("");
+  const [filteredTrips, setFilteredTrips] = useState(trips);
 
-    // Function to check if the trip's start and end dates are in the past
-   
 
   const navigate = useNavigate();
   const username = Cookies.get("username");
@@ -258,13 +256,15 @@ const TripPage = () => {
     }
   };
 
-  const handleFilterByStartDate = () => {
-    if (filterStartDate) {
-      const filtered = trips.filter(
-        (trip) =>
-          new Date(trip.startdate).toLocaleDateString("vi-VN") ===
-          new Date(filterStartDate).toLocaleDateString("vi-VN")
-      );
+  const handleFilterByDate = () => {
+    if (filterStartDate && filterEndDate) {
+      const filtered = trips.filter((trip) => {
+        const tripStartDate = new Date(trip.startdate).toLocaleDateString("vi-VN");
+        const tripEndDate = new Date(trip.enddate).toLocaleDateString("vi-VN");
+        const filterStart = new Date(filterStartDate).toLocaleDateString("vi-VN");
+        const filterEnd = new Date(filterEndDate).toLocaleDateString("vi-VN");
+        return tripStartDate >= filterStart && tripEndDate <= filterEnd;
+      });
       setFilteredTrips(filtered);
     } else {
       setFilteredTrips(trips);
@@ -279,23 +279,33 @@ const TripPage = () => {
       <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">
         Danh sách chuyến đi:
       </h2>
-      <div className="mb-4 flex items-center">
-        <label className="block text-sm font-semibold text-gray-700 mr-4">
+      <div className="mb-4 flex justify-between items-center">
+        <label className="block text-ml font-semibold text-gray-700 mr-4">
           Tìm kiếm chuyến đi theo ngày:
         </label>
-        <input
-          type="date"
-          value={filterStartDate}
-          onChange={(e) => setFilterStartDate(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-md mr-4"
-        />
-        <button
-          onClick={handleFilterByStartDate}
-          className="bg-blue-300 text-white py-2 px-4 rounded-md hover:bg-blue-500"
-        >
-          🔍
-        </button>
+        <div className="flex items-center space-x-4">
+          <input
+            type="date"
+            value={filterStartDate}
+            onChange={(e) => setFilterStartDate(e.target.value)}
+            className="p-2 border border-gray-300 rounded-md"
+          />
+          <input
+            type="date"
+            value={filterEndDate}
+            onChange={(e) => setFilterEndDate(e.target.value)}
+            className="p-2 border border-gray-300 rounded-md"
+          />
+          <button
+            onClick={handleFilterByDate}
+            className="bg-blue-300 text-white py-2 px-4 rounded-md hover:bg-blue-500"
+          >
+            🔍
+          </button>
+        </div>
       </div>
+
+
       <TripList
         trips={filteredTrips}
         onDelete={handleDeleteTrip}

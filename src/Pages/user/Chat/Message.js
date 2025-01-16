@@ -21,9 +21,25 @@ function Message({ avt, messages = [], setMessages, handleSendMessage }) {
   const [image, setImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [clickedImage, setClickedImage] = useState(null);  // State to manage clicked image
   const messagesEndRef = useRef(null);
+  const emojiPickerRef = useRef(null);
 
   const userFromCookie = Cookies.get("username");
+
+  // Close emoji picker when clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleSendMessageClick = () => {
     if (uploading) return;
@@ -76,10 +92,8 @@ function Message({ avt, messages = [], setMessages, handleSendMessage }) {
     }
   };
 
-
   const handleEmojiSelect = (emoji) => {
-    setMessage((prev) => prev + emoji.native);
-    setShowEmojiPicker(false);
+    setMessage((prev) => prev + emoji.native);  // Keep adding emojis to the message
   };
 
   const handleImageChange = (e) => {
@@ -93,6 +107,14 @@ function Message({ avt, messages = [], setMessages, handleSendMessage }) {
   const clearPreviewImage = () => {
     setImage(null);
     setPreviewImage(null);
+  };
+
+  const handleImageClick = (imgSrc) => {
+    setClickedImage(imgSrc);  // Set the clicked image to display in large view
+  };
+
+  const closeModal = () => {
+    setClickedImage(null);  // Close the modal by resetting the clicked image
   };
 
   useEffect(() => {
@@ -127,7 +149,12 @@ function Message({ avt, messages = [], setMessages, handleSendMessage }) {
                   } ${msg.content === "❤️" ? "bg-transparent border-0 text-4xl" : ""}`}
               >
                 {msg.type === "image" ? (
-                  <img src={msg.content} alt="Sent Image" className="w-full h-20 rounded-lg" />
+                  <img
+                    src={msg.content}
+                    alt="Sent Image"
+                    className="w-full h-20 rounded-lg cursor-pointer"
+                    onClick={() => handleImageClick(msg.content)}  // Add click event to open image
+                  />
                 ) : (
                   <p>{msg.content}</p>
                 )}
@@ -138,6 +165,27 @@ function Message({ avt, messages = [], setMessages, handleSendMessage }) {
         ))}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Image Modal */}
+      {clickedImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"
+          onClick={closeModal}
+        >
+          <img
+            src={clickedImage}
+            alt="Large View"
+            className="max-w-full max-h-full object-contain"
+          />
+          <button
+            className="absolute top-5 right-5 text-white text-3xl"
+            onClick={closeModal}
+          >
+            ✖
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center p-2 bg-white rounded-b-lg sm:p-3 md:p-4 shadow-lg">
         <button
           className="text-gray-600 p-1 hover:bg-gray-200 rounded-full transition ease-in-out duration-300 text-2xl"
@@ -191,7 +239,7 @@ function Message({ avt, messages = [], setMessages, handleSendMessage }) {
         </button>
       </div>
       {showEmojiPicker && (
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-50">
+        <div ref={emojiPickerRef} className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-50">
           <EmojiPicker data={data} onEmojiSelect={handleEmojiSelect} theme="light" />
         </div>
       )}

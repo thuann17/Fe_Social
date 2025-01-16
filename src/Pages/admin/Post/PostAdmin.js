@@ -10,7 +10,7 @@ const POST_STATUSES = [
     { label: "Chưa khoá", value: "false" },
 ];
 
-const TABLE_HEAD = ["STT", "Tác giả", "Tiêu đề", "Ngày tạo", "Trạng thái", "Lượt yêu thích", "Lượt bình luận", ""];
+const TABLE_HEAD = ["STT", "Tác giả", "Tiêu đề", "Ngày dăng", "Trạng thái", " Yêu thích", "Bình luận", ""];
 
 function PostAdmin() {
     const [status, setStatus] = useState("all");
@@ -74,12 +74,22 @@ function PostAdmin() {
             setCurrentPage(page);
         }
     };
-
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
-        return date.toLocaleDateString("vi-VN");
+
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        };
+        return date.toLocaleString("vi-VN", options);
     };
+
+
 
     const handleShowModal = (postId) => {
         setSelectedPostId(postId); // Lưu ID bài viết được chọn
@@ -137,7 +147,7 @@ function PostAdmin() {
     return (
         <div className="bg-white shadow-md rounded-lg p-6 w-full">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-700">Quản lý bài viết</h2>
+                <h2 className="text-xl font-semibold text-gray-700">Quản lý bài đăng</h2>
             </div>
             {loading ? (
                 <div className="text-center py-4">
@@ -178,13 +188,14 @@ function PostAdmin() {
                                             </p>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3 text-sm text-gray-700">
+                                    <td className="px-4 py-3 text-sm text-gray-700 truncate max-w-xs whitespace-nowrap overflow-hidden">
                                         {post.content}
                                     </td>
 
                                     <td className="px-4 py-3 text-sm text-gray-700">
                                         {formatDate(post.createdate)}
                                     </td>
+
                                     <td className="px-4 py-3">
                                         <label className="inline-flex items-center cursor-pointer">
                                             <input
@@ -213,7 +224,7 @@ function PostAdmin() {
                                             className="text-blue-500 hover:text-blue-700"
                                             onClick={() => handleShowModal(post.id)}
                                         >
-                                            Xem thông tin
+                                            Chi tiết
                                         </button>
                                     </td>
                                 </tr>

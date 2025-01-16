@@ -178,7 +178,7 @@ const ProfileAdmin = () => {
                         <p className="text-gray-700">{formattedBirthday}</p>
                         <p className="text-gray-500">📧 {userInfo.email}</p>
                         <p className="text-gray-700">🏡 {userInfo.hometown}</p>
-                        <p className="text-gray-700">Bio: {userInfo.bio}</p>
+                        <p className="text-gray-700">Giới hiệu: {userInfo.bio}</p>
                     </div>
                 </div>
             </div>
