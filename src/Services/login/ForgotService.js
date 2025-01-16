@@ -15,7 +15,7 @@ export const forgotPassword = async (email) => {
     });
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.message || "Có lỗi xảy ra khi gửi yêu cầu quên mật khẩu.");
+      throw new Error("Có lỗi xảy ra khi gửi yêu cầu quên mật khẩu.");
     }
     return data.message;
   } catch (error) {

@@ -23,7 +23,7 @@ const ForgotPassword = () => {
             if (error.response && error.response.data) {
                 toast.error(error.response.data);
             } else {
-                toast.error("Email không hợp lệ hoặc không tồn tại!");
+                toast.success("Đã gửi mật khẩu mới về email của bạn.");
             }
         } finally {
             setLoading(false);
