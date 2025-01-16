@@ -13,7 +13,6 @@ const LoginForm = () => {
 
   const navigate = useNavigate();
 
-  // Xử lý form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -24,30 +23,32 @@ const LoginForm = () => {
 
     setLoading(true);
 
-    try {
-      const data = await login(username, password, remember);
-      const { token, role } = data;
-      Cookies.set("token", token, { expires: remember ? 365 : undefined });
-      Cookies.set("role", role, { expires: remember ? 365 : undefined });
+    const data = await login(username, password, remember);
 
-      if (remember) {
-        Cookies.set("username", username, { expires: 365 });
-      } else {
-        Cookies.set("username", username);
-      }
-
-      setTimeout(() => {
-        if (role === "Admin") {
-          navigate("/dashboard");
-        } else {
-          navigate("/index");
-        }
-      }, 2000);
-    } catch (error) {
-      toast.error("Tên đăng nhập hoặc mật khẩu không chính xác.");
-    } finally {
+    if (!data) {
+      // Handle case when login fails (data is null)
       setLoading(false);
+      return;
     }
+
+    const { token, role } = data;  // Now safely destructure since data is not null
+
+    Cookies.set("token", token, { expires: remember ? 365 : undefined });
+    Cookies.set("role", role, { expires: remember ? 365 : undefined });
+
+    if (remember) {
+      Cookies.set("username", username, { expires: 365 });
+    } else {
+      Cookies.set("username", username);
+    }
+
+    setTimeout(() => {
+      if (role === "Admin") {
+        navigate("/dashboard");
+      } else {
+        navigate("/index");
+      }
+    }, 2000);
   };
 
   return (
