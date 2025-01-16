@@ -144,10 +144,11 @@ const Post = ({ post, onDelete, onNewShare }) => {
     setShowShareModal(true);
   };
 
+  const formattedTime = new Date().toLocaleString();
   const handleSubmitShare = async () => {
     const username = Cookies.get("username");
     try {
-      const model = { content: shareContent };
+      const model = { content: shareContent, formattedTime };
       await PostService.addShare(username, post.id, model);
 
       onNewShare();

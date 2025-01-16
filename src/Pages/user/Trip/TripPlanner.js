@@ -40,6 +40,53 @@ const TripPlanner = () => {
       });
   }, []);
 
+  // ✅ Hàm format thời gian
+  const formatDateTime = (dateString, showTime = true) => {
+    const options = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    };
+
+    if (showTime) {
+      options.hour = "2-digit";
+      options.minute = "2-digit";
+    }
+
+    return new Date(dateString).toLocaleString("vi-VN", options);
+  };
+
+  // ✅ Lọc mỗi ngày chỉ đánh dấu 1 lần
+  const filterUniqueTripsByDate = (trips) => {
+    const uniqueDates = new Set();
+    return trips.filter((trip) => {
+      const tripDate = formatDateTime(trip.start, false);
+      if (!uniqueDates.has(tripDate)) {
+        uniqueDates.add(tripDate);
+        return true;
+      }
+      return false;
+    });
+  };
+
+  // ✅ Fetch dữ liệu và thêm tiêu đề cho sự kiện
+  useEffect(() => {
+    TripService.getTripStartDates()
+      .then((response) => {
+        const trips = response.map((trip) => ({
+          start: new Date(trip.startdate).toISOString(),
+        }));
+
+        const uniqueTrips = filterUniqueTripsByDate(trips);
+        setTripDetails({ trips: uniqueTrips });
+      })
+      .catch((error) => {
+        toast.error("Không thể lấy dữ liệu ngày bắt đầu chuyến đi.");
+        console.error(error);
+      });
+  }, []);
+
+  // ✅ Xử lý khi chọn ngày
   const handleDateSelect = (selectInfo) => {
     setSelectedDate(selectInfo.startStr);
     setIsModalOpen(true);
@@ -128,7 +175,6 @@ const TripPlanner = () => {
   return (
     <>
       <div className="flex flex-col md:flex-row gap-6 bg-[#ebc8fe] p-6">
-        {/* Calendar Component */}
         <div className="w-full bg-white shadow-lg rounded-md p-4">
           <label className="block text-gray-800 font-semibold mb-4 text-lg">
             <FaCalendarAlt className="inline mr-2" />
@@ -149,6 +195,129 @@ const TripPlanner = () => {
           />
         </div>
       </div>
+
+      {/* Add/Edit Trip Modal */}
+      <div
+        className={`modal ${isAddTripModalOpen ? "open" : "closed"}`}
+        onClick={handleCloseModalTrip}
+      >
+        <div className="modal-content">
+          <h2>Thêm Chuyến Đi</h2>
+          <form onSubmit={handleSaveTrip}>
+            <div className="form-group">
+              <label>Tiêu đề chuyến đi:</label>
+              <input
+                type="text"
+                value={tripTitle}
+                onChange={(e) => setTripTitle(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Ngày bắt đầu:</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Ngày kết thúc:</label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Mô tả:</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+            <button type="submit">Lưu</button>
+            <button type="button" onClick={handleCloseModalTrip}>
+              Hủy
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Custom styles */}
+      <style>
+        {`
+          .highlight-trip-day {
+            background-color: #ffe6f2 !important;
+            color: #e91e63 !important;
+            border-radius: 10px;
+            border: 2px dashed #e91e63;
+            font-weight: bold;
+            width: 30px;
+            height: 30px;
+          }
+
+          .highlight-trip-day:hover {
+            background-color: #f06292 !important;
+            color: white !important;
+            transform: scale(1.1);
+            transition: all 0.2s ease-in-out;
+          }
+
+          .custom-event {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            margin-left: 5px;
+          }
+
+          .modal {
+            display: none;
+          }
+
+          .modal.open {
+            display: block;
+          }
+
+          .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          }
+
+          .form-group {
+            margin-bottom: 15px;
+          }
+
+          .form-group label {
+            display: block;
+            margin-bottom: 5px;
+          }
+
+          .form-group input,
+          .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+          }
+
+          .form-group button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #e91e63;
+            color: white;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+          }
+
+          .form-group button[type="button"] {
+            background-color: #ccc;
+          }
+        `}
+      </style>
     </>
   );
 };

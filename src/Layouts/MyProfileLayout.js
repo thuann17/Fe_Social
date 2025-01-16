@@ -1,29 +1,49 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import MyProfile from "../Pages/user/Profile/MyProfile";
 import Post from "../Pages/user/Post/Post";
+import Share from "../Pages/user/Post/Share";
+import PostInput from "../Pages/user/Post/Posting";
 import UserService from "../Services/user/UserService";
 import PostService from "../Services/user/PostService";
 import Cookies from "js-cookie";
+
+// Helper function to format the timestamp for display
+const formatTimestamp = (timestamp) => {
+  const options = {
+    weekday: "short", // Weekday in Vietnamese
+    year: "numeric", // Year in numeric format
+    month: "short", // Month in short format (e.g., Jan, Feb)
+    day: "numeric", // Day in numeric format
+    hour: "2-digit", // Hour in 2-digit format
+    minute: "2-digit", // Minute in 2-digit format
+    second: "2-digit", // Second in 2-digit format
+    hour12: false, // Use 24-hour time format (Vietnam typically uses 24-hour format)
+  };
+  return new Date(timestamp).toLocaleString("vi-VN", {
+    ...options,
+    timeZone: "Asia/Ho_Chi_Minh", // Ensure correct timezone (Vietnam)
+  });
+};
 
 const MyProfileLayout = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [userError, setUserError] = useState(null);
   const [loadingUserInfo, setLoadingUserInfo] = useState(true);
-  const [posts, setPosts] = useState([]);
-  const [loadingPosts, setLoadingPosts] = useState(true);
-  const [postsError, setPostsError] = useState(null);
+  const [contents, setContents] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const username = Cookies.get("username");
+
+  // Fetch user info and posts/shares data
   useEffect(() => {
     if (!username) {
-      setUserError("Username is required.");
+      setUserError("Username is required. Please log in.");
       setLoadingUserInfo(false);
-      setLoadingPosts(false);
+      setLoading(false);
       return;
     }
 
-    // Fetch user info with username
     setLoadingUserInfo(true);
     UserService.getInfo(username)
       .then((data) => {
@@ -31,40 +51,60 @@ const MyProfileLayout = () => {
         setUserError(null);
       })
       .catch((err) => {
-        setUserError(
-          err.message || "An error occurred while fetching user data"
-        );
+        setUserError(err.message || "An error occurred while fetching user data");
         setUserInfo(null);
       })
       .finally(() => {
         setLoadingUserInfo(false);
       });
 
-    // Fetch user posts with username
-    setLoadingPosts(true);
-    PostService.getMyPost(username)
-      .then((response) => {
-        setPosts(response.data || []);
-        setPostsError(null);
-      })
-      .catch((error) => {
-        setPostsError("Error fetching posts: " + error.message);
-      })
-      .finally(() => {
-        setLoadingPosts(false);
-      });
-  }, [username]); // Re-run when username changes
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Fetch posts
+        const postsResponse = await PostService.getMyPost(username);
+        const posts = (postsResponse.data || []).map((post) => ({
+          ...post,
+          type: "post",
+          createdAt: new Date(post.createdate),
+          createdAtFormatted: formatTimestamp(post.createdate),
+        }));
 
-  const handleDeletePost = (postId) => {
-    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+        // Fetch shares
+        const sharesResponse = await PostService.getListShare();
+        const shares = (sharesResponse.data || []).map((share) => ({
+          ...share,
+          type: "share",
+          createdAt: new Date(share.createdate),
+          createdAtFormatted: formatTimestamp(share.createdate),
+        }));
+
+        const combinedData = [...posts, ...shares];
+        const sortedData = combinedData.sort((a, b) => b.createdAt - a.createdAt);
+
+        setContents(sortedData);
+        setError(null);
+      } catch (err) {
+        setError("Error fetching data: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [username]);
+
+  const handleDelete = (id, type) => {
+    setContents((prevContents) =>
+      prevContents.filter((content) => content.id !== id)
+    );
   };
 
-  // Loading state
-  if (loadingUserInfo || loadingPosts) {
-    return <p>Loading...</p>;
-  }
+  const handleNewContent = async () => {
+   
+   // fetchData();
+  };
 
-  // Error states
   if (userError) {
     return (
       <div className="error">
@@ -73,17 +113,12 @@ const MyProfileLayout = () => {
     );
   }
 
-  if (postsError) {
+  if (error) {
     return (
       <div className="error">
-        <h2>Error: {postsError}</h2>
+        <h2>Error: {error}</h2>
       </div>
     );
-  }
-
-  // If no user found
-  if (!userInfo) {
-    return <p>User not found.</p>;
   }
 
   return (
@@ -92,24 +127,39 @@ const MyProfileLayout = () => {
       <div className="flex-grow" style={{ paddingTop: "3px" }}>
         {/* My Profile Section */}
         <div>
-          <MyProfile userInfo={userInfo} />
+          {loadingUserInfo ? (
+            <p>Loading user info...</p>
+          ) : (
+            <MyProfile userInfo={userInfo} />
+          )}
         </div>
         <br />
 
-        {/* Post List Section */}
-        <div>
-          <div className="post-list space-y-8">
-            {posts.length === 0 && (
-              <p className="text-gray-500">Không có bài viết</p>
-            )}
-            {posts.map((post) => (
+        {/* Post Input */}
+        <PostInput onNewPost={handleNewContent} />
+
+        {/* Post and Share List */}
+        <div className="post-list space-y-8">
+          {loading && <p>Loading posts...</p>}
+          {!loading && contents.length === 0 && <p>No posts or shares available.</p>}
+          {contents.map((content) =>
+            content.type === "post" ? (
               <Post
-                key={post.id}
-                post={post}
-                onDelete={() => handleDeletePost(post.id)}
+                key={content.id}
+                post={content}
+                onDelete={() => handleDelete(content.id, "post")}
+                onNewShare={handleNewContent}
+                createdAtFormatted={content.createdAtFormatted}
               />
-            ))}
-          </div>
+            ) : (
+              <Share
+                key={content.id}
+                share={content}
+                onDelete={() => handleDelete(content.id, "share")}
+                createdAtFormatted={content.createdAtFormatted}
+              />
+            )
+          )}
         </div>
       </div>
     </div>
