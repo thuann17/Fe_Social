@@ -18,6 +18,7 @@ const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
 
     return tripStartDate < currentDate && tripEndDate < currentDate;
   };
+
   const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
     return `${date.toLocaleDateString("vi-VN")} - ${date.toLocaleTimeString(
@@ -28,24 +29,6 @@ const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
       }
     )}`;
   };
-
-  const formatTimestamp = (timestamp) => {
-    const options = {
-      weekday: "short",  // Hiển thị thứ
-      year: "numeric",   // Hiển thị năm
-      month: "short",    // Hiển thị tháng (viết tắt)
-      day: "numeric",    // Hiển thị ngày
-      hour: "2-digit",   // Hiển thị giờ
-      minute: "2-digit", // Hiển thị phút
-      second: "2-digit", // Hiển thị giây
-      hour12: false,     // Sử dụng định dạng 24 giờ
-    };
-    return new Date(timestamp).toLocaleString("vi-VN", {
-      ...options,
-      timeZone: "Asia/Ho_Chi_Minh", // Đặt múi giờ Việt Nam
-    });
-  };
-
 
   const tripIsPast = isPastTrip(trip.startdate, trip.enddate);
 
@@ -72,8 +55,9 @@ const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
   return (
     <>
       <li
-        className={`relative flex p-5 bg-white rounded-lg shadow-md mb-5 ${tripIsPast ? "opacity-50 bg-gray-500" : "" // Apply dimming if it's a past trip
-          }`}
+        className={`relative flex p-5 bg-white rounded-lg shadow-md mb-5 ${
+          tripIsPast ? "opacity-50 bg-gray-500" : "" // Apply dimming if it's a past trip
+        }`}
       >
         <img
           src={placeImageUrl || "default-image-url.jpg"}
@@ -90,7 +74,9 @@ const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
           >
             ❌
           </button>
-          <p className="text-lg text-gray-600 mb-3">Ghi chú: {trip.description}</p>
+          <p className="text-lg text-gray-600 mb-3">
+            Ghi chú: {trip.description}
+          </p>
 
           <p className="text-sm text-gray-600 flex items-center mb-2">
             <FaRegClock className="mr-2 text-gray-500" />
@@ -105,7 +91,6 @@ const TripItem = ({ trip, onDelete, onUpdate, onAddFriends }) => {
           </p>
 
           <div className="flex justify-end gap-2">
-
             <button
               onClick={() => onUpdate(trip)}
               className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
@@ -166,14 +151,14 @@ const TripPage = () => {
 
   const formatTimestamp = (timestamp) => {
     const options = {
-      weekday: "short",  // Hiển thị thứ
-      year: "numeric",   // Hiển thị năm
-      month: "short",    // Hiển thị tháng (viết tắt)
-      day: "numeric",    // Hiển thị ngày
-      hour: "2-digit",   // Hiển thị giờ
-      minute: "2-digit", // Hiển thị phút
-      second: "2-digit", // Hiển thị giây
-      hour12: false,     // Sử dụng định dạng 24 giờ
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
     };
     return new Date(timestamp).toLocaleString("vi-VN", {
       ...options,
@@ -199,12 +184,6 @@ const TripPage = () => {
         });
     };
     fetchTrips();
-
-    const interval = setInterval(() => {
-      fetchTrips();
-    }, 1200);
-
-    return () => clearInterval(interval);
   }, [username]);
 
   const handleAddTrip = () => {
@@ -220,14 +199,14 @@ const TripPage = () => {
     // Hàm định dạng timestamp thành chuỗi ngày giờ cụ thể
     const formatTimestamp = (timestamp) => {
       const options = {
-        weekday: "short",  // Hiển thị thứ
-        year: "numeric",   // Hiển thị năm
-        month: "short",    // Hiển thị tháng (viết tắt)
-        day: "numeric",    // Hiển thị ngày
-        hour: "2-digit",   // Hiển thị giờ
+        weekday: "short", // Hiển thị thứ
+        year: "numeric", // Hiển thị năm
+        month: "short", // Hiển thị tháng (viết tắt)
+        day: "numeric", // Hiển thị ngày
+        hour: "2-digit", // Hiển thị giờ
         minute: "2-digit", // Hiển thị phút
         second: "2-digit", // Hiển thị giây
-        hour12: false,     // Sử dụng định dạng 24 giờ
+        hour12: false, // Sử dụng định dạng 24 giờ
       };
       return new Date(timestamp).toLocaleString("vi-VN", {
         ...options,
@@ -260,8 +239,12 @@ const TripPage = () => {
   const handleUpdateTripDetails = () => {
     const { description, startdate, enddate } = tripDetails;
 
-    const startDateTime = startdate ? new Date(startdate) : new Date(selectedTrip.startDate);
-    const endDateTime = enddate ? new Date(enddate) : new Date(selectedTrip.endDate);
+    const startDateTime = startdate
+      ? new Date(startdate)
+      : new Date(selectedTrip.startDate);
+    const endDateTime = enddate
+      ? new Date(enddate)
+      : new Date(selectedTrip.endDate);
 
     // Kiểm tra nếu ngày bắt đầu >= ngày kết thúc
     if (startDateTime >= endDateTime) {
@@ -274,7 +257,9 @@ const TripPage = () => {
     const thirtyMinutesInMilliseconds = 30 * 60 * 1000;
 
     if (timeDifference < thirtyMinutesInMilliseconds) {
-      toast.error("Thời gian kết thúc phải sau ít nhất 30 phút từ thời gian bắt đầu.");
+      toast.error(
+        "Thời gian kết thúc phải sau ít nhất 30 phút từ thời gian bắt đầu."
+      );
       return;
     }
 
@@ -295,20 +280,37 @@ const TripPage = () => {
     }
   };
 
-
   const handleFilterByDate = () => {
     if (filterStartDate && filterEndDate) {
+      let filterStart = new Date(filterStartDate);
+      let filterEnd = new Date(filterEndDate);
+
+      // Tự động đặt filterEndDate là ngày tiếp theo của filterStartDate nếu filterEndDate nhỏ hơn filterStartDate
+      if (filterEnd < filterStart) {
+        filterEnd = new Date(filterStart);
+        filterEnd.setDate(filterEnd.getDate() + 1); // Thêm 1 ngày
+        setFilterEndDate(filterEnd.toISOString().split("T")[0]); // Cập nhật state với định dạng YYYY-MM-DD
+      }
+
       const filtered = trips.filter((trip) => {
-        const tripStartDate = new Date(trip.startdate).toLocaleDateString("vi-VN");
-        const tripEndDate = new Date(trip.enddate).toLocaleDateString("vi-VN");
-        const filterStart = new Date(filterStartDate).toLocaleDateString("vi-VN");
-        const filterEnd = new Date(filterEndDate).toLocaleDateString("vi-VN");
+        const tripStartDate = new Date(trip.startdate);
+        const tripEndDate = new Date(trip.enddate);
+
         return tripStartDate >= filterStart && tripEndDate <= filterEnd;
       });
+
       setFilteredTrips(filtered);
     } else {
-      setFilteredTrips(trips);
+      setFilteredTrips(trips); // Hiển thị tất cả nếu không có bộ lọc
     }
+  };
+  const isFormatted = (date) => {
+    if (!date) return false; // Kiểm tra giá trị null hoặc undefined
+
+    // Kiểm tra định dạng "DD/MM/YYYY" hoặc "YYYY-MM-DD"
+    const formattedRegex = /^\d{2}\/\d{2}\/\d{4}$|^\d{4}-\d{2}-\d{2}$/;
+
+    return formattedRegex.test(date);
   };
   const handleFilterByStartDate = () => {
     if (filterStartDate) {
@@ -378,13 +380,11 @@ const TripPage = () => {
             />
             <label className="block text-sm font-semibold text-gray-700 flex items-center">
               Ngày bắt đầu:
-              <p className="m-0 p-0 ml-2"> {formatTimestamp(tripDetails.startdate)}</p>
+              <p className="m-0 p-0 ml-2">{tripDetails.startdate}</p>
             </label>
             <input
               type="datetime-local"
-              value={
-                tripDetails.startdate
-              }
+              value={tripDetails.startdate}
               onChange={(e) =>
                 setTripDetails({ ...tripDetails, startdate: e.target.value })
               }
@@ -392,13 +392,11 @@ const TripPage = () => {
             />
             <label className="block text-sm font-semibold text-gray-700 flex items-center">
               Ngày kết thúc:
-              <p className="m-0 p-0 ml-2">{formatTimestamp(tripDetails.enddate)}</p>
+              <p className="m-0 p-0 ml-2">{tripDetails.enddate}</p>
             </label>
             <input
               type="datetime-local"
-              value={
-                tripDetails.enddate
-              }
+              value={tripDetails.enddate}
               onChange={(e) =>
                 setTripDetails({ ...tripDetails, enddate: e.target.value })
               }
